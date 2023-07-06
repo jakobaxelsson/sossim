@@ -8,7 +8,19 @@ Through the simulation, the effects of different design decisions can be analyze
 
 ## Usage
 
-The package can be used either in batch mode or in interactive mode.
+The package can be used either in interactive mode or in batch mode.
+
+### Interactive mode
+
+In interactive mode, the simulator runs in the web browser using [pyscript](https://pyscript.net/). 
+The browser fetches the necessary files from a web server.
+
+To run the interactive mode locally run `python source/sossim.py -i`.
+This starts a local web server from which the files can be fetched to a browser running on the same machine.
+Then, open the link [http://127.0.0.1:8000/sossim.html](http://127.0.0.1:8000/sossim.html) in the browser.
+
+The latest commit to the Github respository is automatically published on Github pages.
+It can be accessed at [https://jakobaxelsson.github.io/sossim/source/sossim.html](https://jakobaxelsson.github.io/sossim/source/sossim.html).
 
 ### Batch mode
 
@@ -16,14 +28,6 @@ In batch mode, the simulator can be run locally from the command line.
 First, ensure that all required libraries are installed using `pip install -r requirements.txt`.
 Then, run the command `python source/sossim.py`.
 This command can take various command line options, which can be enlisted using `python source/sossim.py -h`.
-
-### Interactive mode
-
-In interactive mode, the simulator runs in the web browser using [pyscript](https://pyscript.net/). 
-The browser fetches the necessary files from a web server.
-To run the interactive mode locally run `python source/sossim.py -i`.
-This starts a local web server from which the files can be fetched to a browser running on the same machine.
-Then, open the link [http://127.0.0.1:8000/sossim.html](http://127.0.0.1:8000/sossim.html) in the browser.
 
 ## Implementation
 
