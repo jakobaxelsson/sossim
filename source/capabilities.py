@@ -75,21 +75,15 @@ class MoveCapability(Capability):
         if not rnw.has_edge(self.agent.pos, self.target):
             return False
 
-        # If there is a vehicle in that position.
+        # There is a vehicle in the new node position, and we don't know if it will move or not.
         if rnw.nodes[self.target]["agent"]:
             return False
         
         # Priority rules of a roundabout prevents a move.
-        # Determine direction of travel (x - x', y - y'), where (x, y) is current and (x', y') is new pos.
-        # Use this to lookup delta to the square to consider.
-        (x, y) = self.target
-        delta = (x - self.agent.pos[0], y - self.agent.pos[1])
-        (prio_x, prio_y) = { (0, -1) : (-1, 0), (-1, 0): (0, 1), (0, 1) : (1, 0), (1, 0) : (0, -1) }[delta]
-        priority_pos = (x + prio_x, y + prio_y)
-        if rnw.has_edge(priority_pos, self.target) and rnw.nodes[priority_pos]["agent"]:
+        if any(rnw.nodes[priority_pos]["agent"] for priority_pos in self.agent.model.space.priority_nodes(self.agent.pos, self.target)):
             return False
 
-        # TODO: The agent has sufficient energy.
+        # TODO: The agent has insufficient energy.
         pass
 
         return super().precondition()

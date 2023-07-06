@@ -14,6 +14,8 @@ Edge = Tuple[Node, Node]
 
 # Auxiliary functions to calculate neighbours of a coordinate in the grid.
 
+directions = {"N" : (0, -1), "E" : (1, 0), "S" : (0, 1), "W" : (-1, 0)}
+
 def node_to(node: Node, direction: str) -> Node:
     """
     Returns the node neighbouring the given node in the given direction
@@ -25,8 +27,23 @@ def node_to(node: Node, direction: str) -> Node:
     Returns:
         Node: the neighbouring node.
     """
-    (dx, dy) = {"N" : (0, -1), "E" : (1, 0), "S" : (0, 1), "W" : (-1, 0)}[direction]
+    (dx, dy) = directions[direction]
     return (node[0] + dx, node[1] + dy)
+
+def direction(from_node: Node, to_node: Node) -> str:
+    """
+    Returns the direction from one node to an adjacent node.
+
+    Args:
+        from_node (Node): the source node.
+        to_node (Node): the sink node.
+
+    Returns:
+        str: direction as one of the strings "N", "E", "S", "W"
+    """
+    inverse_directions = { value : key for (key, value) in directions.items() }
+    (dx, dy) = (to_node[0] - from_node[0], to_node[1] -  from_node[1])
+    return inverse_directions[(dx, dy)]    
 
 def subnode(node: Node, i: int, j: int) -> Node:
     """
@@ -220,6 +237,30 @@ class GridNetworkSpace:
             else:
                 rnw.nodes[node]["destination"] = False
 
+    def priority_nodes(self, from_node: Node, to_node: Node) -> List[Node]:
+        """
+        Returns the nodes from which traffic has priority over from_node when going into to_node.
+
+        Args:
+            from_node (Node): the node to be checked for priority.
+            to_node (Node): the node to be checked for priority.
+
+        Returns:
+            List[Node]: a list of nodes from which vehicles have priority.
+        """
+        # In a roundabout, W has priority over S, S over E, E over N and N over W.
+        priority_rule = { "W" : "S", "S" : "E", "E" : "N", "N" : "W" }
+
+        # Determine which node has priority entering to_node.
+        priority_direction = priority_rule[direction(from_node, to_node)]
+        priority_node = node_to(to_node, priority_direction)
+
+        # If the priority node can reach to_node, return it, otherwise return nothing.
+        if self.road_network.has_edge(priority_node, to_node):
+            return [priority_node]
+        else:
+            return []
+
 class Vehicle(mesa.Agent):
 
     def __init__(self, unique_id: int, model: mesa.Model):
@@ -263,19 +304,22 @@ class Vehicle(mesa.Agent):
         """
         The first part of a simulation round when using the Mesa simultaneous activation scheduler.
         If the agent does not have a plan, it creates one.
+        Then it checks that the preconditions of the first action in the plan are fulfilled.
         """
         if not self.plan:
             self.create_plan()
+        action = self.plan[0]
+        self.ready_to_advance = action.precondition()
 
     def advance(self):
         """
         The second part of a simulation round when using the Mesa simultaneous activation scheduler.
-        If the precondition of the first action in the current plan is fullfilled, that action is carried out.
+        If the precondition of the first action in the current plan was fullfilled, that action is now carried out.
         If this leads to the action's postcondition being fulfilled, the action is removed from the plan.
         Finally, if the agent has a view, that view is updated.
         """
         action = self.plan[0]
-        if action.precondition():
+        if self.ready_to_advance:
             action.activate()
         if action.postcondition():
             self.plan = self.plan[1:]
