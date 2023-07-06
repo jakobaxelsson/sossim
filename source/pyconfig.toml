@@ -1,0 +1,9 @@
+packages = ["networkx", "numpy", "pandas"]
+
+terminal = false
+
+[splashscreen]
+enabled = false
+
+[[fetch]]
+files = ["domscript.py", "model.py", "user_interface.py", "mesa/__init__.py", "mesa/agent.py", "mesa/datacollection.py", "mesa/model.py", "mesa/space.py", "mesa/time.py"]

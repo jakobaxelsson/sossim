@@ -1,0 +1,20 @@
+# .gitignore file for SoSSim project
+
+# Python generate files
+# See https://gist.github.com/GhostofGoes/94580e76cd251972b15b4821c8a06f59
+
+# Source for the following rules: https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+# *.so
+
+# Unit test / coverage reports
+# htmlcov/
+# .coverage
+
+# .env file, which may contain secret information
+# .env

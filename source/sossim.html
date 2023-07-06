@@ -1,0 +1,34 @@
+<!-- 
+This is a small demonstration prototype for running system-of-systems simulations in the browser.
+-->
+
+<html>
+    <head>
+        <title>SoS transport simulation</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Add styling. Options:
+            - Bulma: Complex to use
+            - Pico CSS: Gives to sparse layouts for use in gui
+            - Picnic CSS: More compact, but lacks some features
+            - UIKit: Many options, but not semantic
+            Other options: https://stackdiary.com/minimal-css-frameworks/.
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/picnic/7.1.0/picnic.min.css">
+        -->
+
+        <!-- Pyscript setup -->
+        <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+        <!-- Hide pyscript tags -->
+        <style>
+            py-script { display: none; }    
+        </style>
+    </head>
+
+    <body style = "cursor: wait;">
+        <p id = "load_msg">Loading...</p>
+        <py-config src = "pyconfig.toml"></py-config>
+        <py-script src = "sossim.py"></py-script>
+        <div id = "content"></div>
+   </body>
+</html>
