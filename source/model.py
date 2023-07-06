@@ -6,6 +6,25 @@ import networkx as nx
 
 import mesa
 
+# Auxiliary functions to calculate neighbours of a coordinate in the grid.
+
+def east_of(node): 
+    return (node[0] + 1, node[1])
+
+def west_of(node): 
+    return (node[0] - 1, node[1])
+
+def north_of(node): 
+    return (node[0], node[1] - 1)
+
+def south_of(node): 
+    return (node[0], node[1] + 1)
+
+def subnode(node, i, j):
+    """
+    Returns the detailed network subnode (i, j) of a coarse network node.
+    """
+    return (node[0] * 4 + i, node[1] * 4 + j)
 
 class GridWorld:
     """
@@ -24,91 +43,93 @@ class GridWorld:
         self.generate_roads()
 
     def generate_roads(self):
-        self.coarse_network = nx.Graph()
+        self.coarse_network = cnw = nx.Graph()
         # Step 1. Create a connected graph whose nodes are a subset of the grid cells.
         node = (self.size_x // 2, self.size_y //2)
         edge_candidates = [(node, neighbour) for neighbour in self.neighbours(node)]
 
         # The number of nodes is determined by the road_density parameter.
-        while nx.number_of_nodes(self.coarse_network) < self.size_x * self.size_y * self.road_density:
+        while nx.number_of_nodes(cnw) < self.size_x * self.size_y * self.road_density:
             # Pick an edge to add, removing it from the candidates and adding it to the graph
             edge = random.choices(edge_candidates, weights = [self.edge_preference(e) for e in edge_candidates])[0]
 
             # If the sink of the new edge is new in the graph, add edges to its neighbours as new edge candidates
             node = edge[1]
-            if not self.coarse_network.has_node(node):
+            if not cnw.has_node(node):
                 edge_candidates += [(node, neighbour) for neighbour in self.neighbours(node)]
             # Add the new edge (and implicitly its nodes), and remove the edge as a candidate.
-            self.coarse_network.add_edge(*edge)
+            cnw.add_edge(*edge)
             edge_candidates.remove(edge)
 
         # Step 2. Add lanes and roundabouts.
         # Create a new graph, this time directed. Each node in the coarse graph maps to 4 x 4 nodes in the new graph.
-        self.road_network = nx.DiGraph()
+        self.road_network = rnw = nx.DiGraph()
 
-        for (x, y) in self.coarse_network:
-            if (x + 1, y) in self.coarse_network[(x, y)]: # East
-                path = [(x * 4 + 2 + i, y * 4 + 2) for i in range(4)]
-                nx.add_path(self.road_network, path, direction = "E")
-            if (x - 1, y) in self.coarse_network[(x, y)]: # West
-                path = [(x * 4 + 1 - i, y * 4 + 1) for i in range(4)]
-                nx.add_path(self.road_network, path, direction = "W")
-            if (x, y - 1) in self.coarse_network[(x, y)]: # North
-                path = [(x * 4 + 2, y * 4 + 1 - i) for i in range(4)]
-                nx.add_path(self.road_network, path, direction = "N")
-            if (x, y + 1) in self.coarse_network[(x, y)]: # South
-                path = [(x * 4 + 1, y * 4 + 2 + i) for i in range(4)]
-                nx.add_path(self.road_network, path, direction = "S")
+        for node in cnw:
+            if east_of(node) in cnw[node]: # East
+                path = [subnode(node, 2 + i, 2) for i in range(4)]
+                nx.add_path(rnw, path, direction = "E")
+            if west_of(node) in cnw[node]: # West
+                path = [subnode(node, 1 - i, 1) for i in range(4)]
+                nx.add_path(rnw, path, direction = "W")
+            if north_of(node) in cnw[node]: # North
+                path = [subnode(node, 2, 1 - i) for i in range(4)]
+                nx.add_path(rnw, path, direction = "N")
+            if south_of(node) in cnw[node]: # South
+                path = [subnode(node, 1, 2 + i) for i in range(4)]
+                nx.add_path(rnw, path, direction = "S")
 
         # Add connections for roundabouts and through roads
-        for (x, y) in self.coarse_network:
-            if self.coarse_network.degree[(x, y)] == 1:
+        for node in cnw:
+            (x, y) = node
+            if cnw.degree[node] == 1:
                 # Dead ends need to make it possible to turn around, which requires adding three out of four edges.
-                if (x + 1, y) not in self.coarse_network[(x, y)]: # No eastern neighbour
-                    self.road_network.add_edge((x * 4 + 2, y * 4 + 2), (x * 4 + 2, y * 4 + 1), direction = "N")
-                if (x - 1, y) not in self.coarse_network[(x, y)]: # No western neighbour
-                    self.road_network.add_edge((x * 4 + 1, y * 4 + 1), (x * 4 + 1, y * 4 + 2), direction = "S")
-                if (x, y - 1) not in self.coarse_network[(x, y)]: # No northern neighbour
-                    self.road_network.add_edge((x * 4 + 2, y * 4 + 1), (x * 4 + 1, y * 4 + 1), direction = "W")
-                if (x, y + 1) not in self.coarse_network[(x, y)]: # No southern neighbour
-                    self.road_network.add_edge((x * 4 + 1, y * 4 + 2), (x * 4 + 2, y * 4 + 2), direction = "E")
-            if self.coarse_network.degree[(x, y)] == 2:
+                if east_of(node) not in cnw[node]: # No eastern neighbour
+                    rnw.add_edge(subnode(node, 2, 2), subnode(node, 2, 1), direction = "N")
+                if west_of(node) not in cnw[node]: # No western neighbour
+                    rnw.add_edge(subnode(node, 1, 1), subnode(node, 1, 2), direction = "S")
+                if north_of(node) not in cnw[node]: # No northern neighbour
+                    rnw.add_edge(subnode(node, 2, 1), subnode(node, 1, 1), direction = "W")
+                if south_of(node) not in cnw[node]: # No southern neighbour
+                    rnw.add_edge(subnode(node, 1, 2), subnode(node, 2, 2), direction = "E")
+            if cnw.degree[node] == 2:
                 # Through roads
-                if (x, y - 1) in self.coarse_network[(x, y)] and (x - 1, y) in self.coarse_network[(x, y)]: # Northern and western neighbours
-                    self.road_network.add_edge((x * 4 + 1, y * 4 + 2), (x * 4 + 2, y * 4 + 2), direction = "E")
-                    self.road_network.add_edge((x * 4 + 2, y * 4 + 2), (x * 4 + 2, y * 4 + 1), direction = "N")
-                if (x, y - 1) in self.coarse_network[(x, y)] and (x, y + 1) in self.coarse_network[(x, y)]: # Northern and southern neighbours
-                    self.road_network.add_edge((x * 4 + 1, y * 4 + 1), (x * 4 + 1, y * 4 + 2), direction = "S")
-                    self.road_network.add_edge((x * 4 + 2, y * 4 + 2), (x * 4 + 2, y * 4 + 1), direction = "N")
-                if (x, y - 1) in self.coarse_network[(x, y)] and (x + 1, y) in self.coarse_network[(x, y)]: # Northern and eastern neighbours
-                    self.road_network.add_edge((x * 4 + 1, y * 4 + 1), (x * 4 + 1, y * 4 + 2), direction = "S")
-                    self.road_network.add_edge((x * 4 + 1, y * 4 + 2), (x * 4 + 2, y * 4 + 2), direction = "E")
-                if (x - 1, y) in self.coarse_network[(x, y)] and (x, y + 1) in self.coarse_network[(x, y)]: # Western and southern neighbours
-                    self.road_network.add_edge((x * 4 + 2, y * 4 + 2), (x * 4 + 2, y * 4 + 1), direction = "N")
-                    self.road_network.add_edge((x * 4 + 2, y * 4 + 1), (x * 4 + 1, y * 4 + 1), direction = "W")
-                if (x - 1, y) in self.coarse_network[(x, y)] and (x + 1, y) in self.coarse_network[(x, y)]: # Western and eastern neighbours
-                    self.road_network.add_edge((x * 4 + 2, y * 4 + 1), (x * 4 + 1, y * 4 + 1), direction = "W")
-                    self.road_network.add_edge((x * 4 + 1, y * 4 + 2), (x * 4 + 2, y * 4 + 2), direction = "E")
-                if (x, y + 1) in self.coarse_network[(x, y)] and (x + 1, y) in self.coarse_network[(x, y)]: # Southern and eastern neighbours
-                    self.road_network.add_edge((x * 4 + 2, y * 4 + 1), (x * 4 + 1, y * 4 + 1), direction = "W")
-                    self.road_network.add_edge((x * 4 + 1, y * 4 + 1), (x * 4 + 1, y * 4 + 2), direction = "S")
-            if self.coarse_network.degree[(x, y)] > 2:
+                if north_of(node) in cnw[node] and west_of(node) in cnw[node]: # Northern and western neighbours
+                    rnw.add_edge(subnode(node, 1, 2), subnode(node, 2, 2), direction = "E")
+                    rnw.add_edge(subnode(node, 2, 2), subnode(node, 2, 1), direction = "N")
+                if north_of(node) in cnw[node] and south_of(node) in cnw[node]: # Northern and southern neighbours
+                    rnw.add_edge(subnode(node, 1, 1), subnode(node, 1, 2), direction = "S")
+                    rnw.add_edge(subnode(node, 2, 2), subnode(node, 2, 1), direction = "N")
+                if north_of(node) in cnw[node] and east_of(node) in cnw[node]: # Northern and eastern neighbours
+                    rnw.add_edge(subnode(node, 1, 1), subnode(node, 1, 2), direction = "S")
+                    rnw.add_edge(subnode(node, 1, 2), subnode(node, 2, 2), direction = "E")
+                if west_of(node) in cnw[node] and south_of(node) in cnw[node]: # Western and southern neighbours
+                    rnw.add_edge(subnode(node, 2, 2), subnode(node, 2, 1), direction = "N")
+                    rnw.add_edge(subnode(node, 2, 1), subnode(node, 1, 1), direction = "W")
+                if west_of(node) in cnw[node] and east_of(node) in cnw[node]: # Western and eastern neighbours
+                    rnw.add_edge(subnode(node, 2, 1), subnode(node, 1, 1), direction = "W")
+                    rnw.add_edge(subnode(node, 1, 2), subnode(node, 2, 2), direction = "E")
+                if south_of(node) in cnw[node] and east_of(node) in cnw[node]: # Southern and eastern neighbours
+                    rnw.add_edge(subnode(node, 2, 1), subnode(node, 1, 1), direction = "W")
+                    rnw.add_edge(subnode(node, 1, 1), subnode(node, 1, 2), direction = "S")
+            if cnw.degree[(x, y)] > 2:
                 # Three and four way crossings require roundabouts, so all four edges are added.
-                self.road_network.add_edge((x * 4 + 1, y * 4 + 1), (x * 4 + 1, y * 4 + 2), direction = "S")
-                self.road_network.add_edge((x * 4 + 1, y * 4 + 2), (x * 4 + 2, y * 4 + 2), direction = "E")
-                self.road_network.add_edge((x * 4 + 2, y * 4 + 2), (x * 4 + 2, y * 4 + 1), direction = "N")
-                self.road_network.add_edge((x * 4 + 2, y * 4 + 1), (x * 4 + 1, y * 4 + 1), direction = "W")
+                rnw.add_edge(subnode(node, 1, 1), subnode(node, 1, 2), direction = "S")
+                rnw.add_edge(subnode(node, 1, 2), subnode(node, 2, 2), direction = "E")
+                rnw.add_edge(subnode(node, 2, 2), subnode(node, 2, 1), direction = "N")
+                rnw.add_edge(subnode(node, 2, 1), subnode(node, 1, 1), direction = "W")
 
         # Keep track of all agents in a node
-        for node in self.road_network.nodes:
-            self.road_network.nodes[node]["agent"] = []
+        for node in rnw.nodes:
+            rnw.nodes[node]["agent"] = []
 
     def edge_preference(self, edge):
         # Returns a numerical value indicating how preferred this edge is (higher means more likely to be selected)
+        cnw = self.coarse_network
 
         # Count number of existing edges for the source and sink of the selected edge
-        nb_source_edges = self.coarse_network.degree[edge[0]] if edge[0] in self.coarse_network else 0
-        nb_sink_edges = self.coarse_network.degree[edge[1]] if edge[1] in self.coarse_network else 0
+        nb_source_edges = cnw.degree[edge[0]] if edge[0] in cnw else 0
+        nb_sink_edges = cnw.degree[edge[1]] if edge[1] in cnw else 0
 
         # Count distance of sink from center of world normalized with respect to the size of the world
         dist_x = edge[1][0] - self.size_x // 2
@@ -118,11 +139,27 @@ class GridWorld:
         # Prefer adding edges away from the center and adding new nodes (a small epsilon is added to ensure that weights > 0)
         return 50 * norm_dist / (nb_source_edges ** 2 + nb_sink_edges + 0.00001)
         
-    def neighbours(self, coordinates):
-        x, y = coordinates
-        result = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    def neighbours(self, node):
+        x, y = node
+        result = [east_of(node), west_of(node), south_of(node), north_of(node)]
         return [(x, y) for (x, y) in result if x >= 0 and y >= 0 and x < self.size_x and y < self.size_y ]
 
+    def generate_destinations(self, probability = 1):
+        """
+        Determines which nodes in the road network should be destinations.
+        Only nodes with exactly one ingoing and one outgoing edge can be a destination.
+        This is to disallow destinations in crossings.
+        
+        Args:
+            probability (int, optional): The probability that an eligible node will be selected as a destination. Defaults to 1.
+        """
+        # TODO: This requires some polishing.
+        rnw = self.road_network
+        for node in rnw.nodes:
+            if rnw.in_degree(node) == 1 and rnw.out_degree(node) == 1 and random.random() < probability:
+                rnw.nodes[node]["destination"] = True
+            else:
+                rnw.nodes[node]["destination"] = False
 
 class Vehicle(mesa.Agent):
 
@@ -199,6 +236,7 @@ class TransportSystem(mesa.Model):
 
         self.grid = GridWorld(self.width, self.height)
         self.grid.generate_roads()
+        self.grid.generate_destinations()
         if self.view:
             self.view.update(self)
         # Create agents

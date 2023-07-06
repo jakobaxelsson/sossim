@@ -107,14 +107,18 @@ class TransportSystemView:
     def update(self, model):
         # Draw grid world, clearing any previous graphics
         self.cell_size = cs = min(self.width // model.width, self.height // model.height) / 4
+        rnw = model.grid.road_network
         with dom().query("#map_background") as m:
             m["width"] = self.cell_size * model.width * 4
             m["height"] = self.cell_size * model.height * 4
         with dom().query("#road_network", clear = True):
-            for ((x1, y1), (x2, y2)) in model.grid.road_network.edges():
+            for ((x1, y1), (x2, y2)) in rnw.edges():
                 line(x1 = x1 * cs + cs/2, 
                      y1 = y1 * cs + cs/2, 
                      x2 = x2 * cs + cs/2, 
                      y2 = y2 * cs + cs/2, 
                      stroke = "lightslategray", stroke_width = cs * 0.8, stroke_linecap = "round")
+                # Visualize destinations                
+                if rnw.nodes[(x1, y1)]["destination"]:
+                    circle(cx =  x1 * cs + cs/2, cy = y1 * cs + cs/2, r = cs/4, fill = "darkgray")
         dom().query("#vehicles", clear = True)
