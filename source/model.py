@@ -4,6 +4,7 @@ import sys
 
 import networkx as nx
 
+import capabilities
 import mesa
 
 # Auxiliary functions to calculate neighbours of a coordinate in the grid.
@@ -26,7 +27,13 @@ def subnode(node, i, j):
     """
     return (node[0] * 4 + i, node[1] * 4 + j)
 
-class GridWorld:
+def supernode(node):
+    """
+    Returns the coarse network node corresponding to a detailed road network node.
+    """
+    return (node[0] // 4, node[1] // 4)
+
+class GridNetworkSpace:
     """
     A grid world containing a road network.
     """
@@ -39,11 +46,13 @@ class GridWorld:
         self.coarse_network = None
         self.road_network = None
 
-        # Generate roads
+        # Generate roads and destinations
         self.generate_roads()
+        self.generate_destinations()
 
     def generate_roads(self):
         self.coarse_network = cnw = nx.Graph()
+
         # Step 1. Create a connected graph whose nodes are a subset of the grid cells.
         node = (self.size_x // 2, self.size_y //2)
         edge_candidates = [(node, neighbour) for neighbour in self.neighbours(node)]
@@ -140,7 +149,6 @@ class GridWorld:
         return 50 * norm_dist / (nb_source_edges ** 2 + nb_sink_edges + 0.00001)
         
     def neighbours(self, node):
-        x, y = node
         result = [east_of(node), west_of(node), south_of(node), north_of(node)]
         return [(x, y) for (x, y) in result if x >= 0 and y >= 0 and x < self.size_x and y < self.size_y ]
 
@@ -169,7 +177,7 @@ class Vehicle(mesa.Agent):
         self.capacity = random.choice([1, 2, 3])
 
         # Randomly select a starting position which is not yet occupied by some other vehicle.
-        rnw = self.model.grid.road_network
+        rnw = self.model.space.road_network
         available_positions = [p for p in rnw.nodes if not rnw.nodes[p]["agent"]]
         self.pos = random.choice(available_positions)
         rnw.nodes[self.pos]["agent"].append(self)
@@ -182,32 +190,21 @@ class Vehicle(mesa.Agent):
         if self.model.view:
             self.view = self.model.view.create_agent_view(self)
 
+        # Add a plan, which is a list of capability instances.
+        self.plan = []
+
     def step(self):
-        # Randomly select where to go while avoiding collisions with other vehicles.
-        new_pos = (x, y) = random.choice(list(self.model.grid.road_network.neighbors(self.pos)))
-
-        # If there is a vehicle in that position, do not move.
-        if self.model.grid.road_network.nodes[new_pos]["agent"]:
-            return
-
-        # Check if the move is allowed, with respect to the priority rules of roundabouts.
-        # Determine direction of travel (x - x', y - y'), where (x, y) is current and (x', y') is new pos.
-        # Use this to lookup delta to the square to consider.
-        # TODO: This computation should be handled in the grid object! Query it with self.pos, and get back list of available choices!
-        delta = (x - self.pos[0], y - self.pos[1])
-        (prio_x, prio_y) = { (0, -1) : (-1, 0), (-1, 0): (0, 1), (0, 1) : (1, 0), (1, 0) : (0, -1) }[delta]
-        priority_pos = (x + prio_x, y + prio_y)
-        if self.model.grid.road_network.has_edge(priority_pos, new_pos) and self.model.grid.road_network.nodes[priority_pos]["agent"]:
-            self.new_pos = self.pos
-        else:
-            self.heading = self.model.grid.road_network[self.pos][new_pos]["direction"]
-            self.new_pos = new_pos
+        if not self.plan:
+            new_pos = (x, y) = random.choice(list(self.model.space.road_network.neighbors(self.pos)))
+            self.plan = [capabilities.MoveCapability(self, new_pos)]
 
     def advance(self):
         # Move the vehicle on the grid
-        self.model.grid.road_network.nodes[self.pos]["agent"].remove(self)
-        self.model.grid.road_network.nodes[self.new_pos]["agent"].append(self)
-        self.pos = self.new_pos
+        capability = self.plan[0]
+        if capability.precondition():
+            capability.activate()
+        if capability.postcondition():
+            self.plan = self.plan[1:]
 
         # Update the position in the drawing
         if self.model.view:
@@ -216,7 +213,6 @@ class Vehicle(mesa.Agent):
 class TransportSystem(mesa.Model):
     def __init__(self):
         # TODO: Initialize from a configuration object, to make it easier to edit, load, and save it.
-        # Maybe the parameters should instead be provided to the generate function?
         self.view = None
         self.num_agents = 0
         self.width = 0
@@ -234,9 +230,7 @@ class TransportSystem(mesa.Model):
         random.seed(self.random_seed)
         self.schedule = mesa.time.SimultaneousActivation(self)
 
-        self.grid = GridWorld(self.width, self.height)
-        self.grid.generate_roads()
-        self.grid.generate_destinations()
+        self.space = GridNetworkSpace(self.width, self.height)
         if self.view:
             self.view.update(self)
         # Create agents

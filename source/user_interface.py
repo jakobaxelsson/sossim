@@ -107,7 +107,7 @@ class TransportSystemView:
     def update(self, model):
         # Draw grid world, clearing any previous graphics
         self.cell_size = cs = min(self.width // model.width, self.height // model.height) / 4
-        rnw = model.grid.road_network
+        rnw = model.space.road_network
         with dom().query("#map_background") as m:
             m["width"] = self.cell_size * model.width * 4
             m["height"] = self.cell_size * model.height * 4
