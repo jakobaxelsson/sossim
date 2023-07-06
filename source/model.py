@@ -1,3 +1,7 @@
+"""
+Provides models, agents, and spaces for the SoSSim system-of-systems simulator.
+"""
+
 import math
 import random
 import sys
