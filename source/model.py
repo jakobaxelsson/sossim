@@ -267,7 +267,7 @@ class GridNetworkSpace:
 
 class Vehicle(mesa.Agent):
 
-    def __init__(self, unique_id: int, model: mesa.Model):
+    def __init__(self, unique_id: int, model: "TransportSystem"):
         """
         Creates a vehicle agent in a simulation model.
 

@@ -25,12 +25,12 @@ if __name__ == "__main__":
                 if file.endswith(".py") and not root.endswith("mesa"):
                     path = os.path.join(root, file)
                     print(f"\nChecking {path}\n")
-                    # TODO: Follow imports was skipped due avoid reporting typing errors in mesa. However, it may be too restrictive.
-                    os.system(f"mypy --follow-imports skip {path}")
+                    os.system(f"mypy {path}")
 
     # Documentation.
     if args.docs or args.all:
         print("Generate documentation")
+        # TODO: Should remove any existing files before generating new ones.
         # Pdoc assumes that the top directory is on the path, so add it there.
         os.environ["PYTHONPATH"] = str(os.path.abspath("source"))
         os.system("pdoc ./source/capabilities ./source/model -o ./documentation --docformat google")

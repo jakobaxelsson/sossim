@@ -3,3 +3,7 @@
 
 mypy     # type checking
 pdoc     # documentation
+
+# Typing stubs to improve mypy type checking of imported packages
+networkx-stubs
+pandas-stubs
