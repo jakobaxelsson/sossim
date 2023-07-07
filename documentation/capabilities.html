@@ -293,8 +293,11 @@ capabilities    </h1>
             <div class="docstring"><p>Creates the capability for a certain agent.
 Subclasses can add parameters for how to use a certain capability.</p>
 
-<p>Args:
-    agent (mesa.Agent): the agent who should have this capability.</p>
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>agent (mesa.Agent):</strong>  the agent who should have this capability.</li>
+</ul>
 </div>
 
 
@@ -334,8 +337,11 @@ Subclasses can add parameters for how to use a certain capability.</p>
 
             <div class="docstring"><p>Checks if the precondition for executing this capability is fulfilled.</p>
 
-<p>Returns:
-    bool: True if the capability can be used, False otherwise</p>
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>bool: True if the capability can be used, False otherwise</p>
+</blockquote>
 </div>
 
 
@@ -364,8 +370,11 @@ Subclasses can add parameters for how to use a certain capability.</p>
 
             <div class="docstring"><p>Checks if the postcondition for this capability is fulfilled.</p>
 
-<p>Returns:
-    bool: True if the capability has been fulfilled, False otherwise</p>
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>bool: True if the capability has been fulfilled, False otherwise</p>
+</blockquote>
 </div>
 
 
@@ -504,9 +513,12 @@ Subclasses can add parameters for how to use a certain capability.</p>
             <div class="docstring"><p>Defines the capability of an agent to move to a new position.
 The capability can be given to an agent which has a pos attribute and has a model with a space containing a road network</p>
 
-<p>Args:
-    agent (mesa.Agent): the agent who should be given this capability.
-    new_pos (Tuple[int, int]): the new position in the space.</p>
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>agent (mesa.Agent):</strong>  the agent who should be given this capability.</li>
+<li><strong>new_pos (Tuple[int, int]):</strong>  the new position in the space.</li>
+</ul>
 </div>
 
 
@@ -572,8 +584,11 @@ The capability can be given to an agent which has a pos attribute and has a mode
 <li>TODO: The agent has sufficient energy.</li>
 </ul>
 
-<p>Returns:
-    bool: True if and only if the move is possible.</p>
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>bool: True if and only if the move is possible.</p>
+</blockquote>
 </div>
 
 
@@ -602,8 +617,11 @@ The capability can be given to an agent which has a pos attribute and has a mode
 
             <div class="docstring"><p>The postcondition of a move is that the actual position is the same as the target.</p>
 
-<p>Returns:
-    bool: True if and only if the target has been reached.</p>
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>bool: True if and only if the target has been reached.</p>
+</blockquote>
 </div>
 
 

@@ -33,4 +33,4 @@ if __name__ == "__main__":
         print("Generate documentation")
         # Pdoc assumes that the top directory is on the path, so add it there.
         os.environ["PYTHONPATH"] = str(os.path.abspath("source"))
-        os.system("pdoc ./source/capabilities ./source/model -o ./documentation")
+        os.system("pdoc ./source/capabilities ./source/model -o ./documentation --docformat google")

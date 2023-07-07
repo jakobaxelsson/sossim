@@ -264,8 +264,8 @@ model    </h1>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">size_x</span> <span class="o">=</span> <span class="n">x</span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">size_y</span> <span class="o">=</span> <span class="n">y</span>
 </span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">road_density</span> <span class="o">=</span> <span class="n">road_density</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coarse_network</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">road_network</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coarse_network</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">road_network</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
 </span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
 </span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>        <span class="c1"># Generate roads and destinations</span>
 </span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">generate_roads</span><span class="p">()</span>
@@ -477,7 +477,7 @@ model    </h1>
 </span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">create_agent_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a>
 </span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
-</span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">capabilities</span><span class="o">.</span><span class="n">Capability</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="L-298"><a href="#L-298"><span class="linenos">298</span></a>
 </span><span id="L-299"><a href="#L-299"><span class="linenos">299</span></a>    <span class="k">def</span> <span class="nf">create_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-300"><a href="#L-300"><span class="linenos">300</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -639,12 +639,18 @@ model    </h1>
 
             <div class="docstring"><p>Returns the node neighbouring the given node in the given direction</p>
 
-<p>Args:
-    node (Node): the starting node.
-    direction (str): the direction, which is "N", "E", "S", "W".</p>
+<h6 id="arguments">Arguments:</h6>
 
-<p>Returns:
-    Node: the neighbouring node.</p>
+<ul>
+<li><strong>node (Node):</strong>  the starting node.</li>
+<li><strong>direction (str):</strong>  the direction, which is "N", "E", "S", "W".</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>Node: the neighbouring node.</p>
+</blockquote>
 </div>
 
 
@@ -679,12 +685,18 @@ model    </h1>
 
             <div class="docstring"><p>Returns the direction from one node to an adjacent node.</p>
 
-<p>Args:
-    from_node (Node): the source node.
-    to_node (Node): the sink node.</p>
+<h6 id="arguments">Arguments:</h6>
 
-<p>Returns:
-    str: direction as one of the strings "N", "E", "S", "W"</p>
+<ul>
+<li><strong>from_node (Node):</strong>  the source node.</li>
+<li><strong>to_node (Node):</strong>  the sink node.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>str: direction as one of the strings "N", "E", "S", "W"</p>
+</blockquote>
 </div>
 
 
@@ -768,8 +780,8 @@ model    </h1>
 </span><span id="GridNetworkSpace-82"><a href="#GridNetworkSpace-82"><span class="linenos"> 82</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">size_x</span> <span class="o">=</span> <span class="n">x</span>
 </span><span id="GridNetworkSpace-83"><a href="#GridNetworkSpace-83"><span class="linenos"> 83</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">size_y</span> <span class="o">=</span> <span class="n">y</span>
 </span><span id="GridNetworkSpace-84"><a href="#GridNetworkSpace-84"><span class="linenos"> 84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">road_density</span> <span class="o">=</span> <span class="n">road_density</span>
-</span><span id="GridNetworkSpace-85"><a href="#GridNetworkSpace-85"><span class="linenos"> 85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coarse_network</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="GridNetworkSpace-86"><a href="#GridNetworkSpace-86"><span class="linenos"> 86</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">road_network</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="GridNetworkSpace-85"><a href="#GridNetworkSpace-85"><span class="linenos"> 85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coarse_network</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+</span><span id="GridNetworkSpace-86"><a href="#GridNetworkSpace-86"><span class="linenos"> 86</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">road_network</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
 </span><span id="GridNetworkSpace-87"><a href="#GridNetworkSpace-87"><span class="linenos"> 87</span></a>
 </span><span id="GridNetworkSpace-88"><a href="#GridNetworkSpace-88"><span class="linenos"> 88</span></a>        <span class="c1"># Generate roads and destinations</span>
 </span><span id="GridNetworkSpace-89"><a href="#GridNetworkSpace-89"><span class="linenos"> 89</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">generate_roads</span><span class="p">()</span>
@@ -983,8 +995,8 @@ Some nodes in the road networks can be destinations, where places of interest ca
 </span><span id="GridNetworkSpace.__init__-82"><a href="#GridNetworkSpace.__init__-82"><span class="linenos">82</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">size_x</span> <span class="o">=</span> <span class="n">x</span>
 </span><span id="GridNetworkSpace.__init__-83"><a href="#GridNetworkSpace.__init__-83"><span class="linenos">83</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">size_y</span> <span class="o">=</span> <span class="n">y</span>
 </span><span id="GridNetworkSpace.__init__-84"><a href="#GridNetworkSpace.__init__-84"><span class="linenos">84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">road_density</span> <span class="o">=</span> <span class="n">road_density</span>
-</span><span id="GridNetworkSpace.__init__-85"><a href="#GridNetworkSpace.__init__-85"><span class="linenos">85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coarse_network</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="GridNetworkSpace.__init__-86"><a href="#GridNetworkSpace.__init__-86"><span class="linenos">86</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">road_network</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="GridNetworkSpace.__init__-85"><a href="#GridNetworkSpace.__init__-85"><span class="linenos">85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">coarse_network</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+</span><span id="GridNetworkSpace.__init__-86"><a href="#GridNetworkSpace.__init__-86"><span class="linenos">86</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">road_network</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
 </span><span id="GridNetworkSpace.__init__-87"><a href="#GridNetworkSpace.__init__-87"><span class="linenos">87</span></a>
 </span><span id="GridNetworkSpace.__init__-88"><a href="#GridNetworkSpace.__init__-88"><span class="linenos">88</span></a>        <span class="c1"># Generate roads and destinations</span>
 </span><span id="GridNetworkSpace.__init__-89"><a href="#GridNetworkSpace.__init__-89"><span class="linenos">89</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">generate_roads</span><span class="p">()</span>
@@ -994,10 +1006,13 @@ Some nodes in the road networks can be destinations, where places of interest ca
 
             <div class="docstring"><p>Creates a grid of size (x, y), and adds a road network to it.</p>
 
-<p>Args:
-    x (int, optional): the grid size in the x dimension. Defaults to 10.
-    y (int, optional): the grid size in the y dimension. Defaults to 10.
-    road_density (float, optional): the proportion of grid elements to be connected by roads. Defaults to 0.3.</p>
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>x (int, optional):</strong>  the grid size in the x dimension. Defaults to 10.</li>
+<li><strong>y (int, optional):</strong>  the grid size in the y dimension. Defaults to 10.</li>
+<li><strong>road_density (float, optional):</strong>  the proportion of grid elements to be connected by roads. Defaults to 0.3.</li>
+</ul>
 </div>
 
 
@@ -1193,9 +1208,12 @@ The network keeps track of what agents are currently in a node.</p>
 
             <div class="docstring"><p>Adds a sequence of edges to the road network, starting in the provided node and going in the provided directions.</p>
 
-<p>Args:
-    node (Node): the start node.
-    directions (str): the direction, which is a string containing the characters N, E, S, W</p>
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>node (Node):</strong>  the start node.</li>
+<li><strong>directions (str):</strong>  the direction, which is a string containing the characters N, E, S, W</li>
+</ul>
 </div>
 
 
@@ -1230,11 +1248,17 @@ The network keeps track of what agents are currently in a node.</p>
             <div class="docstring"><p>Returns the grid neighbours of a node, taking coarse network grid boundaries into accound.
 Diagonal neighbours are not considered.</p>
 
-<p>Args:
-    node (Node): the node.</p>
+<h6 id="arguments">Arguments:</h6>
 
-<p>Returns:
-    List[Node]: the neighbours.</p>
+<ul>
+<li><strong>node (Node):</strong>  the node.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>List[Node]: the neighbours.</p>
+</blockquote>
 </div>
 
 
@@ -1273,8 +1297,11 @@ Diagonal neighbours are not considered.</p>
 Only nodes with exactly one ingoing and one outgoing edge can be a destination.
 This is to disallow destinations in crossings.</p>
 
-<p>Args:
-    probability (float, optional): The probability that an eligible node will be selected as a destination. Defaults to 1.</p>
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>probability (float, optional):</strong>  The probability that an eligible node will be selected as a destination. Defaults to 1.</li>
+</ul>
 </div>
 
 
@@ -1318,12 +1345,18 @@ This is to disallow destinations in crossings.</p>
 
             <div class="docstring"><p>Returns the nodes from which traffic has priority over from_node when going into to_node.</p>
 
-<p>Args:
-    from_node (Node): the node to be checked for priority.
-    to_node (Node): the node to be checked for priority.</p>
+<h6 id="arguments">Arguments:</h6>
 
-<p>Returns:
-    List[Node]: a list of nodes from which vehicles have priority.</p>
+<ul>
+<li><strong>from_node (Node):</strong>  the node to be checked for priority.</li>
+<li><strong>to_node (Node):</strong>  the node to be checked for priority.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>List[Node]: a list of nodes from which vehicles have priority.</p>
+</blockquote>
 </div>
 
 
@@ -1369,7 +1402,7 @@ This is to disallow destinations in crossings.</p>
 </span><span id="Vehicle-295"><a href="#Vehicle-295"><span class="linenos">295</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">create_agent_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </span><span id="Vehicle-296"><a href="#Vehicle-296"><span class="linenos">296</span></a>
 </span><span id="Vehicle-297"><a href="#Vehicle-297"><span class="linenos">297</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
-</span><span id="Vehicle-298"><a href="#Vehicle-298"><span class="linenos">298</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="Vehicle-298"><a href="#Vehicle-298"><span class="linenos">298</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">capabilities</span><span class="o">.</span><span class="n">Capability</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="Vehicle-299"><a href="#Vehicle-299"><span class="linenos">299</span></a>
 </span><span id="Vehicle-300"><a href="#Vehicle-300"><span class="linenos">300</span></a>    <span class="k">def</span> <span class="nf">create_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Vehicle-301"><a href="#Vehicle-301"><span class="linenos">301</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1450,15 +1483,18 @@ This is to disallow destinations in crossings.</p>
 </span><span id="Vehicle.__init__-295"><a href="#Vehicle.__init__-295"><span class="linenos">295</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">create_agent_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </span><span id="Vehicle.__init__-296"><a href="#Vehicle.__init__-296"><span class="linenos">296</span></a>
 </span><span id="Vehicle.__init__-297"><a href="#Vehicle.__init__-297"><span class="linenos">297</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
-</span><span id="Vehicle.__init__-298"><a href="#Vehicle.__init__-298"><span class="linenos">298</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="Vehicle.__init__-298"><a href="#Vehicle.__init__-298"><span class="linenos">298</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">capabilities</span><span class="o">.</span><span class="n">Capability</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Creates a vehicle agent in a simulation model.</p>
 
-<p>Args:
-    unique_id (int): the unique id of the agent.
-    model (mesa.Model): the model in which the agent is situated.</p>
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>unique_id (int):</strong>  the unique id of the agent.</li>
+<li><strong>model (mesa.Model):</strong>  the model in which the agent is situated.</li>
+</ul>
 </div>
 
 
@@ -1509,7 +1545,7 @@ This is to disallow destinations in crossings.</p>
                             </div>
                             <div id="Vehicle.plan" class="classattr">
                                 <div class="attr variable">
-            <span class="name">plan</span>
+            <span class="name">plan</span><span class="annotation">: List[<a href="capabilities.html#Capability">capabilities.Capability</a>]</span>
 
         
     </div>
@@ -1808,8 +1844,11 @@ Note that it is empty initially, and needs to be generated using the generate me
 
             <div class="docstring"><p>Adds a view to the model.</p>
 
-<p>Args:
-    view (Any): the view to be added.</p>
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>view (Any):</strong>  the view to be added.</li>
+</ul>
 </div>
 
 
@@ -1854,11 +1893,14 @@ Note that it is empty initially, and needs to be generated using the generate me
 
             <div class="docstring"><p>Generates the model, including creating its space and agents.</p>
 
-<p>Args:
-    N (int, optional): number of agents. Defaults to 10.
-    width (int, optional): width of the coarse grid space. Defaults to 10.
-    height (int, optional): height of the coarse grid space. Defaults to 10.
-    random_seed (int | None, optional): a random seed. Defaults to None, in which case a seed is generated.</p>
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>N (int, optional):</strong>  number of agents. Defaults to 10.</li>
+<li><strong>width (int, optional):</strong>  width of the coarse grid space. Defaults to 10.</li>
+<li><strong>height (int, optional):</strong>  height of the coarse grid space. Defaults to 10.</li>
+<li><strong>random_seed (int | None, optional):</strong>  a random seed. Defaults to None, in which case a seed is generated.</li>
+</ul>
 </div>
 
 
