@@ -25,7 +25,8 @@ if __name__ == "__main__":
                 if file.endswith(".py") and not root.endswith("mesa"):
                     path = os.path.join(root, file)
                     print(f"\nChecking {path}\n")
-                    os.system(f"mypy {path}")
+                    # TODO: Follow imports was skipped due avoid reporting typing errors in mesa. However, it may be too restrictive.
+                    os.system(f"mypy --follow-imports skip {path}")
 
     # Documentation.
     if args.docs or args.all:

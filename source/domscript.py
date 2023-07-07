@@ -29,6 +29,8 @@ TODO:
   It should set the property "display" to "initial" or "none. self.dom_element.style.setProperty("display", "initial")
 """
 
+from typing import List
+
 import js
 from pyodide.ffi import create_proxy
 
@@ -38,7 +40,7 @@ class tag:
     """
 
     # Keep av stack of surrounding contexts.
-    stack = []
+    stack: List["tag"] = []
 
     def __init__(self, tag_name, content = None, namespace = None, **attrs):
         # Create the new DOM node

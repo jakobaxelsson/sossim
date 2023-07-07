@@ -149,7 +149,7 @@ class TransportSystemView:
                 g(id = "road_network")
                 g(id = "vehicles")
 
-    def create_agent_view(self, agent: mesa.Agent) -> AgentView:
+    def create_agent_view(self, agent: mesa.Agent) -> AgentView | None:
         """
         Creates the view of an agent.
         It determines what view to use based on the class name of the agent.
@@ -158,10 +158,12 @@ class TransportSystemView:
             agent (mesa.Agent): the agent.
 
         Returns:
-            AgentView: the new agent view.
+            AgentView: the new agent view, or None if no view is available for that class of agents.
         """
         if agent.__class__.__name__ == "Vehicle":
             return VehicleView(agent, self.cell_size)
+        else:
+            return None
 
     def update_time(self, t: int):
         """

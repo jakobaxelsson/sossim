@@ -81,8 +81,8 @@ class GridNetworkSpace:
         self.size_x = x
         self.size_y = y
         self.road_density = road_density
-        self.coarse_network = None
-        self.road_network = None
+        self.coarse_network = nx.Graph()
+        self.road_network = nx.DiGraph()
 
         # Generate roads and destinations
         self.generate_roads()
@@ -294,7 +294,7 @@ class Vehicle(mesa.Agent):
             self.view = self.model.view.create_agent_view(self)
 
         # Add a plan, which is a list of capability instances.
-        self.plan = []
+        self.plan: List[capabilities.Capability] = []
 
     def create_plan(self):
         """
