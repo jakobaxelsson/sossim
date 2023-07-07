@@ -18,9 +18,9 @@ __all__ = [
     "Agent",
     "time",
     "space",
-    "visualization",
+#    "visualization",
     "DataCollector",
-    "batch_run",
+#    "batch_run",
 ]
 
 __title__ = "mesa"

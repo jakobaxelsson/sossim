@@ -42,3 +42,10 @@ However, `domscript.py` works directly on the DOM elements since it executes in 
 
 The Mesa library has some dependencies that are not possible to use in the browser.
 Therefore, a copy of the core modules of Mesa have been included in this repository. 
+
+## Development
+
+For development tasks, there is a utility called `build.py` that automates recurring development tasks, such as type checking, generating documentation, etc.
+Its features can be checked using `python build.py --help`.
+
+To install the dependencies required for using development utilities, run `pip install -r requirements_development.txt`.

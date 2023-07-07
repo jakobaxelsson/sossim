@@ -1,0 +1,5 @@
+# SoSSim requirements file for development, importing various tools for checking quality and generating documentation.
+-r requirements.txt
+
+mypy     # type checking
+pdoc     # documentation
