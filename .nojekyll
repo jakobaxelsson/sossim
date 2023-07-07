@@ -1,1 +1,2 @@
-
+This file is only included to make Github pages work properly.
+When it is present, Github just copies the repository file to pages as they are, without performing Jekyll processing.
