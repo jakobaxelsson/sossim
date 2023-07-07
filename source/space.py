@@ -59,7 +59,7 @@ def supernode(node: Node) -> Node:
     """
     return (node[0] // 4, node[1] // 4)
 
-class RoadNetworkGrid:
+class RoadNetworkGrid(mesa.space.NetworkGrid):
     """
     A mesa space consisting of a road network which is placed on a grid.
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
@@ -75,12 +75,13 @@ class RoadNetworkGrid:
             y (int, optional): the grid size in the y dimension. Defaults to 10.
             road_density (float, optional): the proportion of grid elements to be connected by roads. Defaults to 0.3.
         """
-        # Setup parameters
+        # Setup parameters and superclass
         self.size_x = x
         self.size_y = y
         self.road_density = road_density
         self.coarse_network = nx.Graph()
         self.road_network = nx.DiGraph()
+        super().__init__(self.road_network)
 
         # Generate roads and destinations
         self.generate_roads()
