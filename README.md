@@ -49,3 +49,7 @@ For development tasks, there is a utility called `build.py` that automates recur
 Its features can be checked using `python build.py --help`.
 
 To install the dependencies required for using development utilities, run `pip install -r requirements_development.txt`.
+
+## Documentation
+
+Some [documentation](https://jakobaxelsson.github.io/sossim/documentation/index.html) is available to browse and search.
