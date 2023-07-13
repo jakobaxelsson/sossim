@@ -93,7 +93,7 @@ class VehicleView(AgentView):
     """
     Renders a vehicle on the map.
     """
-    def __init__(self, model: mesa.Agent, cell_size: int):
+    def __init__(self, model: mesa.Agent):
         """
         Draws the vehicle in its initial position.
         The size of the vehicle reflects its load capacity.
@@ -102,21 +102,14 @@ class VehicleView(AgentView):
 
         Args:
             model (mesa.Agent): the agent model which the view is connected to.
-            cell_size (int): the cell size of a network node.
         """
         # Draw the vehicle
-        self.cell_size = cs = cell_size
         self.color = "#" + "".join([random.choice(list("0123456789abcdef")) for x in range(6)])
         (x, y) = model.pos
         with dom().query("#vehicles"):
             rotation = { "N" : 0, "E" : 90, "S" : 180, "W" : 270 }
-            with g(id = f"vehicle_{model.unique_id}", transform = f"translate({x * cs + cs / 2}, {y * cs + cs / 2}) rotate({rotation[model.heading]})"): 
-                x = -cs * 0.2
-                # If c = 2, y = 0.3; c = 3, y = 0.2; c = 4, y = 0.1
-                y = -cs * (model.capacity + 1) * 0.1
-                h = (model.capacity + 1) * cs * 0.2
-                w = cs * 0.4
-                rect(x = x, y = y, width = w, height = h, fill = self.color)
+            with g(id = f"vehicle_{model.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[model.heading]})"): 
+                rect(x = -0.2, y = -0.1 * (model.capacity + 1), width = 0.4, height = (model.capacity + 1) * 0.2, fill = self.color)
 
     def update(self, model: mesa.Agent):
         """
@@ -126,27 +119,26 @@ class VehicleView(AgentView):
             model (mesa.Agent): the agent model which the view is connected to.
         """
         # Update vehicle positions
-        cs = self.cell_size
         (x, y) = model.pos
         with dom().query(f"#vehicle_{model.unique_id}") as g:
             rotation = { "N" : 0, "E" : 90, "S" : 180, "W" : 270 }
-            g["transform"] = f"translate({x * cs + cs / 2}, {y * cs + cs / 2}) rotate({rotation[model.heading]})"
+            g["transform"] = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[model.heading]})"
 
 class TransportSystemView:
     """
     Provides a view of the road network.
     """
-    def __init__(self):
+    def __init__(self, model: mesa.Model):
         """
         Initiates the view of the model, which consists of a map and simulation controls.
+
+        Args:
+            model (mesa.Agent): the agent model which the view is connected to.
         """
         # Create UI elements
-        self.width = 800
-        self.height = 800
-
         with dom().query("#simulation"):
-            with svg(id = "map", width = self.width, height = self.height, style = "border: 0.5px solid black;"):
-                rect(id = "map_background", x = 0, y = 0, width = self.width, height = self.height, fill = "lightgreen")
+            with svg(id = "map", width = "100%", height = "90vh",
+                     style = "border: 0.5px solid black; background: lightgreen;"):
                 g(id = "road_network")
                 g(id = "vehicles")
 
@@ -162,7 +154,7 @@ class TransportSystemView:
             AgentView: the new agent view, or None if no view is available for that class of agents.
         """
         if agent.__class__.__name__ == "Vehicle":
-            return VehicleView(agent, self.cell_size)
+            return VehicleView(agent)
         else:
             return None
 
@@ -179,25 +171,22 @@ class TransportSystemView:
     def update(self, model: mesa.Model):
         """
         Updates the map, clearing any previous graphics.
+        When drawing the graphics, the internal scale in the SVG is one cell to one unit.
+        The viewBox is set to the entire graph, and the graphics is scaled through SVG element styling.
 
         Args:
             model (mesa.Model): the model to be reflected in the user interface.
         """
-        self.cell_size = cs = min(self.width // model.width, self.height // model.height) / 4
         rnw = model.space.road_network
-        with dom().query("#map_background") as m:
-            m["width"] = self.cell_size * model.width * 4
-            m["height"] = self.cell_size * model.height * 4
+        with dom().query("#map") as m:
+            m["viewBox"] = f"0 0 {model.width * 4} {model.height * 4}"
         with dom().query("#road_network", clear = True):
             for ((x1, y1), (x2, y2)) in rnw.edges():
-                line(x1 = x1 * cs + cs/2, 
-                     y1 = y1 * cs + cs/2, 
-                     x2 = x2 * cs + cs/2, 
-                     y2 = y2 * cs + cs/2, 
-                     stroke = "lightslategray", stroke_width = cs * 0.8, stroke_linecap = "round")
+                line(x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
+                     stroke = "lightslategray", stroke_width = 0.8, stroke_linecap = "round")
                 # Visualize destinations                
                 if rnw.nodes[(x1, y1)]["destination"]:
-                    circle(cx =  x1 * cs + cs/2, cy = y1 * cs + cs/2, r = cs/4, fill = "darkgray")
+                    circle(cx =  x1 + 0.5, cy = y1 + 0.5, r = 0.25, fill = "darkgray")
         dom().query("#vehicles", clear = True)
 
 class MenuBar:

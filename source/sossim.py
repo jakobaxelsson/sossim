@@ -17,7 +17,7 @@ def interactive_mode():
     # Create the model and the user interface.
     mod = model.TransportSystem()
     ui.UserInteface(mod)
-    mod.add_view(ui.TransportSystemView())
+    mod.add_view(ui.TransportSystemView(mod))
 #    controller = ui.SimulationController(mod)
     mod.generate()
 
