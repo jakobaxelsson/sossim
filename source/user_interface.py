@@ -62,6 +62,8 @@ class ConfigurationController:
                     self.width = input_(id = "grid_width")
                 with label("Height:"):
                     self.height = input_(id = "grid_height")
+                with label("Destination density:"):
+                    self.destination_density = input_(id = "destination_density")
                 with label("Seed:"):
                     self.random_seed = input_(id = "random_seed", value = self.model.random_seed)
                 with button("Generate", cls = "error"):
@@ -78,6 +80,8 @@ class ConfigurationController:
             args["width"] = int(self.width.dom_element.value)
         if self.height.dom_element.value:
             args["height"] = int(self.height.dom_element.value)
+        if self.destination_density.dom_element.value:
+            args["destination_density"] = float(self.destination_density.dom_element.value)
         if self.random_seed.dom_element.value:
             args["random_seed"] = int(self.random_seed.dom_element.value)
         self.model.generate(**args)
@@ -110,6 +114,16 @@ class VehicleView(AgentView):
             rotation = { "N" : 0, "E" : 90, "S" : 180, "W" : 270 }
             with g(id = f"vehicle_{model.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[model.heading]})"): 
                 rect(x = -0.2, y = -0.1 * (model.capacity + 1), width = 0.4, height = (model.capacity + 1) * 0.2, fill = self.color)
+                # When a vehicle is clicked, print some data about it to the console.
+                add_event_listener("click", lambda _: self.print_vehicle_info(model))
+
+    def print_vehicle_info(self, model):
+        print(f"Vehicle {model.unique_id} clicked.")
+        print(f"position = {model.pos}")
+        print(f"plan = {model.plan}")
+        rnw = model.model.space.road_network
+        print(f"Incoming edges from: {[n for (n, _) in rnw.in_edges(model.pos)]}")
+        print(f"Outgoing edges to: {[n for (_, n) in rnw.out_edges(model.pos)]}")
 
     def update(self, model: mesa.Agent):
         """
@@ -181,12 +195,14 @@ class TransportSystemView:
         with dom().query("#map") as m:
             m["viewBox"] = f"0 0 {model.width * 4} {model.height * 4}"
         with dom().query("#road_network", clear = True):
+            # Visualize roads
             for ((x1, y1), (x2, y2)) in rnw.edges():
                 line(x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
                      stroke = "lightslategray", stroke_width = 0.8, stroke_linecap = "round")
-                # Visualize destinations                
-                if rnw.nodes[(x1, y1)]["destination"]:
-                    circle(cx =  x1 + 0.5, cy = y1 + 0.5, r = 0.25, fill = "darkgray")
+            # Visualize destinations
+            for (x, y) in rnw.nodes():                
+                if rnw.nodes[(x, y)]["destination"]:
+                    circle(cx =  x + 0.5, cy = y + 0.5, r = 0.25, fill = "darkgray")
         dom().query("#vehicles", clear = True)
 
 class MenuBar:

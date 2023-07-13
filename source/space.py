@@ -17,6 +17,7 @@ Edge = Tuple[Node, Node]
 # Auxiliary functions to calculate neighbours of a coordinate in the grid.
 
 directions = {"N" : (0, -1), "E" : (1, 0), "S" : (0, 1), "W" : (-1, 0)}
+opposite_directions = {"N" : "S", "S" : "N", "W" : "E", "E" : "W"}
 
 def node_to(node: Node, direction: str) -> Node:
     """
@@ -66,26 +67,26 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
     Some nodes in the road networks can be destinations, where places of interest can be placed.
     """
 
-    def __init__(self, x: int = 10, y: int = 10, road_density: float = 0.3):
+    def __init__(self, size_x: int = 10, size_y: int = 10, road_density: float = 0.3, destination_density: float = 0.3):
         """
-        Creates a grid of size (x, y), and adds a road network to it.
+        Creates a grid of size (size_x, size_y), and adds a road network to it.
         
         Args:
-            x (int, optional): the grid size in the x dimension. Defaults to 10.
-            y (int, optional): the grid size in the y dimension. Defaults to 10.
+            size_x (int, optional): the grid size in the x dimension. Defaults to 10.
+            size_y (int, optional): the grid size in the y dimension. Defaults to 10.
             road_density (float, optional): the proportion of grid elements to be connected by roads. Defaults to 0.3.
         """
         # Setup parameters and superclass
-        self.size_x = x
-        self.size_y = y
+        self.size_x = size_x
+        self.size_y = size_y
         self.road_density = road_density
+        self.destination_density = destination_density
         self.coarse_network = nx.Graph()
         self.road_network = nx.DiGraph()
         super().__init__(self.road_network)
 
         # Generate roads and destinations
         self.generate_roads()
-        self.generate_destinations()
 
     def generate_roads(self):
         """
@@ -123,14 +124,19 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
 
         # Add internal connections between coarse node in detailed graph.
         for node in cnw:
+            # TODO: In each if statement, the first add destination is problematic.
             if node_to(node, "E") in cnw[node]: # East
                 self.add_edges(subnode(node, 2, 2), "EEE")
+                self.add_destination(subnode(node, 3, 2), "S")
             if node_to(node, "W") in cnw[node]: # West
                 self.add_edges(subnode(node, 1, 1), "WWW")
+                self.add_destination(subnode(node, 0, 1), "N")
             if node_to(node, "N") in cnw[node]: # North
                 self.add_edges(subnode(node, 2, 1), "NNN")
+                self.add_destination(subnode(node, 2, 0), "E")
             if node_to(node, "S") in cnw[node]: # South
                 self.add_edges(subnode(node, 1, 2), "SSS")
+                self.add_destination(subnode(node, 1, 3), "W")
 
         # Add connections for roundabouts and through roads
         for node in cnw:
@@ -139,31 +145,93 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
                 # Dead ends need to make it possible to turn around, which requires adding three out of four edges.
                 if node_to(node, "E") not in cnw[node]: # No eastern neighbour
                     self.add_edges(subnode(node, 2, 2), "N")
+                    self.add_destination(subnode(node, 2, 1), "E")
                 if node_to(node, "W") not in cnw[node]: # No western neighbour
                     self.add_edges(subnode(node, 1, 1), "S")
+                    self.add_destination(subnode(node, 1, 2), "W")
                 if node_to(node, "N") not in cnw[node]: # No northern neighbour
                     self.add_edges(subnode(node, 2, 1), "W")
+                    self.add_destination(subnode(node, 1, 1), "N")
                 if node_to(node, "S") not in cnw[node]: # No southern neighbour
                     self.add_edges(subnode(node, 1, 2), "E")
+                    self.add_destination(subnode(node, 2, 2), "S")
+                # Add further destinations on the incoming edge
+                if node_to(node, "E") in cnw[node]: # Eastern neighbour
+                    self.add_destination(subnode(node, 3, 1), "N")
+                    self.add_destination(subnode(node, 2, 1), "N")
+                if node_to(node, "W") in cnw[node]: # Western neighbour
+                    self.add_destination(subnode(node, 0, 2), "S")
+                    self.add_destination(subnode(node, 1, 2), "S")
+                if node_to(node, "N") in cnw[node]: # Northern neighbour
+                    self.add_destination(subnode(node, 1, 0), "W")
+                    self.add_destination(subnode(node, 1, 1), "W")
+                if node_to(node, "S") in cnw[node]: # Southern neighbour
+                    self.add_destination(subnode(node, 2, 3), "E")
+                    self.add_destination(subnode(node, 2, 2), "E")
             if cnw.degree[node] == 2:
                 # Through roads
                 if node_to(node, "N") in cnw[node] and node_to(node, "W") in cnw[node]: # Northern and western neighbours
                     self.add_edges(subnode(node, 1, 2), "EN")
+                    self.add_destination(subnode(node, 0, 2), "S")
+                    self.add_destination(subnode(node, 1, 2), "S")
+                    self.add_destination(subnode(node, 2, 2), "S")
+                    self.add_destination(subnode(node, 2, 1), "E")
                 if node_to(node, "N") in cnw[node] and node_to(node, "S") in cnw[node]: # Northern and southern neighbours
                     self.add_edges(subnode(node, 1, 1), "S")
                     self.add_edges(subnode(node, 2, 2), "N")
+                    self.add_destination(subnode(node, 1, 0), "W")
+                    self.add_destination(subnode(node, 1, 1), "W")
+                    self.add_destination(subnode(node, 1, 2), "W")
+                    self.add_destination(subnode(node, 2, 3), "E")
+                    self.add_destination(subnode(node, 2, 2), "E")
+                    self.add_destination(subnode(node, 2, 1), "E")
                 if node_to(node, "N") in cnw[node] and node_to(node, "E") in cnw[node]: # Northern and eastern neighbours
                     self.add_edges(subnode(node, 1, 1), "SE")
+                    self.add_destination(subnode(node, 1, 0), "W")
+                    self.add_destination(subnode(node, 1, 1), "W")
+                    self.add_destination(subnode(node, 1, 2), "W")
+                    self.add_destination(subnode(node, 2, 2), "S")
                 if node_to(node, "W") in cnw[node] and node_to(node, "S") in cnw[node]: # Western and southern neighbours
                     self.add_edges(subnode(node, 2, 2), "NW")
+                    self.add_destination(subnode(node, 2, 3), "E")
+                    self.add_destination(subnode(node, 2, 2), "E")
+                    self.add_destination(subnode(node, 2, 1), "E")
+                    self.add_destination(subnode(node, 1, 1), "N")
                 if node_to(node, "W") in cnw[node] and node_to(node, "E") in cnw[node]: # Western and eastern neighbours
                     self.add_edges(subnode(node, 2, 1), "W")
                     self.add_edges(subnode(node, 1, 2), "E")
+                    self.add_destination(subnode(node, 3, 1), "N")
+                    self.add_destination(subnode(node, 2, 1), "N")
+                    self.add_destination(subnode(node, 1, 1), "N")
+                    self.add_destination(subnode(node, 0, 2), "S")
+                    self.add_destination(subnode(node, 1, 2), "S")
+                    self.add_destination(subnode(node, 2, 2), "S")
                 if node_to(node, "S") in cnw[node] and node_to(node, "E") in cnw[node]: # Southern and eastern neighbours
                     self.add_edges(subnode(node, 2, 1), "WS")
+                    self.add_destination(subnode(node, 3, 1), "N")
+                    self.add_destination(subnode(node, 2, 1), "N")
+                    self.add_destination(subnode(node, 1, 1), "N")
+                    self.add_destination(subnode(node, 1, 2), "W")
             if cnw.degree[(x, y)] > 2:
                 # Three and four way crossings require roundabouts, so all four edges are added.
                 self.add_edges(subnode(node, 1, 1), "SENW")
+                # For three way crossings, it is possible to have two additional destinations.
+                if node_to(node, "E") not in cnw[node]: # No eastern neighbour
+                    self.add_destination(subnode(node, 2, 3), "E")
+                    self.add_destination(subnode(node, 2, 2), "E")
+                    self.add_destination(subnode(node, 2, 1), "E")
+                if node_to(node, "W") not in cnw[node]: # No western neighbour
+                    self.add_destination(subnode(node, 1, 0), "W")
+                    self.add_destination(subnode(node, 1, 1), "W")
+                    self.add_destination(subnode(node, 1, 2), "W")
+                if node_to(node, "N") not in cnw[node]: # No northern neighbour
+                    self.add_destination(subnode(node, 3, 1), "N")
+                    self.add_destination(subnode(node, 2, 1), "N")
+                    self.add_destination(subnode(node, 1, 1), "N")
+                if node_to(node, "S") not in cnw[node]: # No southern neighbour
+                    self.add_destination(subnode(node, 0, 2), "S")
+                    self.add_destination(subnode(node, 1, 2), "S")
+                    self.add_destination(subnode(node, 2, 2), "S")
 
         # Keep track of all agents in a node
         for node in rnw.nodes:
@@ -181,7 +249,26 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
         for d in directions:
             next_node = node_to(node, d)
             rnw.add_edge(node, next_node, direction = d)
+            rnw.nodes[node]["destination"] = False
             node = next_node
+
+    def add_destination(self, node: Node, direction: str):
+        """
+        Adds a destination node, as a neighbor of the given node in the indicated direction.
+        Edges are added to and from the destination from the node.
+        The destination node is indicated as such using a node attribute.
+        The probability of a destination being added is controlled by the configuration parameter destination_density.
+        
+        Args:
+            node (Node): the node to be connected to the destination.
+            direction (str): the direction from the given node to the destination.
+        """
+        if random.random() < self.destination_density:
+            rnw = self.road_network
+            destination = node_to(node, direction)
+            rnw.add_edge(node, destination, direction = direction)
+            rnw.add_edge(destination, node, direction = opposite_directions[direction])
+            rnw.nodes[destination]["destination"] = True
 
     def _edge_preference(self, edge: Edge) -> float:
         """
@@ -223,26 +310,10 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
         return [(x, y) for (x, y) in [node_to(node, d) for d in "EWSN"] 
                 if x >= 0 and y >= 0 and x < self.size_x and y < self.size_y]
 
-    def generate_destinations(self, probability: float = 1.0):
-        """
-        Determines which nodes in the road network should be destinations.
-        Only nodes with exactly one ingoing and one outgoing edge can be a destination.
-        This is to disallow destinations in crossings.
-        
-        Args:
-            probability (float, optional): The probability that an eligible node will be selected as a destination. Defaults to 1.
-        """
-        # TODO: This requires some polishing.
-        rnw = self.road_network
-        for node in rnw.nodes:
-            if rnw.in_degree(node) == 1 and rnw.out_degree(node) == 1 and random.random() < probability:
-                rnw.nodes[node]["destination"] = True
-            else:
-                rnw.nodes[node]["destination"] = False
-
     def priority_nodes(self, from_node: Node, to_node: Node) -> List[Node]:
         """
         Returns the nodes from which traffic has priority over from_node when going into to_node.
+        This is traffic coming from the left in a roundabout, and any traffic when leaving a parking.
 
         Args:
             from_node (Node): the node to be checked for priority.
@@ -251,6 +322,7 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
         Returns:
             List[Node]: a list of nodes from which vehicles have priority.
         """
+        rnw = self.road_network
         # In a roundabout, W has priority over S, S over E, E over N and N over W.
         priority_rule = { "W" : "S", "S" : "E", "E" : "N", "N" : "W" }
 
@@ -258,8 +330,12 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
         priority_direction = priority_rule[direction(from_node, to_node)]
         priority_node = node_to(to_node, priority_direction)
 
+        # If from_node is a destination, all other nodes going into to_node have priority.
+        if rnw.nodes[from_node]["destination"]:
+            return [n for (n, _) in rnw.in_edges(to_node) if n != from_node]
+
         # If the priority node can reach to_node, return it, otherwise return nothing.
-        if self.road_network.has_edge(priority_node, to_node):
+        if rnw.has_edge(priority_node, to_node):
             return [priority_node]
         else:
             return []

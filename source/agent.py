@@ -42,10 +42,19 @@ class Vehicle(mesa.Agent):
     def create_plan(self):
         """
         The vehicle creates a plan, which consists of randomly moving to one the neighbours in the road network.
+        Occasionally, it chooses instead to find a parking.
         """
         rnw = self.model.space.road_network
-        new_pos = random.choice(list(rnw.neighbors(self.pos)))
-        self.plan = [capabilities.MoveCapability(self, new_pos)]
+        if random.random() < 0.1:
+            self.plan = [capabilities.ParkCapability(self)]
+        else:
+            try:
+                new_pos = random.choice([node for node in rnw.neighbors(self.pos) if not rnw.nodes[node]["destination"]])
+                self.plan = [capabilities.MoveCapability(self, new_pos)]
+            except IndexError as e:
+                print(e)
+                print(f"Error occured for agent {self.unique_id} in position = {self.pos}")
+                self.plan = [capabilities.Capability(self)]
 
     def step(self):
         """

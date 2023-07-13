@@ -32,7 +32,7 @@ class TransportSystem(mesa.Model):
         """
         self.view = view
 
-    def generate(self, N: int = 10, width: int = 10, height: int = 10, random_seed: int | None = None):
+    def generate(self, N: int = 10, width: int = 10, height: int = 10, destination_density: float = 0.3, random_seed: int | None = None):
         """
         Generates the model, including creating its space and agents.
 
@@ -40,16 +40,18 @@ class TransportSystem(mesa.Model):
             N (int, optional): number of agents. Defaults to 10.
             width (int, optional): width of the coarse grid space. Defaults to 10.
             height (int, optional): height of the coarse grid space. Defaults to 10.
+            destination_density (float, optional): the proportion of possibly destinations that exist on the map. Defaults to 0.3.
             random_seed (int | None, optional): a random seed. Defaults to None, in which case a seed is generated.
         """
         self.num_agents = N
         self.width = width
         self.height = height
+        self.destination_density = destination_density
         self.random_seed = random_seed or random.randrange(sys.maxsize)
         random.seed(self.random_seed)
         self.schedule = mesa.time.SimultaneousActivation(self)
 
-        self.space = space.RoadNetworkGrid(self.width, self.height)
+        self.space = space.RoadNetworkGrid(size_x = self.width, size_y = self.height, destination_density = self.destination_density)
         if self.view:
             self.view.update(self)
         # Create agents
