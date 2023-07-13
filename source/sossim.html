@@ -7,16 +7,15 @@ This is a small demonstration prototype for running system-of-systems simulation
         <title>SoS transport simulation</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- Add styling. Options:
-            - Bulma: Complex to use
-            - Pico CSS: Gives to sparse layouts for use in gui
-            - Picnic CSS: More compact, but lacks some features
-            - UIKit: Many options, but not semantic
-            Other options: https://stackdiary.com/minimal-css-frameworks/.
-
+        <!-- CSS framework
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/picnic/7.1.0/picnic.min.css">
+        <style>
+            /* Style definitions to modify CSS framework */
+            /* The variable --spacing defaults to 1rem. A lower value gives a more compact layout. */
+            :root { --spacing: 0.5rem; }
+        </style>
         -->
-
+        
         <!-- Pyscript setup -->
         <script defer src="https://pyscript.net/latest/pyscript.js"></script>
         <!-- Hide pyscript tags -->
@@ -29,6 +28,5 @@ This is a small demonstration prototype for running system-of-systems simulation
         <p id = "load_msg">Loading...</p>
         <py-config src = "pyconfig.toml"></py-config>
         <py-script src = "sossim.py"></py-script>
-        <div id = "content"></div>
    </body>
 </html>

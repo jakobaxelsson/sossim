@@ -12,18 +12,49 @@ import mesa
 from domscript import *
 
 class SimulationController:
-
     """
     Provides a simulation controller that lets the user configure and run a simulation.
     """
-
     def __init__(self, model):
         """
-        Sets up the controller, adding the necessary DOM elements.
+        Sets up the simulation controller, adding the necessary DOM elements.
         """
         self.model = model
         self.timer = None
         with dom().query("#controls"):
+            with div(id = "simulation_controls"):
+                with button("Step"):
+                    add_event_listener("click", lambda _: self.model.step())
+                with button("Run"):
+                    add_event_listener("click", lambda _: self.run())
+                with button("Stop"):
+                    add_event_listener("click", lambda _: self.stop())
+                span("Time: ")
+                span("0", id = "time")
+        
+    def run(self):
+        """
+        Runs the simulation by repeatedly invoking step (with a small delay between steps).
+        """
+        self.timer = js.setInterval(create_proxy(self.model.step), 250)
+
+    def stop(self):
+        """
+        Stops a running simulation.
+        """
+        if self.timer:
+            js.clearInterval(self.timer)
+
+class ConfigurationController:
+    """
+    Provides a model configuration controller that lets the user configure the model.
+    """
+    def __init__(self, model):
+        """
+        Sets up the configuration controller, adding the necessary DOM elements.
+        """
+        self.model = model
+        with dom().query("#configuration"):
             with div(id = "model_controls", cls = "flex demo"):
                 with label("#Agents:"):
                     self.N = input_(id = "nb_agents")
@@ -35,15 +66,6 @@ class SimulationController:
                     self.random_seed = input_(id = "random_seed", value = self.model.random_seed)
                 with button("Generate", cls = "error"):
                     add_event_listener("click", lambda _: self.generate())
-            with div(id = "simulation_controls"):
-                with button("Step"):
-                    add_event_listener("click", lambda _: self.model.step())
-                with button("Run"):
-                    add_event_listener("click", lambda _: self.run())
-                with button("Stop"):
-                    add_event_listener("click", lambda _: self.stop())
-                span("Time: ")
-                span("0", id = "time")
 
     def generate(self):
         """
@@ -60,19 +82,6 @@ class SimulationController:
             args["random_seed"] = int(self.random_seed.dom_element.value)
         self.model.generate(**args)
         self.random_seed.dom_element.value = self.model.random_seed
-        
-    def run(self):
-        """
-        Runs the simulation by repeatedly invoking step (with a small delay between steps).
-        """
-        self.timer = js.setInterval(create_proxy(self.model.step), 250)
-
-    def stop(self):
-        """
-        Stops a running simulation.
-        """
-        if self.timer:
-            js.clearInterval(self.timer)
 
 class AgentView: 
     """
@@ -84,7 +93,6 @@ class VehicleView(AgentView):
     """
     Renders a vehicle on the map.
     """
-
     def __init__(self, model: mesa.Agent, cell_size: int):
         """
         Draws the vehicle in its initial position.
@@ -128,22 +136,15 @@ class TransportSystemView:
     """
     Provides a view of the road network.
     """
-
     def __init__(self):
         """
-        Initiates the view of the user interface, and sets up the overall structure of the HTML DOM.
+        Initiates the view of the model, which consists of a map and simulation controls.
         """
-        # Remove load message and set cursor to default
-        with dom().query("#load_msg") as e:
-            e.remove()
-        with dom() as b:
-            b["style"] = "cursor: default;"
         # Create UI elements
         self.width = 800
         self.height = 800
 
-        with dom().query("#content"):
-            div(id = "controls")
+        with dom().query("#simulation"):
             with svg(id = "map", width = self.width, height = self.height, style = "border: 0.5px solid black;"):
                 rect(id = "map_background", x = 0, y = 0, width = self.width, height = self.height, fill = "lightgreen")
                 g(id = "road_network")
@@ -198,3 +199,38 @@ class TransportSystemView:
                 if rnw.nodes[(x1, y1)]["destination"]:
                     circle(cx =  x1 * cs + cs/2, cy = y1 * cs + cs/2, r = cs/4, fill = "darkgray")
         dom().query("#vehicles", clear = True)
+
+class MenuBar:
+    """
+    Main menu bar of the SoSSim user interface.
+    """
+    def __init__(self):
+        with dom().query("#menubar"):
+            with ul():
+                li("File")
+                li("View")
+                li("About")
+
+class UserInteface:
+    """
+    Creates the user interface of the SoSSim interactive mode.
+    """
+    def __init__(self, model: mesa.Model):
+        # Remove load message and set cursor to default
+        with dom().query("#load_msg") as e:
+            e.remove()
+        with dom().query("body") as b:
+            b["style"] = "cursor: default;"
+        # Setup main layout
+        with dom().query("body"):
+            # TODO: Pico CSS navbar does not render as expected.
+#            with header():
+#                with nav(id = "menubar", cls = "container-fluid"): 
+#                    MenuBar()
+            with main(cls = "container"):
+                with div(id = "main_grid", style = "display: grid; grid-template-columns: 2fr 1fr;"):
+                    with div(id = "simulation"):
+                        div(id = "controls")
+                        SimulationController(model)
+                    with div(id = "configuration"):
+                        ConfigurationController(model)

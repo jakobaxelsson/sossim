@@ -16,8 +16,9 @@ def interactive_mode():
 
     # Create the model and the user interface.
     mod = model.TransportSystem()
+    ui.UserInteface(mod)
     mod.add_view(ui.TransportSystemView())
-    controller = ui.SimulationController(mod)
+#    controller = ui.SimulationController(mod)
     mod.generate()
 
 def batch_mode():

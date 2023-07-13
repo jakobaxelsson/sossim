@@ -125,9 +125,9 @@ class dom(tag):
     """
     A context manager for specifying an existing DOM node, that can be used as a parent of a new dom tree.
     """
-    def __init__(self, parent_node = js.document.body):
+    def __init__(self, parent_node = js.document):
         self.dom_element = parent_node
- 
+
 def add_text(content):
     # Creates a text node, and attaches it in the DOM tree.
     # TODO: Is this really necessary? It can be handled using the tags p (for block) and span (for inline).
