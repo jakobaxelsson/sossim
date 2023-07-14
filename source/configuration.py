@@ -3,8 +3,6 @@ Defines configuration handling mechanisms.
 """
 import argparse
 import json
-import random
-import sys
 from typing import Any
 
 class Configuration:
@@ -14,42 +12,36 @@ class Configuration:
     The parameters are grouped under different object classes, to which they apply.
     A configuration object can be initialized from command line arguments or a JSON string.
     """
+
+    # Params are stored in a three level dictionary which is defined on the class.
+    # The first level is class names, the second is parameter names, and the third is parameter information.
+    # The parameter information is type, default, flag (for command line arguments), and help string.
+    params = dict()
+    # Create a command line parser for the parameters.
+    parser = argparse.ArgumentParser(prog = "SoSSIM", 
+                                     description = "A system-of-systems simulator for a transport system")
+
     def __init__(self):
         """
         Creates a configuration object with all parameters set to default values.
         """
-        # Data is stored in a three level dictionary.
-        # The first level is class names, the second is parameter names, and the third is parameter information.
-        # The parameter information is type, default, value, flag (for command line arguments), and help string.
+        # Values are stored in a three level dictionary defined on the object.
+        # The first level is class names, the second is parameter names, and the third is the value.        
         self.data = dict()
-        # Create a command line parser for the parameters.
-        self.parser = argparse.ArgumentParser(prog = "SoSSIM", 
-                                              description = "A system-of-systems simulator for a transport system")
-        # Add parameters
-        self.add_params()
+        # Initialize all params to their default values
+        for c, ps in self.params.items():
+            for p, d in ps.items():
+                self.set_param_value(c, p, d["default"])
 
-    def add_params(self):
-        """
-        Adds all the parameters for the configuration.
-        """
-        self.add_param(cls = "TransportSystem", name = "num_agents", type = int, default = 10, flag = "-N", 
-                       help = "number of vehicles")
-        self.add_param(cls = "TransportSystem", name = "width", type = int, default = 10, flag = "-x", 
-                       help = "number of grid cells in x dimension")
-        self.add_param(cls = "TransportSystem", name = "height", type = int, default = 10, flag = "-y", 
-                       help = "number of grid cells in y dimension")
-        self.add_param(cls = "TransportSystem", name = "destination_density", type = float, default = 0.3, flag = "-dd", 
-                       help = "probability of generating a destination in a position where it is possible")
-        self.add_param(cls = "TransportSystem", name = "random_seed", type = int, default = random.randrange(sys.maxsize), flag = "-r", 
-                       help = "seed for random number generator")
-    
-    def add_param(self, cls: str, name: str, type: Any, default: Any, flag: str, help: str) -> None: 
+    @classmethod
+    def add_param(cls, class_name: str, name: str, type: Any, default: Any, flag: str, help: str) -> None: 
         """
         Adds a parameter to a class, with a type, default value, a command line argument flag, and a help string.
         The current value is set to the default value.
+        Typically, this method is called in conjunction with the definition of the class to which it applies.
 
         Args:
-            cls (str): the name of the class.
+            class_name (str): the name of the class.
             name (str): the name of the parameter.
             type (Any): the type of the parameter.
             default (Any): the default value of the parameter.
@@ -57,16 +49,16 @@ class Configuration:
             help (str): a help string.
         """
         # Create the subdictionaries
-        if cls not in self.data:
-            self.data[cls] = dict()
-        d = self.data[cls][name] = dict()
+        if class_name not in cls.params:
+            cls.params[class_name] = dict()
+        p = cls.params[class_name][name] = dict()
         # Add the parameter information
-        d["type"] = type
-        d["default"] = d["value"] = default
-        d["flag"] = flag
-        d["help"] = help
+        p["type"] = type
+        p["default"] = default
+        p["flag"] = flag
+        p["help"] = help
         # Update the command line arguments parser.
-        self.parser.add_argument(flag, "--" + name, type = type, default = default, help = help)
+        cls.parser.add_argument(flag, "--" + name, type = type, default = default, help = help)
 
     def set_param_value(self, cls: str, name: str, value: Any) -> None:
         """
@@ -77,7 +69,9 @@ class Configuration:
             name (str): the name of the parameter.
             value (Any): the new value of the parameter.
         """
-        self.data[cls][name]["value"] = value
+        if cls not in self.data:
+            self.data[cls] = dict()
+        self.data[cls].update({ name : value })
 
     def initialize(self, obj: Any):
         """
@@ -91,8 +85,8 @@ class Configuration:
         # Iterate over all the params of all the superclasses
         for c in superclasses:
             if c in self.data:
-                for p, d in self.data[c].items():
-                    setattr(obj, p, d["value"])
+                for p, v in self.data[c].items():
+                    setattr(obj, p, v)
 
     def parse_args(self) -> None:
         """

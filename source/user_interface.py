@@ -61,9 +61,9 @@ class ConfigurationController:
                 for cls, params in self.configuration.data.items():
                     with div(id = "configuration_" + cls):
                         h3(cls)
-                        for p, d in params.items():
+                        for p, v in params.items():
                             with label(p):
-                                input_(id = p, value = d["value"]) 
+                                input_(id = p, value = v) 
                 with button("Generate", cls = "error"):
                     add_event_listener("click", lambda _: self.generate())
 
@@ -72,9 +72,10 @@ class ConfigurationController:
         Generates a new model based on parameter values in the input fields in the simulation controls.
         """
         for cls, params in self.configuration.data.items():
-                for p, d in params.items():
+                for p, _ in params.items():
                     with dom().query("#" + p) as field:
-                        self.configuration.set_param_value(cls, p, d["type"](field.dom_element.value))
+                        param_type = self.configuration.params[cls][p]["type"]
+                        self.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
         self.model.generate(self.configuration)
         with dom().query("#random_seed") as field:
             field.dom_element.value = self.model.random_seed

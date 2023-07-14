@@ -2,6 +2,7 @@
 Provides models for the SoSSim system-of-systems simulator.
 """
 import random
+import sys
 from typing import Any
 
 import agent
@@ -10,6 +11,18 @@ import mesa
 import space
 
 class TransportSystem(mesa.Model):
+    # Define configuration parameters relevant to this class
+    Configuration.add_param(class_name = "TransportSystem", name = "num_agents", type = int, default = 10, flag = "-N", 
+                            help = "number of vehicles")
+    Configuration.add_param(class_name = "TransportSystem", name = "width", type = int, default = 10, flag = "-x", 
+                            help = "number of grid cells in x dimension")
+    Configuration.add_param(class_name = "TransportSystem", name = "height", type = int, default = 10, flag = "-y", 
+                            help = "number of grid cells in y dimension")
+    Configuration.add_param(class_name = "TransportSystem", name = "destination_density", type = float, default = 0.3, flag = "-dd", 
+                            help = "probability of generating a destination in a position where it is possible")
+    Configuration.add_param(class_name = "TransportSystem", name = "random_seed", type = int, default = random.randrange(sys.maxsize), flag = "-r", 
+                            help = "seed for random number generator")
+
     def __init__(self):
         """
         Creates a transport system model.

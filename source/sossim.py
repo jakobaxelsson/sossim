@@ -19,7 +19,6 @@ def interactive_mode(configuration: Configuration) -> None:
     mod = model.TransportSystem()
     ui.UserInteface(mod, configuration)
     mod.add_view(ui.TransportSystemView(mod))
-#    controller = ui.SimulationController(mod)
     mod.generate(configuration)
 
 def batch_mode(configuration: Configuration) -> None:
@@ -47,7 +46,6 @@ def batch_mode(configuration: Configuration) -> None:
         # Create the model using the supplied command line arguments, and run it.
         print("Running batch mode simulation")
         mod = model.TransportSystem()
-#        mod.generate(N = args.N, width = args.width, height = args.height, random_seed = args.random_seed)
         mod.generate(configuration)
         for i in range(args.iterations):
             mod.step()
