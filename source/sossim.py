@@ -27,14 +27,10 @@ def batch_mode(configuration: Configuration) -> None:
     """
     # Parse command line arguments.
     import argparse
-    parser = argparse.ArgumentParser(prog = "SoSSIM", description = "A system-of-systems simulator for a transport system")
-    parser.add_argument("-N", type = int, default = 3, help = "number of vehicles")
-    parser.add_argument("-x", "--width", type = int, default = 20, help = "number of grid cells in x dimension")
-    parser.add_argument("-y", "--height", type = int, default = 20, help = "number of grid cells in y dimension")
-    parser.add_argument("-r", "--random_seed", type = int, default = None, help = "seed for random number generator")
-    parser.add_argument("-t", "--iterations", type = int, default = 3, help = "number of iterations of the simulation")
-    parser.add_argument("-i", "--interactive", default = False, action = argparse.BooleanOptionalAction, help = "start server for running in interactive mode")
-    args = parser.parse_args()
+    # Add a few extra arguments to the configuration parser.
+    configuration.parser.add_argument("-t", "--iterations", type = int, default = 3, help = "number of iterations of the simulation")
+    configuration.parser.add_argument("-i", "--interactive", default = False, action = argparse.BooleanOptionalAction, help = "start server for running in interactive mode")
+    args = configuration.parse_args()
 
     if args.interactive:
         # Start a web server from which the interactive mode can be accessed

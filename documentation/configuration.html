@@ -181,32 +181,39 @@ configuration    </h1>
 </span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>                <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>                    <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">        Updates parameter values from the command line.</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="c1"># TODO: Updata the data from the parsed arguments.</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">        Generates a string containing the JSON representation of the configuration.</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">        Returns:</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">            str: a JSON representation of the configuration.</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">        Updates the configuration with the values provided in the JSON formatted text.</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">        Args:</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="sd">            text (str): a JSON representation of a configuration.</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">        Returns:</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">            Any: the parsed command line arguments.</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>        <span class="c1"># TODO: Updata the data from the parsed arguments.</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>            <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ps</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="k">return</span> <span class="n">args</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">        Generates a string containing the JSON representation of the configuration.</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">        Returns:</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">            str: a JSON representation of the configuration.</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">        Updates the configuration with the values provided in the JSON formatted text.</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">        Args:</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">            text (str): a JSON representation of a configuration.</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -305,32 +312,39 @@ configuration    </h1>
 </span><span id="Configuration-89"><a href="#Configuration-89"><span class="linenos"> 89</span></a>                <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
 </span><span id="Configuration-90"><a href="#Configuration-90"><span class="linenos"> 90</span></a>                    <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 </span><span id="Configuration-91"><a href="#Configuration-91"><span class="linenos"> 91</span></a>
-</span><span id="Configuration-92"><a href="#Configuration-92"><span class="linenos"> 92</span></a>    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Configuration-92"><a href="#Configuration-92"><span class="linenos"> 92</span></a>    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 </span><span id="Configuration-93"><a href="#Configuration-93"><span class="linenos"> 93</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Configuration-94"><a href="#Configuration-94"><span class="linenos"> 94</span></a><span class="sd">        Updates parameter values from the command line.</span>
-</span><span id="Configuration-95"><a href="#Configuration-95"><span class="linenos"> 95</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Configuration-96"><a href="#Configuration-96"><span class="linenos"> 96</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-</span><span id="Configuration-97"><a href="#Configuration-97"><span class="linenos"> 97</span></a>        <span class="c1"># TODO: Updata the data from the parsed arguments.</span>
-</span><span id="Configuration-98"><a href="#Configuration-98"><span class="linenos"> 98</span></a>
-</span><span id="Configuration-99"><a href="#Configuration-99"><span class="linenos"> 99</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="Configuration-100"><a href="#Configuration-100"><span class="linenos">100</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Configuration-101"><a href="#Configuration-101"><span class="linenos">101</span></a><span class="sd">        Generates a string containing the JSON representation of the configuration.</span>
-</span><span id="Configuration-102"><a href="#Configuration-102"><span class="linenos">102</span></a>
-</span><span id="Configuration-103"><a href="#Configuration-103"><span class="linenos">103</span></a><span class="sd">        Returns:</span>
-</span><span id="Configuration-104"><a href="#Configuration-104"><span class="linenos">104</span></a><span class="sd">            str: a JSON representation of the configuration.</span>
-</span><span id="Configuration-105"><a href="#Configuration-105"><span class="linenos">105</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Configuration-106"><a href="#Configuration-106"><span class="linenos">106</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
-</span><span id="Configuration-107"><a href="#Configuration-107"><span class="linenos">107</span></a>        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
-</span><span id="Configuration-108"><a href="#Configuration-108"><span class="linenos">108</span></a>    
-</span><span id="Configuration-109"><a href="#Configuration-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="Configuration-110"><a href="#Configuration-110"><span class="linenos">110</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Configuration-111"><a href="#Configuration-111"><span class="linenos">111</span></a><span class="sd">        Updates the configuration with the values provided in the JSON formatted text.</span>
-</span><span id="Configuration-112"><a href="#Configuration-112"><span class="linenos">112</span></a>
-</span><span id="Configuration-113"><a href="#Configuration-113"><span class="linenos">113</span></a><span class="sd">        Args:</span>
-</span><span id="Configuration-114"><a href="#Configuration-114"><span class="linenos">114</span></a><span class="sd">            text (str): a JSON representation of a configuration.</span>
-</span><span id="Configuration-115"><a href="#Configuration-115"><span class="linenos">115</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Configuration-116"><a href="#Configuration-116"><span class="linenos">116</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
-</span><span id="Configuration-117"><a href="#Configuration-117"><span class="linenos">117</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span id="Configuration-95"><a href="#Configuration-95"><span class="linenos"> 95</span></a>
+</span><span id="Configuration-96"><a href="#Configuration-96"><span class="linenos"> 96</span></a><span class="sd">        Returns:</span>
+</span><span id="Configuration-97"><a href="#Configuration-97"><span class="linenos"> 97</span></a><span class="sd">            Any: the parsed command line arguments.</span>
+</span><span id="Configuration-98"><a href="#Configuration-98"><span class="linenos"> 98</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Configuration-99"><a href="#Configuration-99"><span class="linenos"> 99</span></a>        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</span><span id="Configuration-100"><a href="#Configuration-100"><span class="linenos">100</span></a>        <span class="c1"># TODO: Updata the data from the parsed arguments.</span>
+</span><span id="Configuration-101"><a href="#Configuration-101"><span class="linenos">101</span></a>        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="Configuration-102"><a href="#Configuration-102"><span class="linenos">102</span></a>            <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ps</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="Configuration-103"><a href="#Configuration-103"><span class="linenos">103</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+</span><span id="Configuration-104"><a href="#Configuration-104"><span class="linenos">104</span></a>        <span class="k">return</span> <span class="n">args</span>
+</span><span id="Configuration-105"><a href="#Configuration-105"><span class="linenos">105</span></a>
+</span><span id="Configuration-106"><a href="#Configuration-106"><span class="linenos">106</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="Configuration-107"><a href="#Configuration-107"><span class="linenos">107</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Configuration-108"><a href="#Configuration-108"><span class="linenos">108</span></a><span class="sd">        Generates a string containing the JSON representation of the configuration.</span>
+</span><span id="Configuration-109"><a href="#Configuration-109"><span class="linenos">109</span></a>
+</span><span id="Configuration-110"><a href="#Configuration-110"><span class="linenos">110</span></a><span class="sd">        Returns:</span>
+</span><span id="Configuration-111"><a href="#Configuration-111"><span class="linenos">111</span></a><span class="sd">            str: a JSON representation of the configuration.</span>
+</span><span id="Configuration-112"><a href="#Configuration-112"><span class="linenos">112</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Configuration-113"><a href="#Configuration-113"><span class="linenos">113</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
+</span><span id="Configuration-114"><a href="#Configuration-114"><span class="linenos">114</span></a>        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+</span><span id="Configuration-115"><a href="#Configuration-115"><span class="linenos">115</span></a>    
+</span><span id="Configuration-116"><a href="#Configuration-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="Configuration-117"><a href="#Configuration-117"><span class="linenos">117</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Configuration-118"><a href="#Configuration-118"><span class="linenos">118</span></a><span class="sd">        Updates the configuration with the values provided in the JSON formatted text.</span>
+</span><span id="Configuration-119"><a href="#Configuration-119"><span class="linenos">119</span></a>
+</span><span id="Configuration-120"><a href="#Configuration-120"><span class="linenos">120</span></a><span class="sd">        Args:</span>
+</span><span id="Configuration-121"><a href="#Configuration-121"><span class="linenos">121</span></a><span class="sd">            text (str): a JSON representation of a configuration.</span>
+</span><span id="Configuration-122"><a href="#Configuration-122"><span class="linenos">122</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Configuration-123"><a href="#Configuration-123"><span class="linenos">123</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
+</span><span id="Configuration-124"><a href="#Configuration-124"><span class="linenos">124</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -374,7 +388,7 @@ A configuration object can be initialized from command line arguments or a JSON 
                                 <div class="attr variable">
             <span class="name">params</span>        =
 <input id="Configuration.params-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="Configuration.params-view-value"></label><span class="default_value">{&#39;TransportSystem&#39;: {&#39;num_agents&#39;: {&#39;type&#39;: &lt;class &#39;int&#39;&gt;, &#39;default&#39;: 10, &#39;flag&#39;: &#39;-N&#39;, &#39;help&#39;: &#39;number of vehicles&#39;}, &#39;width&#39;: {&#39;type&#39;: &lt;class &#39;int&#39;&gt;, &#39;default&#39;: 10, &#39;flag&#39;: &#39;-x&#39;, &#39;help&#39;: &#39;number of grid cells in x dimension&#39;}, &#39;height&#39;: {&#39;type&#39;: &lt;class &#39;int&#39;&gt;, &#39;default&#39;: 10, &#39;flag&#39;: &#39;-y&#39;, &#39;help&#39;: &#39;number of grid cells in y dimension&#39;}, &#39;destination_density&#39;: {&#39;type&#39;: &lt;class &#39;float&#39;&gt;, &#39;default&#39;: 0.3, &#39;flag&#39;: &#39;-dd&#39;, &#39;help&#39;: &#39;probability of generating a destination in a position where it is possible&#39;}, &#39;random_seed&#39;: {&#39;type&#39;: &lt;class &#39;int&#39;&gt;, &#39;default&#39;: 1181598682718854651, &#39;flag&#39;: &#39;-r&#39;, &#39;help&#39;: &#39;seed for random number generator&#39;}}}</span>
+            <label class="view-value-button pdoc-button" for="Configuration.params-view-value"></label><span class="default_value">{&#39;TransportSystem&#39;: {&#39;num_agents&#39;: {&#39;type&#39;: &lt;class &#39;int&#39;&gt;, &#39;default&#39;: 10, &#39;flag&#39;: &#39;-N&#39;, &#39;help&#39;: &#39;number of vehicles&#39;}, &#39;width&#39;: {&#39;type&#39;: &lt;class &#39;int&#39;&gt;, &#39;default&#39;: 10, &#39;flag&#39;: &#39;-x&#39;, &#39;help&#39;: &#39;number of grid cells in x dimension&#39;}, &#39;height&#39;: {&#39;type&#39;: &lt;class &#39;int&#39;&gt;, &#39;default&#39;: 10, &#39;flag&#39;: &#39;-y&#39;, &#39;help&#39;: &#39;number of grid cells in y dimension&#39;}, &#39;destination_density&#39;: {&#39;type&#39;: &lt;class &#39;float&#39;&gt;, &#39;default&#39;: 0.3, &#39;flag&#39;: &#39;-dd&#39;, &#39;help&#39;: &#39;probability of generating a destination in a position where it is possible&#39;}, &#39;random_seed&#39;: {&#39;type&#39;: &lt;class &#39;int&#39;&gt;, &#39;default&#39;: 8275629847255872194, &#39;flag&#39;: &#39;-r&#39;, &#39;help&#39;: &#39;seed for random number generator&#39;}}}</span>
 
         
     </div>
@@ -549,22 +563,35 @@ Typically, this method is called in conjunction with the definition of the class
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">parse_args</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">parse_args</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Any</span>:</span></span>
 
                 <label class="view-source-button" for="Configuration.parse_args-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#Configuration.parse_args"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Configuration.parse_args-92"><a href="#Configuration.parse_args-92"><span class="linenos">92</span></a>    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Configuration.parse_args-93"><a href="#Configuration.parse_args-93"><span class="linenos">93</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Configuration.parse_args-94"><a href="#Configuration.parse_args-94"><span class="linenos">94</span></a><span class="sd">        Updates parameter values from the command line.</span>
-</span><span id="Configuration.parse_args-95"><a href="#Configuration.parse_args-95"><span class="linenos">95</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Configuration.parse_args-96"><a href="#Configuration.parse_args-96"><span class="linenos">96</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-</span><span id="Configuration.parse_args-97"><a href="#Configuration.parse_args-97"><span class="linenos">97</span></a>        <span class="c1"># TODO: Updata the data from the parsed arguments.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Configuration.parse_args-92"><a href="#Configuration.parse_args-92"><span class="linenos"> 92</span></a>    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span id="Configuration.parse_args-93"><a href="#Configuration.parse_args-93"><span class="linenos"> 93</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Configuration.parse_args-94"><a href="#Configuration.parse_args-94"><span class="linenos"> 94</span></a><span class="sd">        Updates parameter values from the command line.</span>
+</span><span id="Configuration.parse_args-95"><a href="#Configuration.parse_args-95"><span class="linenos"> 95</span></a>
+</span><span id="Configuration.parse_args-96"><a href="#Configuration.parse_args-96"><span class="linenos"> 96</span></a><span class="sd">        Returns:</span>
+</span><span id="Configuration.parse_args-97"><a href="#Configuration.parse_args-97"><span class="linenos"> 97</span></a><span class="sd">            Any: the parsed command line arguments.</span>
+</span><span id="Configuration.parse_args-98"><a href="#Configuration.parse_args-98"><span class="linenos"> 98</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Configuration.parse_args-99"><a href="#Configuration.parse_args-99"><span class="linenos"> 99</span></a>        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</span><span id="Configuration.parse_args-100"><a href="#Configuration.parse_args-100"><span class="linenos">100</span></a>        <span class="c1"># TODO: Updata the data from the parsed arguments.</span>
+</span><span id="Configuration.parse_args-101"><a href="#Configuration.parse_args-101"><span class="linenos">101</span></a>        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="Configuration.parse_args-102"><a href="#Configuration.parse_args-102"><span class="linenos">102</span></a>            <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ps</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="Configuration.parse_args-103"><a href="#Configuration.parse_args-103"><span class="linenos">103</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+</span><span id="Configuration.parse_args-104"><a href="#Configuration.parse_args-104"><span class="linenos">104</span></a>        <span class="k">return</span> <span class="n">args</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Updates parameter values from the command line.</p>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>Any: the parsed command line arguments.</p>
+</blockquote>
 </div>
 
 
@@ -580,15 +607,15 @@ Typically, this method is called in conjunction with the definition of the class
 
     </div>
     <a class="headerlink" href="#Configuration.to_json"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Configuration.to_json-99"><a href="#Configuration.to_json-99"><span class="linenos"> 99</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="Configuration.to_json-100"><a href="#Configuration.to_json-100"><span class="linenos">100</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Configuration.to_json-101"><a href="#Configuration.to_json-101"><span class="linenos">101</span></a><span class="sd">        Generates a string containing the JSON representation of the configuration.</span>
-</span><span id="Configuration.to_json-102"><a href="#Configuration.to_json-102"><span class="linenos">102</span></a>
-</span><span id="Configuration.to_json-103"><a href="#Configuration.to_json-103"><span class="linenos">103</span></a><span class="sd">        Returns:</span>
-</span><span id="Configuration.to_json-104"><a href="#Configuration.to_json-104"><span class="linenos">104</span></a><span class="sd">            str: a JSON representation of the configuration.</span>
-</span><span id="Configuration.to_json-105"><a href="#Configuration.to_json-105"><span class="linenos">105</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Configuration.to_json-106"><a href="#Configuration.to_json-106"><span class="linenos">106</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
-</span><span id="Configuration.to_json-107"><a href="#Configuration.to_json-107"><span class="linenos">107</span></a>        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Configuration.to_json-106"><a href="#Configuration.to_json-106"><span class="linenos">106</span></a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="Configuration.to_json-107"><a href="#Configuration.to_json-107"><span class="linenos">107</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Configuration.to_json-108"><a href="#Configuration.to_json-108"><span class="linenos">108</span></a><span class="sd">        Generates a string containing the JSON representation of the configuration.</span>
+</span><span id="Configuration.to_json-109"><a href="#Configuration.to_json-109"><span class="linenos">109</span></a>
+</span><span id="Configuration.to_json-110"><a href="#Configuration.to_json-110"><span class="linenos">110</span></a><span class="sd">        Returns:</span>
+</span><span id="Configuration.to_json-111"><a href="#Configuration.to_json-111"><span class="linenos">111</span></a><span class="sd">            str: a JSON representation of the configuration.</span>
+</span><span id="Configuration.to_json-112"><a href="#Configuration.to_json-112"><span class="linenos">112</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Configuration.to_json-113"><a href="#Configuration.to_json-113"><span class="linenos">113</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
+</span><span id="Configuration.to_json-114"><a href="#Configuration.to_json-114"><span class="linenos">114</span></a>        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -614,15 +641,15 @@ Typically, this method is called in conjunction with the definition of the class
 
     </div>
     <a class="headerlink" href="#Configuration.from_json"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Configuration.from_json-109"><a href="#Configuration.from_json-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="Configuration.from_json-110"><a href="#Configuration.from_json-110"><span class="linenos">110</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Configuration.from_json-111"><a href="#Configuration.from_json-111"><span class="linenos">111</span></a><span class="sd">        Updates the configuration with the values provided in the JSON formatted text.</span>
-</span><span id="Configuration.from_json-112"><a href="#Configuration.from_json-112"><span class="linenos">112</span></a>
-</span><span id="Configuration.from_json-113"><a href="#Configuration.from_json-113"><span class="linenos">113</span></a><span class="sd">        Args:</span>
-</span><span id="Configuration.from_json-114"><a href="#Configuration.from_json-114"><span class="linenos">114</span></a><span class="sd">            text (str): a JSON representation of a configuration.</span>
-</span><span id="Configuration.from_json-115"><a href="#Configuration.from_json-115"><span class="linenos">115</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Configuration.from_json-116"><a href="#Configuration.from_json-116"><span class="linenos">116</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
-</span><span id="Configuration.from_json-117"><a href="#Configuration.from_json-117"><span class="linenos">117</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Configuration.from_json-116"><a href="#Configuration.from_json-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="Configuration.from_json-117"><a href="#Configuration.from_json-117"><span class="linenos">117</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Configuration.from_json-118"><a href="#Configuration.from_json-118"><span class="linenos">118</span></a><span class="sd">        Updates the configuration with the values provided in the JSON formatted text.</span>
+</span><span id="Configuration.from_json-119"><a href="#Configuration.from_json-119"><span class="linenos">119</span></a>
+</span><span id="Configuration.from_json-120"><a href="#Configuration.from_json-120"><span class="linenos">120</span></a><span class="sd">        Args:</span>
+</span><span id="Configuration.from_json-121"><a href="#Configuration.from_json-121"><span class="linenos">121</span></a><span class="sd">            text (str): a JSON representation of a configuration.</span>
+</span><span id="Configuration.from_json-122"><a href="#Configuration.from_json-122"><span class="linenos">122</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Configuration.from_json-123"><a href="#Configuration.from_json-123"><span class="linenos">123</span></a>        <span class="c1"># TODO: This doesn&#39;t work. The &quot;type&quot; field does not serialize.</span>
+</span><span id="Configuration.from_json-124"><a href="#Configuration.from_json-124"><span class="linenos">124</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </span></pre></div>
 
 

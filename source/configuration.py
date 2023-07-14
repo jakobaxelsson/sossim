@@ -88,12 +88,19 @@ class Configuration:
                 for p, v in self.data[c].items():
                     setattr(obj, p, v)
 
-    def parse_args(self) -> None:
+    def parse_args(self) -> Any:
         """
         Updates parameter values from the command line.
+
+        Returns:
+            Any: the parsed command line arguments.
         """
-        self.parser.parse_args()
+        args = self.parser.parse_args()
         # TODO: Updata the data from the parsed arguments.
+        for c, ps in self.params.items():
+            for p, _ in ps.items():
+                self.set_param_value(c, p, getattr(args, p))
+        return args
 
     def to_json(self) -> str:
         """
