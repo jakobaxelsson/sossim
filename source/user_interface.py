@@ -7,6 +7,7 @@ The user interface is provided as HTML DOM elements which is manipulated using t
 
 import random
 
+from configuration import Configuration
 import mesa
 
 from domscript import *
@@ -49,23 +50,20 @@ class ConfigurationController:
     """
     Provides a model configuration controller that lets the user configure the model.
     """
-    def __init__(self, model):
+    def __init__(self, model, configuration: Configuration):
         """
         Sets up the configuration controller, adding the necessary DOM elements.
         """
         self.model = model
+        self.configuration = configuration
         with dom().query("#configuration"):
-            with div(id = "model_controls", cls = "flex demo"):
-                with label("#Agents:"):
-                    self.N = input_(id = "nb_agents")
-                with label("Width:"):
-                    self.width = input_(id = "grid_width")
-                with label("Height:"):
-                    self.height = input_(id = "grid_height")
-                with label("Destination density:"):
-                    self.destination_density = input_(id = "destination_density")
-                with label("Seed:"):
-                    self.random_seed = input_(id = "random_seed", value = self.model.random_seed)
+            with div(id = "configuration_controls", cls = "flex demo"):
+                for cls, params in self.configuration.data.items():
+                    with div(id = "configuration_" + cls):
+                        h3(cls)
+                        for p, d in params.items():
+                            with label(p):
+                                input_(id = p, value = d["value"]) 
                 with button("Generate", cls = "error"):
                     add_event_listener("click", lambda _: self.generate())
 
@@ -73,19 +71,13 @@ class ConfigurationController:
         """
         Generates a new model based on parameter values in the input fields in the simulation controls.
         """
-        args = dict()
-        if self.N.dom_element.value:
-            args["N"] = int(self.N.dom_element.value)
-        if self.width.dom_element.value:
-            args["width"] = int(self.width.dom_element.value)
-        if self.height.dom_element.value:
-            args["height"] = int(self.height.dom_element.value)
-        if self.destination_density.dom_element.value:
-            args["destination_density"] = float(self.destination_density.dom_element.value)
-        if self.random_seed.dom_element.value:
-            args["random_seed"] = int(self.random_seed.dom_element.value)
-        self.model.generate(**args)
-        self.random_seed.dom_element.value = self.model.random_seed
+        for cls, params in self.configuration.data.items():
+                for p, d in params.items():
+                    with dom().query("#" + p) as field:
+                        self.configuration.set_param_value(cls, p, d["type"](field.dom_element.value))
+        self.model.generate(self.configuration)
+        with dom().query("#random_seed") as field:
+            field.dom_element.value = self.model.random_seed
 
 class AgentView: 
     """
@@ -220,7 +212,7 @@ class UserInteface:
     """
     Creates the user interface of the SoSSim interactive mode.
     """
-    def __init__(self, model: mesa.Model):
+    def __init__(self, model: mesa.Model, configuration: Configuration):
         # Remove load message and set cursor to default
         with dom().query("#load_msg") as e:
             e.remove()
@@ -238,4 +230,4 @@ class UserInteface:
                         div(id = "controls")
                         SimulationController(model)
                     with div(id = "configuration"):
-                        ConfigurationController(model)
+                        ConfigurationController(model, configuration)

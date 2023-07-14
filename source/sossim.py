@@ -6,9 +6,10 @@ It can be ran in batch mode or in interactive mode in the browser using pyscript
 
 import sys
 
+from configuration import Configuration
 import model
 
-def interactive_mode():
+def interactive_mode(configuration: Configuration) -> None:
     """
     Runs the simulator in interactive mode in the browser.
     """
@@ -16,12 +17,12 @@ def interactive_mode():
 
     # Create the model and the user interface.
     mod = model.TransportSystem()
-    ui.UserInteface(mod)
+    ui.UserInteface(mod, configuration)
     mod.add_view(ui.TransportSystemView(mod))
 #    controller = ui.SimulationController(mod)
-    mod.generate()
+    mod.generate(configuration)
 
-def batch_mode():
+def batch_mode(configuration: Configuration) -> None:
     """
     Runs the simulator in batch mode from command line.
     """
@@ -46,13 +47,15 @@ def batch_mode():
         # Create the model using the supplied command line arguments, and run it.
         print("Running batch mode simulation")
         mod = model.TransportSystem()
-        mod.generate(N = args.N, width = args.width, height = args.height, random_seed = args.random_seed)
+#        mod.generate(N = args.N, width = args.width, height = args.height, random_seed = args.random_seed)
+        mod.generate(configuration)
         for i in range(args.iterations):
             mod.step()
 
 if __name__ == "__main__":
     # Check if the file is running in the browser, in which case interactive mode is chosen, and otherwise run it in batch mode.
+    configuration = Configuration()
     if sys.platform == "emscripten":
-        interactive_mode()
+        interactive_mode(configuration)
     else:
-        batch_mode()
+        batch_mode(configuration)

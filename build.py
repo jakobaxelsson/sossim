@@ -35,7 +35,7 @@ if __name__ == "__main__":
         # TODO: Should remove any existing files before generating new ones.
         # Pdoc assumes that the top directory is on the path, so add it there.
         os.environ["PYTHONPATH"] = str(os.path.abspath("source"))
-        os.system("pdoc ./source/agent.py ./source/capabilities ./source/model ./source/space.py -o ./documentation --docformat google")
+        os.system("pdoc ./source/agent.py ./source/capabilities ./source/configuration.py ./source/model ./source/space.py -o ./documentation --docformat google")
 
     # Pyscript configuration file
     if args.pyconfig or args.all:
