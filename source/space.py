@@ -73,6 +73,47 @@ class RoadGridGraph(nx.DiGraph):
             else: # d == (0, 1)
                 self[source][sink]["direction"] = "S"
 
+    def add_road(self, source: Node, sink: Node, bidirectional: bool = False):
+        """
+        Adds a road from the source node to the sink node.
+
+        Args:
+            source (Node): source node.
+            sink (Node): sink node.
+            bidirectional (bool, optional): if True, the road in opposite direction is also added. Defaults to False.
+        """
+        self.nodes[source]["road"] = True
+        self.nodes[sink]["road"] = True
+        self[source][sink]["road"] = True
+        if bidirectional:
+            self[sink][source]["road"] = True
+
+    def add_roads(self, node: Node, directions: str):
+        """
+        Adds a sequence of roads to the network, starting in the provided node and going in the provided directions.
+
+        Args:
+            node (Node): the start node.
+            directions (str): the direction, which is a string containing the characters N, E, S, W
+        """
+        for d in directions:
+            next_node = next(n for n in self.neighbors(node) if self[node][n]["direction"] == d)
+            self.add_road(node, next_node)
+            node = next_node
+
+    def add_destination(self, node1: Node, node2: Node):
+        """
+        Adds a destination node, as a neighbor of the given node.
+        Roads are added to and from the destination from the node.
+        The destination node is indicated as such using a node attribute.
+        
+        Args:
+            node1 (Node): the node to be connected to the destination.
+            node2 (Node): the destination.
+        """
+        self.add_road(node1, node2, bidirectional = True)
+        self.nodes[node2]["destination"] = True
+
     def roads_from(self, source: Node) -> List[Node]:
         """
         Returns a list of all nodes that can be reached by road from a given source node.
@@ -109,47 +150,6 @@ class RoadGridGraph(nx.DiGraph):
             bool: _description_
         """
         return any(self[source][sink]["direction"] == direction for sink in self.roads_from(source))
-
-    def add_road(self, source: Node, sink: Node, bidirectional: bool = False):
-        """
-        Adds a road from the source node to the sink node.
-
-        Args:
-            source (Node): source node.
-            sink (Node): sink node.
-            bidirectional (bool, optional): if True, the road in opposite direction is also added. Defaults to False.
-        """
-        self.nodes[source]["road"] = True
-        self.nodes[sink]["road"] = True
-        self[source][sink]["road"] = True
-        if bidirectional:
-            self[sink][source]["road"] = True
-
-    def add_roads(self, node: Node, directions: str):
-        """
-        Adds a sequence of roads to the network, starting in the provided node and going in the provided directions.
-
-        Args:
-            node (Node): the start node.
-            directions (str): the direction, which is a string containing the characters N, E, S, W
-        """
-        for d in directions:
-            next_node = next(n for n in self.neighbors(node) if self[node][n]["direction"] == d)
-            self.add_road(node, next_node)
-            node = next_node
-
-    def add_destination2(self, node1: Node, node2: Node):
-        """
-        Adds a destination node, as a neighbor of the given node.
-        Roads are added to and from the destination from the node.
-        The destination node is indicated as such using a node attribute.
-        
-        Args:
-            node1 (Node): the node to be connected to the destination.
-            node2 (Node): the destination.
-        """
-        self.add_road(node1, node2, bidirectional = True)
-        self.nodes[node2]["destination"] = True
 
     def is_road(self, node1: Node, node2: Optional[Node] = None) -> bool:
         """
@@ -309,7 +309,7 @@ class RoadNetworkGrid:
                 for destination in rnw.neighbors(node): 
                     if not rnw.is_road(destination):
                         if random.random() < self.destination_density:
-                            rnw.add_destination2(node, destination)
+                            rnw.add_destination(node, destination)
                             break
 
     def _edge_preference(self, edge: Edge) -> float:
@@ -367,7 +367,57 @@ class RoadNetworkGrid:
             return [priority_node]
         else:
             return []
-        
+
+    def road_nodes(self) -> List[Node]:
+        """
+        Returns a list of all nodes which are connected by roads.
+
+        Returns:
+            List[Node]: the nodes connected by roads.
+        """
+        return [n for n in self.road_network.nodes if self.road_network.is_road(n)]
+
+    def road_edges(self) -> List[Edge]:
+        """
+        Returns a list of all edges that are roads.
+
+        Returns:
+            List[Node]: the nodes connected by roads.
+        """
+        return [(n1, n2) for (n1, n2) in self.road_network.edges if self.road_network.is_road(n1, n2)]
+
+    # Provide reference to some of the RoadGridNetwork methods directly in the space.
+
+    def roads_from(self, source: Node) -> List[Node]:
+        """
+        Calls the method with the same name on self.road_network.
+        """
+        return self.road_network.roads_from(source)
+
+    def roads_to(self, sink: Node) -> List[Node]:
+        """
+        Calls the method with the same name on self.road_network.
+        """
+        return self.road_network.roads_to(sink)
+
+    def has_road_to(self, source: Node, direction: str) -> bool:
+        """
+        Calls the method with the same name on self.road_network.
+        """
+        return self.road_network.has_road(source, direction)
+
+    def is_road(self, node1: Node, node2: Optional[Node] = None) -> bool:
+        """
+        Calls the method with the same name on self.road_network.
+        """
+        return self.road_network.is_road(node1, node2)
+
+    def is_destination(self, node: Node) -> bool:
+        """
+        Calls the method with the same name on self.road_network.
+        """
+        return self.road_network.is_destination(node)
+
     # Mesa space API (adapted from mesa.space.NetworkGrid)
 
     def place_agent(self, agent: mesa.Agent, node_id: Node) -> None:

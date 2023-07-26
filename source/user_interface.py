@@ -116,9 +116,9 @@ class VehicleView(AgentView):
         print(f"Vehicle {agent.unique_id} clicked.")
         print(f"position = {agent.pos}")
         print(f"plan = {agent.plan}")
-        rnw = agent.model.space.road_network
-        print(f"Incoming edges from: {rnw.roads_from(agent.pos)}")
-        print(f"Outgoing edges to: {rnw.roads_to(agent.pos)}")
+        space = agent.model.space
+        print(f"Incoming edges from: {space.roads_from(agent.pos)}")
+        print(f"Outgoing edges to: {space.roads_to(agent.pos)}")
 
     def update(self, agent: mesa.Agent):
         """
@@ -186,19 +186,18 @@ class TransportSystemView:
         Args:
             model (mesa.Model): the model to be reflected in the user interface.
         """
-        rnw = model.space.road_network
+        space = model.space
         with dom().query("#map") as m:
             m["viewBox"] = f"0 0 {model.width * 4} {model.height * 4}"
         with dom().query("#road_network", clear = True):
             # Visualize roads
-            for (x1, y1), (x2, y2), d in rnw.edges(data = True):
-                if d["road"]:
-                    line(x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
-                        stroke = "lightslategray", stroke_width = 0.8, stroke_linecap = "round")
+            for (x1, y1), (x2, y2) in space.road_edges():
+                line(x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
+                     stroke = "lightslategray", stroke_width = 0.8, stroke_linecap = "round")
             # Visualize destinations
-            for node in rnw.nodes:                
+            for node in space.road_nodes():                
                 (x, y) = node
-                if rnw.is_destination(node):
+                if space.is_destination(node):
                     circle(cx =  x + 0.5, cy = y + 0.5, r = 0.25, fill = "darkgray")
         dom().query("#vehicles", clear = True)
 
