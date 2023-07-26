@@ -137,22 +137,18 @@ class RoadGridGraph(nx.DiGraph):
             self.add_road(node, next_node)
             node = next_node
 
-    def add_destination(self, node: Node, direction: str, p: float = 1.0):
+    def add_destination2(self, node1: Node, node2: Node):
         """
-        Adds a destination node, as a neighbor of the given node in the indicated direction.
+        Adds a destination node, as a neighbor of the given node.
         Roads are added to and from the destination from the node.
         The destination node is indicated as such using a node attribute.
-        The probability of a destination being added is controlled by the optional parameter p.
         
         Args:
-            node (Node): the node to be connected to the destination.
-            direction (str): the direction from the given node to the destination.
-            p (float): the probability of adding the destination. Defaults to 1.0.
+            node1 (Node): the node to be connected to the destination.
+            node2 (Node): the destination.
         """
-        if random.random() < p:
-            destination = next(n for n in self.neighbors(node) if self[node][n]["direction"] == direction)
-            self.add_road(node, destination, bidirectional = True)
-            self.nodes[destination]["destination"] = True
+        self.add_road(node1, node2, bidirectional = True)
+        self.nodes[node2]["destination"] = True
 
     def is_road(self, node1: Node, node2: Optional[Node] = None) -> bool:
         """
@@ -262,22 +258,17 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
         # Step 2. Add lanes and roundabouts.
         # Create a new graph, this time directed. Each node in the coarse graph maps to 4 x 4 nodes in the new graph.
         rnw = self.road_network = RoadGridGraph(self.width * 4, self.height * 4, node_attrs = { "agent" : [] })
-        p = self.destination_density
 
         # Add internal connections between coarse node in detailed graph.
         for node in cnw:
             if cnw.has_road_to(node, "E"):
                 rnw.add_roads(subnode(node, 2, 2), "EEE")
-                rnw.add_destination(subnode(node, 3, 2), "S", p)
             if cnw.has_road_to(node, "W"):
                 rnw.add_roads(subnode(node, 1, 1), "WWW")
-                rnw.add_destination(subnode(node, 0, 1), "N", p)
             if cnw.has_road_to(node, "N"):
                 rnw.add_roads(subnode(node, 2, 1), "NNN")
-                rnw.add_destination(subnode(node, 2, 0), "E", p)
             if cnw.has_road_to(node, "S"):
                 rnw.add_roads(subnode(node, 1, 2), "SSS")
-                rnw.add_destination(subnode(node, 1, 3), "W", p)
 
         # Add connections for roundabouts and through roads
         for node in cnw:
@@ -285,94 +276,41 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
                 # Dead ends need to make it possible to turn around, which requires adding three out of four edges.
                 if not cnw.has_road_to(node, "E"):
                     rnw.add_roads(subnode(node, 2, 2), "N")
-                    rnw.add_destination(subnode(node, 2, 1), "E", p)
                 if not cnw.has_road_to(node, "W"):
                     rnw.add_roads(subnode(node, 1, 1), "S")
-                    rnw.add_destination(subnode(node, 1, 2), "W", p)
                 if not cnw.has_road_to(node, "N"):
                     rnw.add_roads(subnode(node, 2, 1), "W")
-                    rnw.add_destination(subnode(node, 1, 1), "N", p)
                 if not cnw.has_road_to(node, "S"):
                     rnw.add_roads(subnode(node, 1, 2), "E")
-                    rnw.add_destination(subnode(node, 2, 2), "S", p)
-                # Add further destinations on the incoming edge
-                if cnw.has_road_to(node, "E"):
-                    rnw.add_destination(subnode(node, 3, 1), "N", p)
-                    rnw.add_destination(subnode(node, 2, 1), "N", p)
-                if cnw.has_road_to(node, "W"):
-                    rnw.add_destination(subnode(node, 0, 2), "S", p)
-                    rnw.add_destination(subnode(node, 1, 2), "S", p)
-                if cnw.has_road_to(node, "N"):
-                    rnw.add_destination(subnode(node, 1, 0), "W", p)
-                    rnw.add_destination(subnode(node, 1, 1), "W", p)
-                if cnw.has_road_to(node, "S"):
-                    rnw.add_destination(subnode(node, 2, 3), "E", p)
-                    rnw.add_destination(subnode(node, 2, 2), "E", p)
             if cnw.road_degree(node) == 2:
                 # # Through roads
                 # Through roads
                 if cnw.has_road_to(node, "N") and cnw.has_road_to(node, "W"):
                     rnw.add_roads(subnode(node, 1, 2), "EN")
-                    rnw.add_destination(subnode(node, 0, 2), "S", p)
-                    rnw.add_destination(subnode(node, 1, 2), "S", p)
-                    rnw.add_destination(subnode(node, 2, 2), "S", p)
-                    rnw.add_destination(subnode(node, 2, 1), "E", p)
                 if cnw.has_road_to(node, "N") and cnw.has_road_to(node, "S"):
                     rnw.add_roads(subnode(node, 1, 1), "S")
                     rnw.add_roads(subnode(node, 2, 2), "N")
-                    rnw.add_destination(subnode(node, 1, 0), "W", p)
-                    rnw.add_destination(subnode(node, 1, 1), "W", p)
-                    rnw.add_destination(subnode(node, 1, 2), "W", p)
-                    rnw.add_destination(subnode(node, 2, 3), "E", p)
-                    rnw.add_destination(subnode(node, 2, 2), "E", p)
-                    rnw.add_destination(subnode(node, 2, 1), "E", p)
                 if cnw.has_road_to(node, "N") and cnw.has_road_to(node, "E"):
                     rnw.add_roads(subnode(node, 1, 1), "SE")
-                    rnw.add_destination(subnode(node, 1, 0), "W", p)
-                    rnw.add_destination(subnode(node, 1, 1), "W", p)
-                    rnw.add_destination(subnode(node, 1, 2), "W", p)
-                    rnw.add_destination(subnode(node, 2, 2), "S", p)
                 if cnw.has_road_to(node, "W") and cnw.has_road_to(node, "S"):
                     rnw.add_roads(subnode(node, 2, 2), "NW")
-                    rnw.add_destination(subnode(node, 2, 3), "E", p)
-                    rnw.add_destination(subnode(node, 2, 2), "E", p)
-                    rnw.add_destination(subnode(node, 2, 1), "E", p)
-                    rnw.add_destination(subnode(node, 1, 1), "N", p)
                 if cnw.has_road_to(node, "W") and cnw.has_road_to(node, "E"):
                     rnw.add_roads(subnode(node, 2, 1), "W")
                     rnw.add_roads(subnode(node, 1, 2), "E")
-                    rnw.add_destination(subnode(node, 3, 1), "N", p)
-                    rnw.add_destination(subnode(node, 2, 1), "N", p)
-                    rnw.add_destination(subnode(node, 1, 1), "N", p)
-                    rnw.add_destination(subnode(node, 0, 2), "S", p)
-                    rnw.add_destination(subnode(node, 1, 2), "S", p)
-                    rnw.add_destination(subnode(node, 2, 2), "S", p)
                 if cnw.has_road_to(node, "S") and cnw.has_road_to(node, "E"):
                     rnw.add_roads(subnode(node, 2, 1), "WS")
-                    rnw.add_destination(subnode(node, 3, 1), "N", p)
-                    rnw.add_destination(subnode(node, 2, 1), "N", p)
-                    rnw.add_destination(subnode(node, 1, 1), "N", p)
-                    rnw.add_destination(subnode(node, 1, 2), "W", p)
             if cnw.road_degree(node) > 2:
                 # # Three and four way crossings require roundabouts, so all four edges are added.
                 rnw.add_roads(subnode(node, 1, 1), "SENW")
-                # For three way crossings, it is possible to have two additional destinations.
-                if not cnw.has_road_to(node, "E"):
-                    rnw.add_destination(subnode(node, 2, 3), "E", p)
-                    rnw.add_destination(subnode(node, 2, 2), "E", p)
-                    rnw.add_destination(subnode(node, 2, 1), "E", p)
-                if not cnw.has_road_to(node, "W"):
-                    rnw.add_destination(subnode(node, 1, 0), "W", p)
-                    rnw.add_destination(subnode(node, 1, 1), "W", p)
-                    rnw.add_destination(subnode(node, 1, 2), "W", p)
-                if not cnw.has_road_to(node, "N"):
-                    rnw.add_destination(subnode(node, 3, 1), "N", p)
-                    rnw.add_destination(subnode(node, 2, 1), "N", p)
-                    rnw.add_destination(subnode(node, 1, 1), "N", p)
-                if not cnw.has_road_to(node, "S"):
-                    rnw.add_destination(subnode(node, 0, 2), "S", p)
-                    rnw.add_destination(subnode(node, 1, 2), "S", p)
-                    rnw.add_destination(subnode(node, 2, 2), "S", p)
+
+        # Add one destination to all road nodes that have a free grid neighbor. 
+        for node in rnw.nodes:
+            if rnw.is_road(node) and not rnw.is_destination(node):
+                for destination in rnw.neighbors(node): 
+                    if not rnw.is_road(destination):
+                        if random.random() < self.destination_density:
+                            rnw.add_destination2(node, destination)
+                            break
 
     def _edge_preference(self, edge: Edge) -> float:
         """
