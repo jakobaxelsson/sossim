@@ -76,6 +76,7 @@ class MoveCapability(Capability):
         Returns:
             bool: True if and only if the move is possible.
         """
+        space = self.agent.model.space
         rnw = self.agent.model.space.road_network
 
         # There is no road to the new node from the current node.
@@ -83,11 +84,11 @@ class MoveCapability(Capability):
             return False
 
         # There is a vehicle in the new node position, and we don't know if it will move or not.
-        if rnw.nodes[self.target]["agent"]:
+        if not space.is_cell_empty(self.target):
             return False
         
         # Priority rules prevent a move.
-        if any(rnw.nodes[priority_pos]["agent"] for priority_pos in self.agent.model.space.priority_nodes(self.agent.pos, self.target)):
+        if any(not space.is_cell_empty(priority_pos) for priority_pos in space.priority_nodes(self.agent.pos, self.target)):
             return False
 
         # TODO: The agent has insufficient energy.
@@ -108,12 +109,7 @@ class MoveCapability(Capability):
         """
         Performs the move.
         """
-        rnw = self.agent.model.space.road_network
-        rnw.nodes[self.agent.pos]["agent"].remove(self.agent)
-        rnw.nodes[self.target]["agent"].append(self.agent)
-
-        self.agent.heading = rnw[self.agent.pos][self.target]["direction"]
-        self.agent.pos = self.target
+        self.agent.model.space.move_agent(self.agent, self.target)
 
         # TODO: Reduce agent energy when making the move.
 
@@ -138,11 +134,12 @@ class ParkCapability(Capability):
         Returns:
             bool: True if and only if the agent can either park or move on.
         """
+        space = self.agent.model.space
         rnw = self.agent.model.space.road_network
 
         # There is an adjacent destination and it is free.
         destinations = [node for node in rnw.roads_from(self.agent.pos) if rnw.is_destination(node)]
-        if destinations and rnw.nodes[destinations[0]]["agent"] == []:
+        if destinations and space.is_cell_empty(destinations[0]):
             return True
         else:
             # No destination is available here, so insert a move at the head of the agent's plan and check if that is possible.
@@ -166,12 +163,9 @@ class ParkCapability(Capability):
         Performs the parking or keep looking for another destination.
         """
         # There is an adjacent destination and it is free.
+        space = self.agent.model.space
         rnw = self.agent.model.space.road_network
         destination = [node for (_, node) in rnw.out_edges(self.agent.pos) if rnw.is_destination(node)][0]
-        rnw.nodes[self.agent.pos]["agent"].remove(self.agent)
-        rnw.nodes[destination]["agent"].append(self.agent)
-
-        self.agent.heading = rnw[self.agent.pos][destination]["direction"]
-        self.agent.pos = destination
+        space.move_agent(self.agent, destination)
 
         # TODO: Reduce agent energy when making the move.

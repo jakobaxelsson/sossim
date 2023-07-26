@@ -23,14 +23,10 @@ class Vehicle(mesa.Agent):
         self.capacity = random.choice([1, 2, 3])
 
         # Randomly select a starting position which is not yet occupied by some other vehicle.
+        space = self.model.space
         rnw = self.model.space.road_network
-        available_positions = [p for p in rnw.nodes if rnw.is_road(p) and not rnw.nodes[p]["agent"]]
-        self.pos = random.choice(available_positions)
-        rnw.nodes[self.pos]["agent"].append(self)
-        self.new_pos = self.pos
-
-        # Set the initial heading of the vehicle.
-        self.heading = rnw[self.pos][next(rnw.neighbors(self.pos))]["direction"]
+        available_positions = [p for p in rnw.nodes if rnw.is_road(p) and space.is_cell_empty(p)]
+        space.place_agent(self, random.choice(available_positions))
 
         # Add a view
         if self.model.view:

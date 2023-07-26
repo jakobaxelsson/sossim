@@ -3,10 +3,10 @@ Provides spaces for the SoSSim system-of-systems simulator.
 The space is a grid rendered as a bidirectional graph, with nodes being grid cells and with edges between all adjacent grid cells.
 Attributes can be set on nodes and edges to represent roads, destinations, etc.
 """
-
+import itertools
 import math
 import random
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import networkx as nx
 
@@ -50,9 +50,10 @@ class RoadGridGraph(nx.DiGraph):
 
         # Set default attribute values for nodes and edges
         for node in self.nodes:
+            self.nodes[node]["road"] = False
+            self.nodes[node]["destination"] = False
+            self.nodes[node]["agent"] = []
             for (attr, value) in node_attrs.items():
-                self.nodes[node]["road"] = False
-                self.nodes[node]["destination"] = False
                 self.nodes[node][attr] = value
         for (source, sink) in self.edges:
             self[source][sink]["road"] = False
@@ -196,7 +197,7 @@ def subnode(node: Node, i: int, j: int) -> Node:
     """
     return (node[0] * 4 + i, node[1] * 4 + j)
 
-class RoadNetworkGrid(mesa.space.NetworkGrid):
+class RoadNetworkGrid:
     """
     A mesa space consisting of a road network which is placed on a grid.
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
@@ -222,8 +223,7 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
 
         # Generate roads and destinations
         self.generate_roads()
-        super().__init__(self.road_network)
-
+ 
     def generate_roads(self):
         """
         Generates the road network. This is a two step process.
@@ -257,7 +257,7 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
 
         # Step 2. Add lanes and roundabouts.
         # Create a new graph, this time directed. Each node in the coarse graph maps to 4 x 4 nodes in the new graph.
-        rnw = self.road_network = RoadGridGraph(self.width * 4, self.height * 4, node_attrs = { "agent" : [] })
+        rnw = self.road_network = RoadGridGraph(self.width * 4, self.height * 4)
 
         # Add internal connections between coarse node in detailed graph.
         for node in cnw:
@@ -367,3 +367,65 @@ class RoadNetworkGrid(mesa.space.NetworkGrid):
             return [priority_node]
         else:
             return []
+        
+    # Mesa space API (adapted from mesa.space.NetworkGrid)
+
+    def place_agent(self, agent: mesa.Agent, node_id: Node) -> None:
+        """Place an agent in a node."""
+        self.road_network.nodes[node_id]["agent"].append(agent)
+        agent.pos = node_id
+        # Set the initial heading of the vehicle.
+        agent.heading = self.road_network[node_id][next(self.road_network.neighbors(node_id))]["direction"]
+
+    def get_neighborhood(self, node_id: Node, include_center: bool = False, radius: int = 1) -> list[Node]:
+        """Get all adjacent nodes within a certain radius"""
+        if radius == 1:
+            neighborhood = list(self.road_network.neighbors(node_id))
+            if include_center:
+                neighborhood.append(node_id)
+        else:
+            neighbors_with_distance = nx.single_source_shortest_path_length(self.road_network, node_id, radius)
+            if not include_center:
+                del neighbors_with_distance[node_id]
+            neighborhood = sorted(neighbors_with_distance.keys())
+        return neighborhood
+
+    def get_neighbors(self, node_id: Node, include_center: bool = False) -> list[mesa.Agent]:
+        """Get all agents in adjacent nodes."""
+        neighborhood = self.get_neighborhood(node_id, include_center)
+        return self.get_cell_list_contents(neighborhood)
+
+    def move_agent(self, agent: mesa.Agent, node_id: Node) -> None:
+        """Move an agent from its current node to a new node."""
+        agent.heading = self.road_network[agent.pos][node_id]["direction"]
+        self.remove_agent(agent)
+        self.place_agent(agent, node_id)
+
+    def remove_agent(self, agent: mesa.Agent) -> None:
+        """Remove the agent from the network and set its pos attribute to None."""
+        node_id = agent.pos
+        self.road_network.nodes[node_id]["agent"].remove(agent)
+        agent.pos = None
+
+    def is_cell_empty(self, node_id: Node) -> bool:
+        """Returns a bool of the contents of a cell."""
+        return self.road_network.nodes[node_id]["agent"] == []
+
+    def get_cell_list_contents(self, cell_list: list[Node]) -> list[mesa.Agent]:
+        """Returns a list of the agents contained in the nodes identified
+        in `cell_list`; nodes with empty content are excluded.
+        """
+        return list(self.iter_cell_list_contents(cell_list))
+
+    def get_all_cell_contents(self) -> list[mesa.Agent]:
+        """Returns a list of all the agents in the network."""
+        return self.get_cell_list_contents(self.road_network)
+
+    def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[mesa.Agent]:
+        """Returns an iterator of the agents contained in the nodes identified
+        in `cell_list`; nodes with empty content are excluded.
+        """
+        return itertools.chain.from_iterable(
+            self.road_network.nodes[node_id]["agent"]
+            for node_id in itertools.filterfalse(self.is_cell_empty, cell_list)
+        )
