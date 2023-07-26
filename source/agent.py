@@ -27,6 +27,9 @@ class Vehicle(mesa.Agent):
         available_positions = [p for p in space.road_nodes() if space.is_cell_empty(p)]
         space.place_agent(self, random.choice(available_positions))
 
+        # Set the initial heading of the vehicle to that of the heading of one of the roads leading into the current position.
+        self.heading = space.edge_direction(space.roads_to(self.pos)[0], self.pos)
+
         # Add a view
         if self.model.view:
             self.view = self.model.view.create_agent_view(self)

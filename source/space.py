@@ -114,30 +114,6 @@ class RoadGridGraph(nx.DiGraph):
         self.add_road(node1, node2, bidirectional = True)
         self.nodes[node2]["destination"] = True
 
-    def roads_from(self, source: Node) -> List[Node]:
-        """
-        Returns a list of all nodes that can be reached by road from a given source node.
-
-        Args:
-            source (Node): the source node.
-
-        Returns:
-            List[Node]: a list of nodes reachable by road.
-        """
-        return [sink for _, sink, has_road in self.out_edges(source, data = "road") if has_road]
-
-    def roads_to(self, sink: Node) -> List[Node]:
-        """
-        Returns a list of all nodes that can reach the given sink node by road.
-
-        Args:
-            sink (Node): the sink node.
-
-        Returns:
-            List[Node]: a list of nodes from which the sink node can be reached by road.
-        """
-        return [source for source, _, has_road in self.in_edges(sink, data = "road") if has_road]
-
     def has_road_to(self, source: Node, direction: str) -> bool:
         """
         Returns True if and only if the graph has a road from the given node in the given direction.
@@ -149,7 +125,8 @@ class RoadGridGraph(nx.DiGraph):
         Returns:
             bool: _description_
         """
-        return any(self[source][sink]["direction"] == direction for sink in self.roads_from(source))
+        roads_from = [sink for _, sink, has_road in self.out_edges(source, data = "road") if has_road]
+        return any(self[source][sink]["direction"] == direction for sink in roads_from)
 
     def is_road(self, node1: Node, node2: Optional[Node] = None) -> bool:
         """
@@ -167,18 +144,6 @@ class RoadGridGraph(nx.DiGraph):
         else:
             return self.nodes[node1].get("road", False)
 
-    def is_destination(self, node: Node) -> bool:
-        """
-        Checks if a node is a destination.
-
-        Args:
-            node (Node): the node.
-
-        Returns:
-            bool: True if the node is a destination.
-        """
-        return self.nodes[node].get("destination", False)
-
     def road_degree(self, node: Node) -> int:
         """
         Returns the number of outgoing roads from a node.
@@ -189,7 +154,7 @@ class RoadGridGraph(nx.DiGraph):
         Returns:
             int: the number of outgoing roads.
         """
-        return len(self.roads_from(node))
+        return len([sink for _, sink, has_road in self.out_edges(node, data = "road") if has_road])
 
 def subnode(node: Node, i: int, j: int) -> Node:
     """
@@ -305,7 +270,7 @@ class RoadNetworkGrid:
 
         # Add one destination to all road nodes that have a free grid neighbor. 
         for node in rnw.nodes:
-            if rnw.is_road(node) and not rnw.is_destination(node):
+            if rnw.is_road(node) and not self.is_destination(node):
                 for destination in rnw.neighbors(node): 
                     if not rnw.is_road(destination):
                         if random.random() < self.destination_density:
@@ -354,8 +319,8 @@ class RoadNetworkGrid:
         # Determine which node has priority entering to_node.
 
         # If from_node is a destination, all other nodes going into to_node have priority.
-        if rnw.is_destination(from_node):
-            return [n for n in rnw.roads_to(to_node) if n != from_node]
+        if self.is_destination(from_node):
+            return [n for n in self.roads_to(to_node) if n != from_node]
 
         # In a roundabout, a vehicle going S yields to one going W, E to S, N to E, and W to N.
         priority_rule = { "S" : "W", "E" : "S", "N" : "E", "W" : "N" }
@@ -363,7 +328,7 @@ class RoadNetworkGrid:
         priority_node = next(n for n, _, d in rnw.in_edges(to_node, data = "direction") if d == priority_direction)
 
         # If the priority node can reach to_node, return it, otherwise return nothing.
-        if rnw.is_road(priority_node, to_node) and not rnw.is_destination(priority_node):
+        if self.is_road(priority_node, to_node) and not self.is_destination(priority_node):
             return [priority_node]
         else:
             return []
@@ -386,19 +351,56 @@ class RoadNetworkGrid:
         """
         return [(n1, n2) for (n1, n2) in self.road_network.edges if self.road_network.is_road(n1, n2)]
 
-    # Provide reference to some of the RoadGridNetwork methods directly in the space.
-
     def roads_from(self, source: Node) -> List[Node]:
         """
-        Calls the method with the same name on self.road_network.
+        Returns a list of all nodes that can be reached by road from a given source node.
+
+        Args:
+            source (Node): the source node.
+
+        Returns:
+            List[Node]: a list of nodes reachable by road.
         """
-        return self.road_network.roads_from(source)
+        return [sink for _, sink, has_road in self.road_network.out_edges(source, data = "road") if has_road]
 
     def roads_to(self, sink: Node) -> List[Node]:
         """
-        Calls the method with the same name on self.road_network.
+        Returns a list of all nodes that can reach the given sink node by road.
+
+        Args:
+            sink (Node): the sink node.
+
+        Returns:
+            List[Node]: a list of nodes from which the sink node can be reached by road.
         """
-        return self.road_network.roads_to(sink)
+        return [source for source, _, has_road in self.road_network.in_edges(sink, data = "road") if has_road]
+
+    def is_destination(self, node: Node) -> bool:
+        """
+        Checks if a node is a destination.
+
+        Args:
+            node (Node): the node.
+
+        Returns:
+            bool: True if the node is a destination.
+        """
+        return self.road_network.nodes[node].get("destination", False)
+
+    def edge_direction(self, source: Node, sink: Node) -> str:
+        """
+        Returns the direction of the edge going from source to sink.
+
+        Args:
+            source (Node): source node.
+            sink (Node): sink node.
+
+        Returns:
+            str: the direction as a string "N", "W", "S", or "E".
+        """
+        return self.road_network[source][sink]["direction"]
+
+    # Provide reference to some of the RoadGridNetwork methods directly in the space.
 
     def has_road_to(self, source: Node, direction: str) -> bool:
         """
@@ -412,20 +414,12 @@ class RoadNetworkGrid:
         """
         return self.road_network.is_road(node1, node2)
 
-    def is_destination(self, node: Node) -> bool:
-        """
-        Calls the method with the same name on self.road_network.
-        """
-        return self.road_network.is_destination(node)
-
     # Mesa space API (adapted from mesa.space.NetworkGrid)
 
     def place_agent(self, agent: mesa.Agent, node_id: Node) -> None:
         """Place an agent in a node."""
         self.road_network.nodes[node_id]["agent"].append(agent)
         agent.pos = node_id
-        # Set the initial heading of the vehicle.
-        agent.heading = self.road_network[node_id][next(self.road_network.neighbors(node_id))]["direction"]
 
     def get_neighborhood(self, node_id: Node, include_center: bool = False, radius: int = 1) -> list[Node]:
         """Get all adjacent nodes within a certain radius"""
