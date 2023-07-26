@@ -70,12 +70,14 @@ class ConfigurationController:
     def generate(self):
         """
         Generates a new model based on parameter values in the input fields in the simulation controls.
+        If no value is provided, the default parameter value is used instead.
         """
         for cls, params in self.configuration.data.items():
                 for p, _ in params.items():
                     with dom().query("#" + p) as field:
                         param_type = self.configuration.params[cls][p]["type"]
-                        self.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
+                        if field.dom_element.value != "":
+                            self.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
         self.model.generate(self.configuration)
         with dom().query("#random_seed") as field:
             field.dom_element.value = self.model.random_seed
@@ -90,7 +92,7 @@ class VehicleView(AgentView):
     """
     Renders a vehicle on the map.
     """
-    def __init__(self, model: mesa.Agent):
+    def __init__(self, agent: mesa.Agent):
         """
         Draws the vehicle in its initial position.
         The size of the vehicle reflects its load capacity.
@@ -101,24 +103,24 @@ class VehicleView(AgentView):
             model (mesa.Agent): the agent model which the view is connected to.
         """
         # Draw the vehicle
-        self.color = "#" + "".join([random.choice(list("0123456789abcdef")) for x in range(6)])
-        (x, y) = model.pos
+        self.color = "#" + "".join([random.choice(list("0123456789abcdef")) for i in range(6)])
+        (x, y) = agent.pos
         with dom().query("#vehicles"):
             rotation = { "N" : 0, "E" : 90, "S" : 180, "W" : 270 }
-            with g(id = f"vehicle_{model.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[model.heading]})"): 
-                rect(x = -0.2, y = -0.1 * (model.capacity + 1), width = 0.4, height = (model.capacity + 1) * 0.2, fill = self.color)
+            with g(id = f"vehicle_{agent.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[agent.heading]})"): 
+                rect(x = -0.2, y = -0.1 * (agent.capacity + 1), width = 0.4, height = (agent.capacity + 1) * 0.2, fill = self.color)
                 # When a vehicle is clicked, print some data about it to the console.
-                add_event_listener("click", lambda _: self.print_vehicle_info(model))
+                add_event_listener("click", lambda _: self.print_vehicle_info(agent))
 
-    def print_vehicle_info(self, model):
-        print(f"Vehicle {model.unique_id} clicked.")
-        print(f"position = {model.pos}")
-        print(f"plan = {model.plan}")
-        rnw = model.model.space.road_network
-        print(f"Incoming edges from: {[n for (n, _) in rnw.in_edges(model.pos)]}")
-        print(f"Outgoing edges to: {[n for (_, n) in rnw.out_edges(model.pos)]}")
+    def print_vehicle_info(self, agent: mesa.Agent):
+        print(f"Vehicle {agent.unique_id} clicked.")
+        print(f"position = {agent.pos}")
+        print(f"plan = {agent.plan}")
+        rnw = agent.model.space.road_network
+        print(f"Incoming edges from: {rnw.roads_from(agent.pos)}")
+        print(f"Outgoing edges to: {rnw.roads_to(agent.pos)}")
 
-    def update(self, model: mesa.Agent):
+    def update(self, agent: mesa.Agent):
         """
         Updates the position ahd heading of the vehicle by translating and rotating the SVG elements.
 
@@ -126,10 +128,10 @@ class VehicleView(AgentView):
             model (mesa.Agent): the agent model which the view is connected to.
         """
         # Update vehicle positions
-        (x, y) = model.pos
-        with dom().query(f"#vehicle_{model.unique_id}") as g:
+        (x, y) = agent.pos
+        with dom().query(f"#vehicle_{agent.unique_id}") as g:
             rotation = { "N" : 0, "E" : 90, "S" : 180, "W" : 270 }
-            g["transform"] = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[model.heading]})"
+            g["transform"] = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[agent.heading]})"
 
 class TransportSystemView:
     """
@@ -189,12 +191,14 @@ class TransportSystemView:
             m["viewBox"] = f"0 0 {model.width * 4} {model.height * 4}"
         with dom().query("#road_network", clear = True):
             # Visualize roads
-            for ((x1, y1), (x2, y2)) in rnw.edges():
-                line(x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
-                     stroke = "lightslategray", stroke_width = 0.8, stroke_linecap = "round")
+            for (x1, y1), (x2, y2), d in rnw.edges(data = True):
+                if d["road"]:
+                    line(x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
+                        stroke = "lightslategray", stroke_width = 0.8, stroke_linecap = "round")
             # Visualize destinations
-            for (x, y) in rnw.nodes():                
-                if rnw.nodes[(x, y)]["destination"]:
+            for node in rnw.nodes:                
+                (x, y) = node
+                if rnw.is_destination(node):
                     circle(cx =  x + 0.5, cy = y + 0.5, r = 0.25, fill = "darkgray")
         dom().query("#vehicles", clear = True)
 

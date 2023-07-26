@@ -55,7 +55,7 @@ class TransportSystem(mesa.Model):
         random.seed(self.random_seed)
         self.schedule = mesa.time.SimultaneousActivation(self)
 
-        self.space = space.RoadNetworkGrid(size_x = self.width, size_y = self.height, destination_density = self.destination_density)
+        self.space = space.RoadNetworkGrid(width = self.width, height = self.height, destination_density = self.destination_density)
         if self.view:
             self.view.update(self)
         # Create agents

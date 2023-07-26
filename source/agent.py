@@ -24,7 +24,7 @@ class Vehicle(mesa.Agent):
 
         # Randomly select a starting position which is not yet occupied by some other vehicle.
         rnw = self.model.space.road_network
-        available_positions = [p for p in rnw.nodes if not rnw.nodes[p]["agent"]]
+        available_positions = [p for p in rnw.nodes if rnw.is_road(p) and not rnw.nodes[p]["agent"]]
         self.pos = random.choice(available_positions)
         rnw.nodes[self.pos]["agent"].append(self)
         self.new_pos = self.pos
@@ -49,7 +49,7 @@ class Vehicle(mesa.Agent):
             self.plan = [capabilities.ParkCapability(self)]
         else:
             try:
-                new_pos = random.choice([node for node in rnw.neighbors(self.pos) if not rnw.nodes[node]["destination"]])
+                new_pos = random.choice([node for node in rnw.roads_from(self.pos) if not rnw.is_destination(node)])
                 self.plan = [capabilities.MoveCapability(self, new_pos)]
             except IndexError as e:
                 print(e)

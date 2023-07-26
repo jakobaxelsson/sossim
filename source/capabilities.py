@@ -69,7 +69,7 @@ class MoveCapability(Capability):
     def precondition(self) -> bool:
         """
         Defines the preconditions to make a move:
-        - There is a path to the new node from the current node.
+        - There is a road to the new node from the current node.
         - There is no conflicting traffic.
         - TODO: The agent has sufficient energy.
 
@@ -78,15 +78,15 @@ class MoveCapability(Capability):
         """
         rnw = self.agent.model.space.road_network
 
-        # There is no path to the new node from the current node.
-        if not rnw.has_edge(self.agent.pos, self.target):
+        # There is no road to the new node from the current node.
+        if self.target not in rnw.roads_from(self.agent.pos):
             return False
 
         # There is a vehicle in the new node position, and we don't know if it will move or not.
         if rnw.nodes[self.target]["agent"]:
             return False
         
-        # Priority rules of a roundabout prevents a move.
+        # Priority rules prevent a move.
         if any(rnw.nodes[priority_pos]["agent"] for priority_pos in self.agent.model.space.priority_nodes(self.agent.pos, self.target)):
             return False
 
@@ -128,7 +128,6 @@ class ParkCapability(Capability):
             agent (mesa.Agent): the agent who should be given this capability.
         """
         super().__init__(agent)
-        print(f"Vehicle {self.agent.unique_id} is looking for a parking near {self.agent.pos}")
 
     def precondition(self) -> bool:
         """
@@ -142,12 +141,12 @@ class ParkCapability(Capability):
         rnw = self.agent.model.space.road_network
 
         # There is an adjacent destination and it is free.
-        destinations = [node for (_, node) in rnw.out_edges(self.agent.pos) if rnw.nodes[node]["destination"]]
+        destinations = [node for node in rnw.roads_from(self.agent.pos) if rnw.is_destination(node)]
         if destinations and rnw.nodes[destinations[0]]["agent"] == []:
             return True
         else:
             # No destination is available here, so insert a move at the head of the agent's plan and check if that is possible.
-            new_pos = random.choice([node for node in rnw.neighbors(self.agent.pos) if not rnw.nodes[node]["destination"]])
+            new_pos = random.choice([node for node in rnw.roads_from(self.agent.pos) if not rnw.is_destination(node)])
             move = MoveCapability(self.agent, new_pos)
             self.agent.plan = [move] + self.agent.plan
             return move.precondition()
@@ -160,7 +159,7 @@ class ParkCapability(Capability):
             bool: True if and only if the current position is a destination.
         """
         rnw = self.agent.model.space.road_network
-        return rnw.nodes[self.agent.pos]["destination"]
+        return rnw.is_destination(self.agent.pos)
     
     def activate(self):
         """
@@ -168,13 +167,11 @@ class ParkCapability(Capability):
         """
         # There is an adjacent destination and it is free.
         rnw = self.agent.model.space.road_network
-        destination = [node for (_, node) in rnw.out_edges(self.agent.pos) if rnw.nodes[node]["destination"]][0]
+        destination = [node for (_, node) in rnw.out_edges(self.agent.pos) if rnw.is_destination(node)][0]
         rnw.nodes[self.agent.pos]["agent"].remove(self.agent)
         rnw.nodes[destination]["agent"].append(self.agent)
 
         self.agent.heading = rnw[self.agent.pos][destination]["direction"]
         self.agent.pos = destination
-
-        print(f"Vehicle {self.agent.unique_id} has found a parking at {self.agent.pos}")
 
         # TODO: Reduce agent energy when making the move.
