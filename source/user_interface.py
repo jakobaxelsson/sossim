@@ -15,7 +15,7 @@ import mesa
 from configuration import Configuration
 from agent import Vehicle
 from model import TransportSystem
-from domscript import add_event_listener, button, circle, dom, div, g, h3, input_, label, line, main, rect, span, svg #type: ignore
+from domscript import add_event_listener, br, button, circle, dom, div, g, h3, input_, label, line, main, rect, span, svg #type: ignore
 
 class SimulationController:
     """
@@ -67,8 +67,10 @@ class ConfigurationController:
                     with div(id = "configuration_" + cls):
                         h3(cls)
                         for p, v in params.items():
-                            with label(p):
-                                input_(id = p, value = v) 
+                            label(p)
+                            br()
+                            input_(id = p, value = v) 
+                            br()
                 with button("Generate", cls = "error"):
                     add_event_listener("click", lambda _: self.generate())
 

@@ -21,6 +21,9 @@ class SoSAgent(mesa.Agent):
         # Add a plan, which is a list of capability instances.
         self.plan: List["Capability"] = []
 
+        # Add an optional view
+        self.view = None
+
     def create_plan(self):
         """
         Creates a plan for the agent, consisting of a list of capability instances.
@@ -52,7 +55,7 @@ class SoSAgent(mesa.Agent):
             self.plan = self.plan[1:]
 
         # Update the views of the agent
-        if self.model.view:
+        if self.view:
             self.view.update(self)
 
 class Capability:
