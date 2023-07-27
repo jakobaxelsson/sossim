@@ -7,51 +7,8 @@ from typing import Tuple
 
 import mesa
 
-class Capability:
-    """
-    A generic capability, serving as a base class for specific capabilities.
-    """
+from sos_core import Capability
 
-    def __init__(self, agent: mesa.Agent):
-        """
-        Creates the capability for a certain agent.
-        Subclasses can add parameters for how to use a certain capability.
-
-        Args:
-            agent (mesa.Agent): the agent who should have this capability.
-        """
-        self.agent = agent
-
-    def __repr__(self) -> str:
-        """
-        Returns a string representation of the capability.        
-        """
-        return self.__class__.__name__
-
-    def precondition(self) -> bool:
-        """
-        Checks if the precondition for executing this capability is fulfilled.
-
-        Returns:
-            bool: True if the capability can be used, False otherwise
-        """
-        return True
-    
-    def postcondition(self) -> bool:
-        """
-        Checks if the postcondition for this capability is fulfilled.
-
-        Returns:
-            bool: True if the capability has been fulfilled, False otherwise
-        """
-        return True
-    
-    def activate(self):
-        """
-        Carries out the capability.
-        """
-        pass
-    
 class MoveCapability(Capability):
     
     def __init__(self, agent: mesa.Agent, target: Tuple[int, int]):
