@@ -34,6 +34,7 @@ class TransportSystem(mesa.Model):
         self.num_agents = 0
         self.width = 0
         self.height = 0
+        self.space = space.RoadNetworkGrid()
 
     def add_view(self, view: Any):
         """

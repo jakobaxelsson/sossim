@@ -7,10 +7,15 @@ The user interface is provided as HTML DOM elements which is manipulated using t
 
 import random
 
-from configuration import Configuration
+import js #type: ignore
+from pyodide.ffi import create_proxy #type: ignore
+
 import mesa
 
-from domscript import *
+from configuration import Configuration
+from agent import Vehicle
+from model import TransportSystem
+from domscript import add_event_listener, button, circle, dom, div, g, h3, input_, label, line, main, rect, span, svg #type: ignore
 
 class SimulationController:
     """
@@ -92,7 +97,7 @@ class VehicleView(AgentView):
     """
     Renders a vehicle on the map.
     """
-    def __init__(self, agent: mesa.Agent):
+    def __init__(self, agent: Vehicle):
         """
         Draws the vehicle in its initial position.
         The size of the vehicle reflects its load capacity.
@@ -100,7 +105,7 @@ class VehicleView(AgentView):
         It is assigned a random color, to makes it easier to follow a specific vehicle on the screen.
 
         Args:
-            model (mesa.Agent): the agent model which the view is connected to.
+            model (Vehicle): the agent model which the view is connected to.
         """
         # Draw the vehicle
         self.color = "#" + "".join([random.choice(list("0123456789abcdef")) for i in range(6)])
@@ -112,7 +117,7 @@ class VehicleView(AgentView):
                 # When a vehicle is clicked, print some data about it to the console.
                 add_event_listener("click", lambda _: self.print_vehicle_info(agent))
 
-    def print_vehicle_info(self, agent: mesa.Agent):
+    def print_vehicle_info(self, agent: Vehicle):
         print(f"Vehicle {agent.unique_id} clicked.")
         print(f"position = {agent.pos}")
         print(f"plan = {agent.plan}")
@@ -120,12 +125,12 @@ class VehicleView(AgentView):
         print(f"Incoming edges from: {space.roads_from(agent.pos)}")
         print(f"Outgoing edges to: {space.roads_to(agent.pos)}")
 
-    def update(self, agent: mesa.Agent):
+    def update(self, agent: Vehicle):
         """
         Updates the position ahd heading of the vehicle by translating and rotating the SVG elements.
 
         Args:
-            model (mesa.Agent): the agent model which the view is connected to.
+            model (Vehicle): the agent model which the view is connected to.
         """
         # Update vehicle positions
         (x, y) = agent.pos
@@ -137,12 +142,12 @@ class TransportSystemView:
     """
     Provides a view of the road network.
     """
-    def __init__(self, model: mesa.Model):
+    def __init__(self, model: TransportSystem):
         """
         Initiates the view of the model, which consists of a map and simulation controls.
 
         Args:
-            model (mesa.Agent): the agent model which the view is connected to.
+            model (TransportSystem): the transport system model which the view is connected to.
         """
         # Create UI elements
         with dom().query("#simulation"):
@@ -162,7 +167,8 @@ class TransportSystemView:
         Returns:
             AgentView: the new agent view, or None if no view is available for that class of agents.
         """
-        if agent.__class__.__name__ == "Vehicle":
+#        if agent.__class__.__name__ == "Vehicle":
+        if isinstance(agent, Vehicle):
             return VehicleView(agent)
         else:
             return None
@@ -177,14 +183,14 @@ class TransportSystemView:
         with dom().query("#time") as p:
             p.inner_html(t)
 
-    def update(self, model: mesa.Model):
+    def update(self, model: TransportSystem):
         """
         Updates the map, clearing any previous graphics.
         When drawing the graphics, the internal scale in the SVG is one cell to one unit.
         The viewBox is set to the entire graph, and the graphics is scaled through SVG element styling.
 
         Args:
-            model (mesa.Model): the model to be reflected in the user interface.
+            model (TransportSystem): the transport system model to be reflected in the user interface.
         """
         space = model.space
         with dom().query("#map") as m:
@@ -216,7 +222,7 @@ class UserInteface:
     """
     Creates the user interface of the SoSSim interactive mode.
     """
-    def __init__(self, model: mesa.Model, configuration: Configuration):
+    def __init__(self, model: TransportSystem, configuration: Configuration):
         # Remove load message and set cursor to default
         with dom().query("#load_msg") as e:
             e.remove()

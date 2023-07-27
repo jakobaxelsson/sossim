@@ -4,13 +4,15 @@ import argparse
 import os
 from pathlib import Path
 
+import pdoc
+
 if __name__ == "__main__":
     # Parse the command line arguments and store them in args.
     parser = argparse.ArgumentParser(description='Build the SoSSim simulator.')
-    parser.add_argument('--typecheck', default = False, action=argparse.BooleanOptionalAction, help = "Run code typecheck")
-    parser.add_argument('--docs',      default = False, action=argparse.BooleanOptionalAction, help = "Generate documentation")
-    parser.add_argument('--pyconfig',  default = False, action=argparse.BooleanOptionalAction, help = "Generate pyscript configuration file")
-    parser.add_argument('--all',       default = False, action='store_true',                   help = "Run all build steps")
+    parser.add_argument('--typecheck', default = False, action = argparse.BooleanOptionalAction, help = "Run code typecheck")
+    parser.add_argument('--docs',      default = False, action = argparse.BooleanOptionalAction, help = "Generate documentation")
+    parser.add_argument('--pyconfig',  default = False, action = argparse.BooleanOptionalAction, help = "Generate pyscript configuration file")
+    parser.add_argument('--all',       default = False, action = 'store_true',                   help = "Run all build steps")
 
     args = parser.parse_args()
 
@@ -32,10 +34,33 @@ if __name__ == "__main__":
     # Documentation.
     if args.docs or args.all:
         print("Generate documentation")
-        # TODO: Should remove any existing files before generating new ones.
-        # Pdoc assumes that the top directory is on the path, so add it there.
-        os.environ["PYTHONPATH"] = str(os.path.abspath("source"))
-        os.system("pdoc ./source/agent.py ./source/capabilities ./source/configuration.py ./source/model ./source/space.py -o ./documentation --docformat google")
+        source_dir = Path("source")
+        target_dir = Path("documentation")
+        # Remove existing files before generating new ones.
+        for file in target_dir.glob("*"):
+            file.unlink()
+        # Configure and run pdoc on selected files
+        pdoc.render.configure(docformat = "google")
+        modules = list(source_dir.glob("*.py"))
+        # The following code is based on pdoc.pdoc, but modified to skip files that causes an error.
+        all_modules = {}
+        for module_name in pdoc.extract.walk_specs(modules):
+            try:
+                all_modules[module_name] = pdoc.doc.Module.from_name(module_name)
+            except Exception:
+                print("Cannot document module", module_name)
+
+        for module in all_modules.values():
+            out = pdoc.render.html_module(module, all_modules)
+            outfile = target_dir / f"{module.fullname.replace('.', '/')}.html"
+            outfile.parent.mkdir(parents=True, exist_ok=True)
+            outfile.write_bytes(out.encode())
+
+        if index := pdoc.render.html_index(all_modules):
+            (target_dir / "index.html").write_bytes(index.encode())
+
+        if search := pdoc.render.search_index(all_modules):
+            (target_dir / "search.js").write_bytes(search.encode())
 
     # Pyscript configuration file
     if args.pyconfig or args.all:

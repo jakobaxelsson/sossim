@@ -7,6 +7,7 @@ from typing import List
 
 import capabilities
 import mesa
+from space import Node
 
 class Vehicle(mesa.Agent):
 
@@ -16,9 +17,11 @@ class Vehicle(mesa.Agent):
 
         Args:
             unique_id (int): the unique id of the agent.
-            model (mesa.Model): the model in which the agent is situated.
+            model (model.TransportSystem): the model in which the agent is situated.
         """
         super().__init__(unique_id, model)
+        self.pos: Node = (0, 0)
+
         # Add a load capacity of the vehicle
         self.capacity = random.choice([1, 2, 3])
 
