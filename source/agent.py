@@ -5,12 +5,19 @@ Provides concrete agents for the SoSSim system-of-systems simulator.
 import random
 
 import capabilities
+from configuration import Configuration
 from sos_core import SoSAgent
 from space import Node
 
 class Vehicle(SoSAgent):
 
-    def __init__(self, unique_id: int, model: "model.TransportSystem"):
+    # Define configuration parameters relevant to this class
+    Configuration.add_param(class_name = "Vehicle", name = "max_load", type = int, default = 3, flag = "-ml", 
+                            help = "maximum load of a vehicle")
+    Configuration.add_param(class_name = "Vehicle", name = "parking_probability", type = float, default = 0.1, flag = "-pp", 
+                            help = "probability that a vehicle will start looking for a parking")
+
+    def __init__(self, unique_id: int, model: "model.TransportSystem", configuration: Configuration):
         """
         Creates a vehicle agent in a simulation model.
 
@@ -19,10 +26,11 @@ class Vehicle(SoSAgent):
             model (model.TransportSystem): the model in which the agent is situated.
         """
         super().__init__(unique_id, model)
+        configuration.initialize(self)
         self.pos: Node = (0, 0)
 
         # Add a load capacity of the vehicle
-        self.capacity = random.choice([1, 2, 3])
+        self.capacity = random.choice(range(1, self.max_load + 1))
 
         # Randomly select a starting position which is not yet occupied by some other vehicle.
         space = self.model.space
@@ -42,7 +50,7 @@ class Vehicle(SoSAgent):
         Occasionally, it chooses instead to find a parking.
         """
         space = self.model.space
-        if random.random() < 0.1:
+        if random.random() < self.parking_probability:
             self.plan = [capabilities.ParkCapability(self)]
         else:
             try:

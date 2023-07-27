@@ -61,7 +61,7 @@ class TransportSystem(mesa.Model):
             self.view.update(self)
         # Create agents
         for i in range(self.num_agents):
-            a = agent.Vehicle(i, self)
+            a = agent.Vehicle(i, self, configuration)
             self.schedule.add(a)
 
     def step(self):

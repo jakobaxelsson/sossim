@@ -115,6 +115,7 @@ class VehicleView(AgentView):
         with dom().query("#vehicles"):
             rotation = { "N" : 0, "E" : 90, "S" : 180, "W" : 270 }
             with g(id = f"vehicle_{agent.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[agent.heading]})"): 
+                # TODO: Modify graphics to take max_load of vehicle into account
                 rect(x = -0.2, y = -0.1 * (agent.capacity + 1), width = 0.4, height = (agent.capacity + 1) * 0.2, fill = self.color)
                 # When a vehicle is clicked, print some data about it to the console.
                 add_event_listener("click", lambda _: self.print_vehicle_info(agent))
