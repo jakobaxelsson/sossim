@@ -12,10 +12,11 @@ from pyodide.ffi import create_proxy #type: ignore
 
 import mesa
 
-from configuration import Configuration
 from agent import Vehicle
-from model import TransportSystem
+from configuration import Configuration
 from domscript import add_event_listener, br, button, circle, dom, div, g, h3, input_, label, line, main, rect, span, svg #type: ignore
+from model import TransportSystem
+from view import View
 
 class SimulationController:
     """
@@ -86,17 +87,11 @@ class ConfigurationController:
                         if field.dom_element.value != "":
                             self.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
         # Reinitialize the model, but keep its old view.
-        self.model.__init__(self.configuration, self.model.view)
+        self.model.__init__(self.configuration, self.model.get_view())
         with dom().query("#random_seed") as field:
             field.dom_element.value = self.model.random_seed
 
-class AgentView: 
-    """
-    A common superclass for agent views.
-    """
-    pass
-
-class VehicleView(AgentView):
+class VehicleView(View):
     """
     Renders a vehicle on the map.
     """
@@ -142,7 +137,7 @@ class VehicleView(AgentView):
             rotation = { "N" : 0, "E" : 90, "S" : 180, "W" : 270 }
             g["transform"] = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[agent.heading]})"
 
-class TransportSystemView:
+class TransportSystemView(View):
     """
     Provides a view of the road network.
     """
@@ -160,7 +155,7 @@ class TransportSystemView:
                 g(id = "road_network")
                 g(id = "vehicles")
 
-    def create_agent_view(self, agent: mesa.Agent) -> AgentView | None:
+    def create_agent_view(self, agent: mesa.Agent) -> None:
         """
         Creates the view of an agent.
         It determines what view to use based on the class name of the agent.
@@ -171,11 +166,8 @@ class TransportSystemView:
         Returns:
             AgentView: the new agent view, or None if no view is available for that class of agents.
         """
-#        if agent.__class__.__name__ == "Vehicle":
         if isinstance(agent, Vehicle):
-            return VehicleView(agent)
-        else:
-            return None
+            agent.add_view(VehicleView(agent))
 
     def update_time(self, t: int):
         """
@@ -212,7 +204,7 @@ class TransportSystemView:
         dom().query("#vehicles", clear = True)
         # Add agent views
         for agent in model.schedule.agents:
-            agent.view = self.create_agent_view(agent)
+            self.create_agent_view(agent)
 
 class MenuBar:
     """

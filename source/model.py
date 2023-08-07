@@ -9,8 +9,9 @@ import agent
 from configuration import Configuration
 import mesa
 import space
+from view import Viewable
 
-class TransportSystem(mesa.Model):
+class TransportSystem(mesa.Model, Viewable):
     # Define configuration parameters relevant to this class
     Configuration.add_param(class_name = "TransportSystem", name = "num_agents", type = int, default = 10, flag = "-N", 
                             help = "number of vehicles")
@@ -32,8 +33,6 @@ class TransportSystem(mesa.Model):
             configuration (Configuration): the configuration of parameters from which the model is generated.
             view (Any): an optional view of the model.
         """
-        self.view = view
-
         # Initialize configuration
         configuration.initialize(self)
 
@@ -48,25 +47,14 @@ class TransportSystem(mesa.Model):
         for i in range(self.num_agents):
             a = agent.Vehicle(i, self, configuration)
             self.schedule.add(a)
-        
-        # Update view
-        if self.view:
-            self.view.update(self)
 
-    def add_view(self, view: Any):
-        """
-        Adds a view to the model.
-
-        Args:
-            view (Any): the view to be added.
-        """
-        self.view = view
-        self.view.update(self)
+        # Add a view.
+        self.add_view(view)
 
     def step(self):
         """
         Performs a simulation step and updates the views.
         """
         self.schedule.step()
-        if self.view:
-            self.view.update_time(self.schedule.time)
+        if self.get_view():
+            self.get_view().update_time(self.schedule.time)

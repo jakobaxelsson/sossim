@@ -5,8 +5,9 @@ Provides abstract classes representing the core concepts of systems-of-systems.
 from typing import List
 
 import mesa
+from view import Viewable
 
-class SoSAgent(mesa.Agent):
+class SoSAgent(mesa.Agent, Viewable):
 
     def __init__(self, unique_id: int, model: mesa.Model):
         """
@@ -20,9 +21,6 @@ class SoSAgent(mesa.Agent):
 
         # Add a plan, which is a list of capability instances.
         self.plan: List["Capability"] = []
-
-        # Add an optional view
-        self.view = None
 
     def create_plan(self):
         """
@@ -55,8 +53,7 @@ class SoSAgent(mesa.Agent):
             self.plan = self.plan[1:]
 
         # Update the views of the agent
-        if self.view:
-            self.view.update(self)
+        self.update_view()
 
 class Capability:
     """

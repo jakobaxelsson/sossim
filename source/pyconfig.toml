@@ -7,4 +7,4 @@ terminal = false
 enabled = false
 
 [[fetch]]
-files = ["agent.py", "capabilities.py", "configuration.py", "domscript.py", "model.py", "sos_core.py", "space.py", "user_interface.py", "mesa/agent.py", "mesa/datacollection.py", "mesa/model.py", "mesa/space.py", "mesa/time.py", "mesa/__init__.py"]
+files = ["agent.py", "capabilities.py", "configuration.py", "domscript.py", "model.py", "sos_core.py", "space.py", "user_interface.py", "view.py", "mesa/agent.py", "mesa/datacollection.py", "mesa/model.py", "mesa/space.py", "mesa/time.py", "mesa/__init__.py"]
