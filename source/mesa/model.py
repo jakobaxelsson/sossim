@@ -12,7 +12,7 @@ import random
 # mypy
 from typing import Any
 
-from mesa.datacollection import DataCollector
+# from mesa.datacollection import DataCollector
 
 
 class Model:

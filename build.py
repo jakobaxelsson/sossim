@@ -84,14 +84,3 @@ if __name__ == "__main__":
             f.write("enabled = false\n\n")
             f.write("[[fetch]]\n")
             f.write(f"files = [{files}]")
-        """ 
-        packages = ["networkx", "numpy", "pandas"]
-
-terminal = false
-
-[splashscreen]
-enabled = false
-
-[[fetch]]
-files = ["agent.py", "capabilities.py", "domscript.py", "model.py", "space.py", "user_interface.py", "mesa/__init__.py", "mesa/agent.py", "mesa/datacollection.py", "mesa/model.py", "mesa/space.py", "mesa/time.py"]
-"""
