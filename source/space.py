@@ -12,13 +12,14 @@ import networkx as nx
 
 import mesa
 
-# Type abbreviations for nodes and edges
+# Type abbreviations for nodes, edges and directions.
 Node = Tuple[int, int]
 Edge = Tuple[Node, Node]
+Direction = int
 
 class RoadGridGraph(nx.DiGraph):
     """
-    A directed graph representing a 2D grid where the edges are labelled by direction (N, S, E, W).
+    A directed graph representing a 2D grid where the edges are labelled by direction in degrees.
     Roads are represented by having the node and edge attribute "road" set to True.
     Destinations are represented by having the node attribute "destination" set to True.
     """
@@ -80,13 +81,13 @@ class RoadGridGraph(nx.DiGraph):
         if bidirectional:
             self[sink][source]["road"] = True
 
-    def add_roads(self, node: Node, directions: List[int]):
+    def add_roads(self, node: Node, directions: List[Direction]):
         """
         Adds a sequence of roads to the network, starting in the provided node and going in the provided directions.
 
         Args:
             node (Node): the start node.
-            directions (List[int]): a list containing directions in degrees.
+            directions (List[Direction]): a list containing directions in degrees.
         """
         for d in directions:
             next_node = next(n for n in self.neighbors(node) if self[node][n]["direction"] == d)
@@ -106,13 +107,13 @@ class RoadGridGraph(nx.DiGraph):
         self.add_road(node1, node2, bidirectional = True)
         self.nodes[node2]["destination"] = True
 
-    def has_road_to(self, source: Node, direction: int) -> bool:
+    def has_road_to(self, source: Node, direction: Direction) -> bool:
         """
         Returns True if and only if the graph has a road from the given node in the given direction.
 
         Args:
             source (Node): the source node.
-            direction (int): the direction in degrees.
+            direction (Direction): the direction in degrees.
 
         Returns:
             bool: _description_
@@ -216,6 +217,7 @@ class RoadNetworkGrid:
         # Create a new graph, this time directed. Each node in the coarse graph maps to 4 x 4 nodes in the new graph.
         rnw = self.road_network = RoadGridGraph(self.width * 4, self.height * 4)
 
+        # Main directions as letters to improve readability.
         N, E, S, W = [0, 90, 180, 270]
 
         # Add internal connections between coarse node in detailed graph.
@@ -381,7 +383,7 @@ class RoadNetworkGrid:
         """
         return self.road_network.nodes[node].get("destination", False)
 
-    def edge_direction(self, source: Node, sink: Node) -> int:
+    def edge_direction(self, source: Node, sink: Node) -> Direction:
         """
         Returns the direction of the edge going from source to sink.
 
@@ -390,13 +392,13 @@ class RoadNetworkGrid:
             sink (Node): sink node.
 
         Returns:
-            int: the direction in degrees.
+            Direction: the direction in degrees.
         """
         return self.road_network[source][sink]["direction"]
 
     # Provide reference to some of the RoadGridNetwork methods directly in the space.
 
-    def has_road_to(self, source: Node, direction: int) -> bool:
+    def has_road_to(self, source: Node, direction: Direction) -> bool:
         """
         Calls the method with the same name on self.road_network.
         """
