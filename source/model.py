@@ -3,7 +3,7 @@ Provides models for the SoSSim system-of-systems simulator.
 """
 import random
 import sys
-from typing import Any
+from typing import List
 
 import agent
 from configuration import Configuration
@@ -24,15 +24,16 @@ class TransportSystem(mesa.Model, Viewable):
     Configuration.add_param(class_name = "TransportSystem", name = "random_seed", type = int, default = random.randrange(sys.maxsize), flag = "-r", 
                             help = "seed for random number generator")
 
-    def __init__(self, configuration: Configuration, view: Any = None):
+    def __init__(self, configuration: Configuration):
         """
         Creates a transport system model.
-        Note that it is empty initially, and needs to be generated using the generate method.
 
         Args:
             configuration (Configuration): the configuration of parameters from which the model is generated.
-            view (Any): an optional view of the model.
+            views (List[View]): a list of views to be added to the model.
         """
+        super().__init__()
+
         # Initialize configuration
         configuration.initialize(self)
 
@@ -48,13 +49,9 @@ class TransportSystem(mesa.Model, Viewable):
             a = agent.Vehicle(i, self, configuration)
             self.schedule.add(a)
 
-        # Add a view.
-        self.add_view(view)
-
     def step(self):
         """
         Performs a simulation step and updates the views.
         """
         self.schedule.step()
-        if self.get_view():
-            self.get_view().update_time(self.schedule.time)
+        self.update_views()

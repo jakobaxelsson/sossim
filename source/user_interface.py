@@ -16,11 +16,12 @@ from agent import Vehicle
 from configuration import Configuration
 from domscript import add_event_listener, br, button, circle, dom, div, g, h3, input_, label, line, main, rect, span, svg #type: ignore
 from model import TransportSystem
+from space import RoadNetworkGrid
 from view import View
 
 class SimulationController:
     """
-    Provides a simulation controller that lets the user configure and run a simulation.
+    Provides a simulation controller that lets the user run a simulation.
     """
     def __init__(self, model):
         """
@@ -86,8 +87,10 @@ class ConfigurationController:
                         param_type = self.configuration.params[cls][p]["type"]
                         if field.dom_element.value != "":
                             self.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
-        # Reinitialize the model, but keep its old view.
-        self.model.__init__(self.configuration, self.model.get_view())
+        # Reinitialize the model and its views.
+        self.model.__init__(self.configuration)
+        self.model.clear_views()
+        self.model.add_view(TransportSystemView(self.model))
         with dom().query("#random_seed") as field:
             field.dom_element.value = self.model.random_seed
 
@@ -135,49 +138,12 @@ class VehicleView(View):
         with dom().query(f"#vehicle_{agent.unique_id}") as g:
             g["transform"] = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"
 
-class TransportSystemView(View):
+class RoadNetworkGridView(View):
     """
     Provides a view of the road network.
     """
-    def __init__(self, model: TransportSystem):
-        """
-        Initiates the view of the model, which consists of a map and simulation controls.
 
-        Args:
-            model (TransportSystem): the transport system model which the view is connected to.
-        """
-        # Create UI elements
-        with dom().query("#simulation"):
-            with svg(id = "map", width = "100%", height = "90vh",
-                     style = "border: 0.5px solid black; background: lightgreen;"):
-                g(id = "road_network")
-                g(id = "vehicles")
-
-    def create_agent_view(self, agent: mesa.Agent) -> None:
-        """
-        Creates the view of an agent.
-        It determines what view to use based on the class name of the agent.
-
-        Args:
-            agent (mesa.Agent): the agent.
-
-        Returns:
-            AgentView: the new agent view, or None if no view is available for that class of agents.
-        """
-        if isinstance(agent, Vehicle):
-            agent.add_view(VehicleView(agent))
-
-    def update_time(self, t: int):
-        """
-        Updates the time indicator in the user interface.
-
-        Args:
-            t (int): the new time.
-        """
-        with dom().query("#time") as p:
-            p.inner_html(t)
-
-    def update(self, model: TransportSystem):
+    def update(self, space: RoadNetworkGrid):
         """
         Updates the map, clearing any previous graphics.
         When drawing the graphics, the internal scale in the SVG is one cell to one unit.
@@ -186,9 +152,8 @@ class TransportSystemView(View):
         Args:
             model (TransportSystem): the transport system model to be reflected in the user interface.
         """
-        space = model.space
         with dom().query("#map") as m:
-            m["viewBox"] = f"0 0 {model.width * 4} {model.height * 4}"
+            m["viewBox"] = f"0 0 {space.width * 4} {space.height * 4}"
         with dom().query("#road_network", clear = True):
             # Visualize roads
             for (x1, y1), (x2, y2) in space.road_edges():
@@ -199,10 +164,34 @@ class TransportSystemView(View):
                 (x, y) = node
                 if space.is_destination(node):
                     circle(cx =  x + 0.5, cy = y + 0.5, r = 0.25, fill = "darkgray")
-        dom().query("#vehicles", clear = True)
+
+class TransportSystemView(View):
+    """
+    Provides a view of the entire transport system.
+    """
+    def __init__(self, model: TransportSystem):
+        """
+        Initiates the view of the model, which consists of a map, vehicles, and simulation controls.
+        """
+        # Add a space view.
+        model.space.add_view(RoadNetworkGridView())
+
         # Add agent views
+        dom().query("#vehicles", clear = True)
         for agent in model.schedule.agents:
-            self.create_agent_view(agent)
+            if isinstance(agent, Vehicle):
+                agent.add_view(VehicleView(agent))
+
+    def update(self, model: TransportSystem):
+        """
+        Updates the time indicator in the user interface.
+
+        Args:
+            model (TransportSystem): the model.
+        """
+        t = model.schedule.time
+        with dom().query("#time") as p:
+            p.inner_html(t)
 
 class MenuBar:
     """
@@ -235,6 +224,10 @@ class UserInteface:
                 with div(id = "main_grid", style = "display: grid; grid-template-columns: 2fr 1fr;"):
                     with div(id = "simulation"):
                         div(id = "controls")
+                        with svg(id = "map", width = "100%", height = "90vh",
+                                 style = "border: 0.5px solid black; background: lightgreen;"):
+                                g(id = "road_network")
+                                g(id = "vehicles")
                         SimulationController(model)
                     with div(id = "configuration"):
                         ConfigurationController(model, configuration)

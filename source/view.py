@@ -1,6 +1,8 @@
 """
 Module containing functionality for attaching views to model classes.    
 """
+from typing import List
+
 class View:
     """
     Base class for views.
@@ -16,7 +18,7 @@ class View:
 
 class Viewable:
     """
-    A mixin for objects to which a view can be attached. It adds the methods add_view and update_view.
+    A mixin for objects to which a view can be attached. It adds the methods add_view and update_views.
     """
     def add_view(self, view: View):
         """
@@ -25,21 +27,33 @@ class Viewable:
         Args:
             view (Any): the view.
         """
-        self._view = view
-        self.update_view()
+        if not hasattr(self, "_views"):
+            self._views = []
+        self._views += [view]
+        self.update_views()
 
-    def get_view(self) -> View:
+    def get_views(self) -> List[View]:
         """
-        Returns the view attached to the viewable object, if any.
+        Returns the list of views attached to the viewable object.
 
         Returns:
-            Any: the view (or None).
+            List[View]: the views.
         """
-        return self._view
+        if not hasattr(self, "_views"):
+            self._views = []
+        return self._views
 
-    def update_view(self):
+    def update_views(self):
         """
-        Updates the view, if one exists.
+        Updates the views.
         """
-        if hasattr(self, "_view") and self._view:
-            self._view.update(self)
+        if not hasattr(self, "_views"):
+            self._views = []
+        for view in self._views:
+            view.update(self)
+
+    def clear_views(self):
+        """
+        Removes all views.
+        """
+        self._views = []

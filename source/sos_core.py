@@ -53,7 +53,7 @@ class SoSAgent(mesa.Agent, Viewable):
             self.plan = self.plan[1:]
 
         # Update the views of the agent
-        self.update_view()
+        self.update_views()
 
 class Capability:
     """

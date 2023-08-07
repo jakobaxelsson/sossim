@@ -9,8 +9,9 @@ import random
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import networkx as nx
-
 import mesa
+
+from view import Viewable
 
 # Type abbreviations for nodes, edges and directions.
 Node = Tuple[int, int]
@@ -155,7 +156,7 @@ def subnode(node: Node, i: int, j: int) -> Node:
     """
     return (node[0] * 4 + i, node[1] * 4 + j)
 
-class RoadNetworkGrid:
+class RoadNetworkGrid(Viewable):
     """
     A mesa space consisting of a road network which is placed on a grid.
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
