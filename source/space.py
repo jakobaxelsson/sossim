@@ -63,15 +63,7 @@ class RoadGridGraph(nx.DiGraph):
         # Set the direction attribute for edges
         for (source, sink) in self.edges:
             ((x1, y1), (x2, y2)) = (source, sink)
-            d = (x2 - x1, y2 - y1)
-            if d == (-1, 0):
-                self[source][sink]["direction"] = 270
-            elif d == (1, 0):
-                self[source][sink]["direction"] = 90
-            elif d == (0, -1):
-                self[source][sink]["direction"] = 0
-            else: # d == (0, 1)
-                self[source][sink]["direction"] = 180
+            self[source][sink]["direction"] = int(math.degrees(math.atan2(y2 - y1, x2 - x1))) + 90
 
     def add_road(self, source: Node, sink: Node, bidirectional: bool = False):
         """
