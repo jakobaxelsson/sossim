@@ -11,6 +11,7 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple
 import networkx as nx
 import mesa
 
+from configuration import Configuration
 from view import Viewable
 
 # Type abbreviations for nodes, edges and directions.
@@ -162,21 +163,25 @@ class RoadNetworkGrid(Viewable):
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
     Some nodes in the road networks can be destinations, where places of interest can be placed.
     """
+    Configuration.add_param(class_name = "RoadNetworkGrid", name = "width", type = int, default = 10, flag = "-x", 
+                            help = "number of grid cells in x dimension")
+    Configuration.add_param(class_name = "RoadNetworkGrid", name = "height", type = int, default = 10, flag = "-y", 
+                            help = "number of grid cells in y dimension")
+    Configuration.add_param(class_name = "RoadNetworkGrid", name = "road_density", type = float, default = 0.3, flag = "-rd", 
+                            help = "the proportion of the grid to be covered by roads")
+    Configuration.add_param(class_name = "RoadNetworkGrid", name = "destination_density", type = float, default = 0.3, flag = "-dd", 
+                            help = "probability of generating a destination in a position where it is possible")
 
-    def __init__(self, width: int = 10, height: int = 10, road_density: float = 0.3, destination_density: float = 0.3):
+    def __init__(self, configuration: Configuration):
         """
         Creates a grid of size (width, height), and adds a road network to it.
         
         Args:
-            width (int, optional): the grid size in the x dimension. Defaults to 10.
-            height (int, optional): the grid size in the y dimension. Defaults to 10.
-            road_density (float, optional): the proportion of grid elements to be connected by roads. Defaults to 0.3.
+            configuration (Configuration): the configuration of parameters from which the road network is generated.
         """
         # Setup parameters and superclass
-        self.width = width
-        self.height = height
-        self.road_density = road_density
-        self.destination_density = destination_density
+        super().__init__()
+        configuration.initialize(self)
         self.coarse_network = None
         self.road_network = None
 

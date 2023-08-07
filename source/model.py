@@ -15,12 +15,6 @@ class TransportSystem(mesa.Model, Viewable):
     # Define configuration parameters relevant to this class
     Configuration.add_param(class_name = "TransportSystem", name = "num_agents", type = int, default = 10, flag = "-N", 
                             help = "number of vehicles")
-    Configuration.add_param(class_name = "TransportSystem", name = "width", type = int, default = 10, flag = "-x", 
-                            help = "number of grid cells in x dimension")
-    Configuration.add_param(class_name = "TransportSystem", name = "height", type = int, default = 10, flag = "-y", 
-                            help = "number of grid cells in y dimension")
-    Configuration.add_param(class_name = "TransportSystem", name = "destination_density", type = float, default = 0.3, flag = "-dd", 
-                            help = "probability of generating a destination in a position where it is possible")
     Configuration.add_param(class_name = "TransportSystem", name = "random_seed", type = int, default = random.randrange(sys.maxsize), flag = "-r", 
                             help = "seed for random number generator")
 
@@ -30,7 +24,6 @@ class TransportSystem(mesa.Model, Viewable):
 
         Args:
             configuration (Configuration): the configuration of parameters from which the model is generated.
-            views (List[View]): a list of views to be added to the model.
         """
         super().__init__()
 
@@ -42,7 +35,7 @@ class TransportSystem(mesa.Model, Viewable):
 
         # Create time and space
         self.schedule = mesa.time.SimultaneousActivation(self)
-        self.space = space.RoadNetworkGrid(width = self.width, height = self.height, destination_density = self.destination_density)
+        self.space = space.RoadNetworkGrid(configuration)
 
         # Create agents
         for i in range(self.num_agents):
