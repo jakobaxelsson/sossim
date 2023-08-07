@@ -109,8 +109,7 @@ class VehicleView(View):
         self.color = "#" + "".join([random.choice(list("0123456789abcdef")) for i in range(6)])
         (x, y) = agent.pos
         with dom().query("#vehicles"):
-            rotation = { "N" : 0, "E" : 90, "S" : 180, "W" : 270 }
-            with g(id = f"vehicle_{agent.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[agent.heading]})"): 
+            with g(id = f"vehicle_{agent.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"): 
                 height = (agent.capacity + 1) / (agent.max_load + 1) * 0.8
                 rect(x = -0.2, y = -height / 2, width = 0.4, height = height, fill = self.color)
                 # When a vehicle is clicked, print some data about it to the console.
@@ -134,8 +133,7 @@ class VehicleView(View):
         # Update vehicle positions
         (x, y) = agent.pos
         with dom().query(f"#vehicle_{agent.unique_id}") as g:
-            rotation = { "N" : 0, "E" : 90, "S" : 180, "W" : 270 }
-            g["transform"] = f"translate({x + 0.5}, {y + 0.5}) rotate({rotation[agent.heading]})"
+            g["transform"] = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"
 
 class TransportSystemView(View):
     """

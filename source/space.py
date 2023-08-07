@@ -65,13 +65,13 @@ class RoadGridGraph(nx.DiGraph):
             ((x1, y1), (x2, y2)) = (source, sink)
             d = (x2 - x1, y2 - y1)
             if d == (-1, 0):
-                self[source][sink]["direction"] = "W"
+                self[source][sink]["direction"] = 270
             elif d == (1, 0):
-                self[source][sink]["direction"] = "E"
+                self[source][sink]["direction"] = 90
             elif d == (0, -1):
-                self[source][sink]["direction"] = "N"
+                self[source][sink]["direction"] = 0
             else: # d == (0, 1)
-                self[source][sink]["direction"] = "S"
+                self[source][sink]["direction"] = 180
 
     def add_road(self, source: Node, sink: Node, bidirectional: bool = False):
         """
@@ -88,13 +88,13 @@ class RoadGridGraph(nx.DiGraph):
         if bidirectional:
             self[sink][source]["road"] = True
 
-    def add_roads(self, node: Node, directions: str):
+    def add_roads(self, node: Node, directions: List[int]):
         """
         Adds a sequence of roads to the network, starting in the provided node and going in the provided directions.
 
         Args:
             node (Node): the start node.
-            directions (str): the direction, which is a string containing the characters N, E, S, W
+            directions (List[int]): a list containing directions in degrees.
         """
         for d in directions:
             next_node = next(n for n in self.neighbors(node) if self[node][n]["direction"] == d)
@@ -114,13 +114,13 @@ class RoadGridGraph(nx.DiGraph):
         self.add_road(node1, node2, bidirectional = True)
         self.nodes[node2]["destination"] = True
 
-    def has_road_to(self, source: Node, direction: str) -> bool:
+    def has_road_to(self, source: Node, direction: int) -> bool:
         """
         Returns True if and only if the graph has a road from the given node in the given direction.
 
         Args:
             source (Node): the source node.
-            direction (str): the direction, which is one of "N", "S", "E", "W".
+            direction (int): the direction in degrees.
 
         Returns:
             bool: _description_
@@ -224,49 +224,51 @@ class RoadNetworkGrid:
         # Create a new graph, this time directed. Each node in the coarse graph maps to 4 x 4 nodes in the new graph.
         rnw = self.road_network = RoadGridGraph(self.width * 4, self.height * 4)
 
+        N, E, S, W = [0, 90, 180, 270]
+
         # Add internal connections between coarse node in detailed graph.
         for node in cnw:
-            if cnw.has_road_to(node, "E"):
-                rnw.add_roads(subnode(node, 2, 2), "EEE")
-            if cnw.has_road_to(node, "W"):
-                rnw.add_roads(subnode(node, 1, 1), "WWW")
-            if cnw.has_road_to(node, "N"):
-                rnw.add_roads(subnode(node, 2, 1), "NNN")
-            if cnw.has_road_to(node, "S"):
-                rnw.add_roads(subnode(node, 1, 2), "SSS")
+            if cnw.has_road_to(node, E):
+                rnw.add_roads(subnode(node, 2, 2), [E] * 3)
+            if cnw.has_road_to(node, W):
+                rnw.add_roads(subnode(node, 1, 1), [W] * 3)
+            if cnw.has_road_to(node, N):
+                rnw.add_roads(subnode(node, 2, 1), [N] * 3)
+            if cnw.has_road_to(node, S):
+                rnw.add_roads(subnode(node, 1, 2), [S] * 3)
 
         # Add connections for roundabouts and through roads
         for node in cnw:
             if cnw.road_degree(node) == 1:
                 # Dead ends need to make it possible to turn around, which requires adding three out of four edges.
-                if not cnw.has_road_to(node, "E"):
-                    rnw.add_roads(subnode(node, 2, 2), "N")
-                if not cnw.has_road_to(node, "W"):
-                    rnw.add_roads(subnode(node, 1, 1), "S")
-                if not cnw.has_road_to(node, "N"):
-                    rnw.add_roads(subnode(node, 2, 1), "W")
-                if not cnw.has_road_to(node, "S"):
-                    rnw.add_roads(subnode(node, 1, 2), "E")
+                if not cnw.has_road_to(node, E):
+                    rnw.add_roads(subnode(node, 2, 2), [N])
+                if not cnw.has_road_to(node, W):
+                    rnw.add_roads(subnode(node, 1, 1), [S])
+                if not cnw.has_road_to(node, N):
+                    rnw.add_roads(subnode(node, 2, 1), [W])
+                if not cnw.has_road_to(node, S):
+                    rnw.add_roads(subnode(node, 1, 2), [E])
             if cnw.road_degree(node) == 2:
                 # # Through roads
                 # Through roads
-                if cnw.has_road_to(node, "N") and cnw.has_road_to(node, "W"):
-                    rnw.add_roads(subnode(node, 1, 2), "EN")
-                if cnw.has_road_to(node, "N") and cnw.has_road_to(node, "S"):
-                    rnw.add_roads(subnode(node, 1, 1), "S")
-                    rnw.add_roads(subnode(node, 2, 2), "N")
-                if cnw.has_road_to(node, "N") and cnw.has_road_to(node, "E"):
-                    rnw.add_roads(subnode(node, 1, 1), "SE")
-                if cnw.has_road_to(node, "W") and cnw.has_road_to(node, "S"):
-                    rnw.add_roads(subnode(node, 2, 2), "NW")
-                if cnw.has_road_to(node, "W") and cnw.has_road_to(node, "E"):
-                    rnw.add_roads(subnode(node, 2, 1), "W")
-                    rnw.add_roads(subnode(node, 1, 2), "E")
-                if cnw.has_road_to(node, "S") and cnw.has_road_to(node, "E"):
-                    rnw.add_roads(subnode(node, 2, 1), "WS")
+                if cnw.has_road_to(node, N) and cnw.has_road_to(node, W):
+                    rnw.add_roads(subnode(node, 1, 2), [E, N])
+                if cnw.has_road_to(node, N) and cnw.has_road_to(node, S):
+                    rnw.add_roads(subnode(node, 1, 1), [S])
+                    rnw.add_roads(subnode(node, 2, 2), [N])
+                if cnw.has_road_to(node, N) and cnw.has_road_to(node, E):
+                    rnw.add_roads(subnode(node, 1, 1), [S, E])
+                if cnw.has_road_to(node, W) and cnw.has_road_to(node, S):
+                    rnw.add_roads(subnode(node, 2, 2), [N, W])
+                if cnw.has_road_to(node, W) and cnw.has_road_to(node, E):
+                    rnw.add_roads(subnode(node, 2, 1), [W])
+                    rnw.add_roads(subnode(node, 1, 2), [E])
+                if cnw.has_road_to(node, S) and cnw.has_road_to(node, E):
+                    rnw.add_roads(subnode(node, 2, 1), [W, S])
             if cnw.road_degree(node) > 2:
                 # # Three and four way crossings require roundabouts, so all four edges are added.
-                rnw.add_roads(subnode(node, 1, 1), "SENW")
+                rnw.add_roads(subnode(node, 1, 1), [S, E, N, W])
 
         # Add one destination to all road nodes that have a free grid neighbor. 
         for node in rnw.nodes:
@@ -323,7 +325,7 @@ class RoadNetworkGrid:
             return [n for n in self.roads_to(to_node) if n != from_node]
 
         # In a roundabout, a vehicle going S yields to one going W, E to S, N to E, and W to N.
-        priority_rule = { "S" : "W", "E" : "S", "N" : "E", "W" : "N" }
+        priority_rule = { 180 : 270, 90 : 180, 0 : 90, 270 : 0 }
         priority_direction = priority_rule[rnw[from_node][to_node]["direction"]]
         priority_node = next(n for n, _, d in rnw.in_edges(to_node, data = "direction") if d == priority_direction)
 
@@ -387,7 +389,7 @@ class RoadNetworkGrid:
         """
         return self.road_network.nodes[node].get("destination", False)
 
-    def edge_direction(self, source: Node, sink: Node) -> str:
+    def edge_direction(self, source: Node, sink: Node) -> int:
         """
         Returns the direction of the edge going from source to sink.
 
@@ -396,13 +398,13 @@ class RoadNetworkGrid:
             sink (Node): sink node.
 
         Returns:
-            str: the direction as a string "N", "W", "S", or "E".
+            int: the direction in degrees.
         """
         return self.road_network[source][sink]["direction"]
 
     # Provide reference to some of the RoadGridNetwork methods directly in the space.
 
-    def has_road_to(self, source: Node, direction: str) -> bool:
+    def has_road_to(self, source: Node, direction: int) -> bool:
         """
         Calls the method with the same name on self.road_network.
         """
