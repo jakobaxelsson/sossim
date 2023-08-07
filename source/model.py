@@ -23,18 +23,35 @@ class TransportSystem(mesa.Model):
     Configuration.add_param(class_name = "TransportSystem", name = "random_seed", type = int, default = random.randrange(sys.maxsize), flag = "-r", 
                             help = "seed for random number generator")
 
-    def __init__(self):
+    def __init__(self, configuration: Configuration, view: Any = None):
         """
         Creates a transport system model.
         Note that it is empty initially, and needs to be generated using the generate method.
+
+        Args:
+            configuration (Configuration): the configuration of parameters from which the model is generated.
+            view (Any): an optional view of the model.
         """
-        # TODO: Initialize from a configuration object, to make it easier to edit, load, and save it.
+        self.view = view
+
+        # Initialize configuration
+        configuration.initialize(self)
+
         # TODO: Mesa has its own random seed handling, see source code of Mesa.model. 
-        self.view = None
-        self.num_agents = 0
-        self.width = 0
-        self.height = 0
-        self.space = space.RoadNetworkGrid()
+        random.seed(self.random_seed)
+
+        # Create time and space
+        self.schedule = mesa.time.SimultaneousActivation(self)
+        self.space = space.RoadNetworkGrid(width = self.width, height = self.height, destination_density = self.destination_density)
+
+        # Create agents
+        for i in range(self.num_agents):
+            a = agent.Vehicle(i, self, configuration)
+            self.schedule.add(a)
+        
+        # Update view
+        if self.view:
+            self.view.update(self)
 
     def add_view(self, view: Any):
         """
@@ -44,25 +61,7 @@ class TransportSystem(mesa.Model):
             view (Any): the view to be added.
         """
         self.view = view
-
-    def generate(self, configuration: Configuration):
-        """
-        Generates the model, including creating its space and agents.
-
-        Args:
-            configuration (Configuration): the configuration of parameters from which the model is generated.
-        """
-        configuration.initialize(self)
-        random.seed(self.random_seed)
-        self.schedule = mesa.time.SimultaneousActivation(self)
-
-        self.space = space.RoadNetworkGrid(width = self.width, height = self.height, destination_density = self.destination_density)
-        if self.view:
-            self.view.update(self)
-        # Create agents
-        for i in range(self.num_agents):
-            a = agent.Vehicle(i, self, configuration)
-            self.schedule.add(a)
+        self.view.update(self)
 
     def step(self):
         """

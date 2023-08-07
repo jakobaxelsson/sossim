@@ -3,7 +3,6 @@ Main file for the SoSSim system-of-systems simulator.
 It imports the necessary modules and configures the simulation.
 It can be ran in batch mode or in interactive mode in the browser using pyscript.
 """
-
 import sys
 
 from configuration import Configuration
@@ -16,10 +15,8 @@ def interactive_mode(configuration: Configuration) -> None:
     import user_interface as ui
 
     # Create the model and the user interface.
-    mod = model.TransportSystem()
+    mod = model.TransportSystem(configuration)
     ui.UserInteface(mod, configuration)
-    mod.add_view(ui.TransportSystemView(mod))
-    mod.generate(configuration)
 
 def batch_mode(configuration: Configuration) -> None:
     """
@@ -41,8 +38,7 @@ def batch_mode(configuration: Configuration) -> None:
     else:
         # Create the model using the supplied command line arguments, and run it.
         print("Running batch mode simulation")
-        mod = model.TransportSystem()
-        mod.generate(configuration)
+        mod = model.TransportSystem(configuration)
         for i in range(args.iterations):
             mod.step()
 

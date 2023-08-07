@@ -85,7 +85,8 @@ class ConfigurationController:
                         param_type = self.configuration.params[cls][p]["type"]
                         if field.dom_element.value != "":
                             self.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
-        self.model.generate(self.configuration)
+        # Reinitialize the model, but keep its old view.
+        self.model.__init__(self.configuration, self.model.view)
         with dom().query("#random_seed") as field:
             field.dom_element.value = self.model.random_seed
 
@@ -209,6 +210,9 @@ class TransportSystemView:
                 if space.is_destination(node):
                     circle(cx =  x + 0.5, cy = y + 0.5, r = 0.25, fill = "darkgray")
         dom().query("#vehicles", clear = True)
+        # Add agent views
+        for agent in model.schedule.agents:
+            agent.view = self.create_agent_view(agent)
 
 class MenuBar:
     """
@@ -244,3 +248,4 @@ class UserInteface:
                         SimulationController(model)
                     with div(id = "configuration"):
                         ConfigurationController(model, configuration)
+        model.add_view(TransportSystemView(model))

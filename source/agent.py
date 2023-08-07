@@ -40,10 +40,6 @@ class Vehicle(SoSAgent):
         # Set the initial heading of the vehicle to that of the heading of one of the roads leading into the current position.
         self.heading = space.edge_direction(space.roads_to(self.pos)[0], self.pos)
 
-        # Add a view
-        if self.model.view:
-            self.view = self.model.view.create_agent_view(self)
-
     def create_plan(self):
         """
         The vehicle creates a plan, which consists of randomly moving to one the neighbours in the road network.
