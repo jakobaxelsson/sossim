@@ -9,7 +9,7 @@ from pyodide.ffi import create_proxy #type: ignore
 
 from agent import Vehicle
 from configuration import Configuration
-from domscript import add_event_listener, br, button, circle, dom, div, g, h3, input_, label, line, main, polygon, rect, span, svg #type: ignore
+from domscript import add_event_listener, br, button, circle, details, dom, div, g, h3, input_, label, line, main, polygon, rect, span, summary, svg #type: ignore
 from model import TransportSystem
 from space import RoadNetworkGrid
 from view import View
@@ -59,10 +59,11 @@ class ConfigurationController:
         self.model = model
         self.configuration = configuration
         with dom().query("#configuration"):
+            h3("Configuration parameters")
             with div(id = "configuration_controls", cls = "flex demo"):
                 for cls, params in self.configuration.data.items():
-                    with div(id = "configuration_" + cls):
-                        h3(cls)
+                    with details(id = "configuration_" + cls):
+                        summary(cls)
                         for p, v in params.items():
                             # Add a label with the parameter name, and the help text as a tooltip
                             label(p, title = self.configuration.params[cls][p]["help"])
