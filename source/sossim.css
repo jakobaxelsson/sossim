@@ -1,0 +1,40 @@
+/* 
+Style sheet for the SoSSim systems-of-systems simulator.
+*/
+
+/* Define variables */
+:root {
+    /* Fonts */
+    --font-family: Arial, Helvetica, sans-serif;
+
+    /* Map colors */
+    --map-background: lightgreen;
+    --map-border: 0.5px solid black;
+    --road-color: lightslategray;
+    --destination-background: darkgray;
+    --charging-point-background: orange;
+    --charging-point-foreground: black;
+}
+
+
+/* Define styling */
+
+/* Fonts */
+* { 
+    font-family: var(--font-family); 
+}
+
+/* Maps*/
+.map {
+    border: var(--map-border); 
+    background: var(--map-background);
+
+    & .road { stroke: var(--road-color); }
+
+    & .destination { fill: var(--destination-background); }
+
+    & .charging_point {
+        & circle { fill: var(--charging-point-background); }
+        & polygon { fill: var(--charging-point-foreground);  }
+    }
+}

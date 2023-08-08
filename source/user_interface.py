@@ -154,20 +154,20 @@ class RoadNetworkGridView(View):
         with dom().query("#road_network", clear = True):
             # Visualize roads
             for (x1, y1), (x2, y2) in space.road_edges():
-                line(x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
-                     stroke = "lightslategray", stroke_width = 0.8, stroke_linecap = "round")
+                line(cls = "road", x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
+                     stroke_width = 0.8, stroke_linecap = "round")
             # Visualize destinations
             for node in space.road_nodes():                
                 (x, y) = node
                 if space.is_destination(node):
-                    circle(cx =  0.5, cy = 0.5, r = 0.25, fill = "darkgray", transform = f"translate({x}, {y})")
+                    circle(cls = "destination", cx =  0.5, cy = 0.5, r = 0.25, transform = f"translate({x}, {y})")
             # Visualize charging points
             for node in space.road_nodes():                
                 (x, y) = node
                 if space.is_charging_point(node):
-                    with g(transform = f"translate({x}, {y})"):
-                        circle(cx =  0.5, cy = 0.5, r = 0.25, fill = "orange")
-                        polygon(points = "0.52,0.30 0.35,0.55 0.48,0.55 0.48,0.70 0.65,0.45 0.52,0.45 0.52,0.30", fill = "black")
+                    with g(cls = "charging_point", transform = f"translate({x}, {y})"):
+                        circle(cx =  0.5, cy = 0.5, r = 0.25)
+                        polygon(points = "0.52,0.30 0.35,0.55 0.48,0.55 0.48,0.70 0.65,0.45 0.52,0.45 0.52,0.30")
 
 class TransportSystemView(View):
     """
@@ -228,8 +228,7 @@ class UserInteface:
                 with div(id = "main_grid", style = "display: grid; grid-template-columns: 2fr 1fr;"):
                     with div(id = "simulation"):
                         div(id = "controls")
-                        with svg(id = "map", width = "100%", height = "90vh",
-                                 style = "border: 0.5px solid black; background: lightgreen;"):
+                        with svg(cls = "map", id = "map", width = "100%", height = "90vh"):
                                 g(id = "road_network")
                                 g(id = "vehicles")
                         SimulationController(model)
