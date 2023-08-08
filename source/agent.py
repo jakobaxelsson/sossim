@@ -1,9 +1,6 @@
 """
 Provides concrete agents for the SoSSim system-of-systems simulator.
 """
-
-import random
-
 import capabilities
 from configuration import Configuration
 from sos_core import SoSAgent
@@ -34,15 +31,15 @@ class Vehicle(SoSAgent):
         self.pos: Node = (0, 0)
 
         # Add a load capacity of the vehicle
-        self.capacity = random.choice(range(1, self.max_load + 1))
+        self.capacity = self.model.random.choice(range(1, self.max_load + 1))
 
         # Add an energy level and initialize it to a random value
-        self.energy_level = random.choice(range(round(0.2 * self.max_energy), self.max_energy + 1))
+        self.energy_level = self.model.random.choice(range(round(0.2 * self.max_energy), self.max_energy + 1))
 
         # Randomly select a starting position which is not yet occupied by some other vehicle.
         space = self.model.space
         available_positions = [p for p in space.road_nodes() if space.is_cell_empty(p)]
-        space.place_agent(self, random.choice(available_positions))
+        space.place_agent(self, self.model. random.choice(available_positions))
 
         # Set the initial heading of the vehicle to that of the heading of one of the roads leading into the current position.
         self.heading = space.edge_direction(space.roads_to(self.pos)[0], self.pos)
@@ -54,17 +51,17 @@ class Vehicle(SoSAgent):
         When energy level is low, it searches for an available charging point and charges energy there.
         """
         space = self.model.space
-        if self.energy_level < 20:
+        if self.energy_level < 30:
             # Find a charging point and charge energy there.
             print(f"Vehicle {self.unique_id} needs to charge")
             self.plan = [capabilities.FindDestinationCapability(self, lambda pos: space.is_charging_point(pos)),
                          capabilities.ChargeEnergyCapability(self)]
-        elif random.random() < self.parking_probability:
+        elif self.model.random.random() < self.parking_probability:
             # Find a destination which is not a charging point.
             self.plan = [capabilities.FindDestinationCapability(self, lambda pos: not space.is_charging_point(pos))]
         else:
             try:
-                new_pos = random.choice([node for node in space.roads_from(self.pos) if not space.is_destination(node)])
+                new_pos = self.model.random.choice([node for node in space.roads_from(self.pos) if not space.is_destination(node)])
                 self.plan = [capabilities.MoveCapability(self, new_pos)]
             except IndexError as e:
                 print(e)

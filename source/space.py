@@ -5,7 +5,6 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.
 """
 import itertools
 import math
-import random
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import networkx as nx
@@ -179,16 +178,18 @@ class RoadNetworkGrid(Viewable):
     Configuration.add_param(class_name = "RoadNetworkGrid", name = "charging_point_density", type = float, default = 0.3, flag = "-cpd", 
                             help = "probability of a destination having a charging point")
 
-    def __init__(self, configuration: Configuration):
+    def __init__(self, configuration: Configuration, model: mesa.Model):
         """
         Creates a grid of size (width, height), and adds a road network to it.
         
         Args:
             configuration (Configuration): the configuration of parameters from which the road network is generated.
+            model (mesa.Model): the model of which this space is to be a part.
         """
         # Setup parameters and superclass
         super().__init__()
         configuration.initialize(self)
+        self.model = model
         self.coarse_network = None
         self.road_network = None
 
@@ -216,7 +217,7 @@ class RoadNetworkGrid(Viewable):
         remaining_nodes = self.width * self.height * self.road_density
         while remaining_nodes > 0:
             # Pick an edge to add, removing it from the candidates and adding it to the graph
-            (source, sink) = random.choices(edge_candidates, weights = [self._edge_preference(e) for e in edge_candidates])[0]
+            (source, sink) = self.model.random.choices(edge_candidates, weights = [self._edge_preference(e) for e in edge_candidates])[0]
 
             # If the sink of the new edge is new in the graph, add edges to its neighbors as new edge candidates
             if not cnw.is_road(sink):
@@ -281,8 +282,8 @@ class RoadNetworkGrid(Viewable):
             if rnw.is_road(node) and not self.is_destination(node):
                 for destination in rnw.neighbors(node): 
                     if not rnw.is_road(destination):
-                        if random.random() < self.destination_density:
-                            charging_point = random.random() < self.charging_point_density
+                        if self.model.random.random() < self.destination_density:
+                            charging_point = self.model.random.random() < self.charging_point_density
                             rnw.add_destination(node, destination, charging_point = charging_point)
                             break
 

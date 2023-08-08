@@ -4,9 +4,6 @@ The user interface is based on the Model-View-Controller pattern.
 The model is a Mesa model, and this module provides simulation controller and user interface elements.
 The user interface is provided as HTML DOM elements which is manipulated using the domscript module.
 """
-
-import random
-
 import js #type: ignore
 from pyodide.ffi import create_proxy #type: ignore
 
@@ -75,6 +72,8 @@ class ConfigurationController:
                             br()
                 with button("Generate", cls = "error"):
                     add_event_listener("click", lambda _: self.generate())
+        with dom().query("#random_seed") as field:
+            field.dom_element.value = self.model.random_seed
 
     def generate(self):
         """
@@ -106,10 +105,10 @@ class VehicleView(View):
         It is assigned a random color, to makes it easier to follow a specific vehicle on the screen.
 
         Args:
-            model (Vehicle): the agent model which the view is connected to.
+            agent (Vehicle): the agent which the view is connected to.
         """
         # Draw the vehicle
-        self.color = "#" + "".join([random.choice(list("0123456789abcdef")) for i in range(6)])
+        self.color = "#" + "".join([agent.model.random.choice(list("0123456789abcdef")) for i in range(6)])
         (x, y) = agent.pos
         with dom().query("#vehicles"):
             with g(id = f"vehicle_{agent.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"): 

@@ -14,8 +14,8 @@ class TransportSystem(mesa.Model, Viewable):
     # Define configuration parameters relevant to this class
     Configuration.add_param(class_name = "TransportSystem", name = "num_agents", type = int, default = 10, flag = "-N", 
                             help = "number of vehicles")
-    Configuration.add_param(class_name = "TransportSystem", name = "random_seed", type = int, default = random.randrange(sys.maxsize), flag = "-r", 
-                            help = "seed for random number generator")
+    Configuration.add_param(class_name = "TransportSystem", name = "random_seed", type = int, default = -1, flag = "-r", 
+                            help = "seed for random number generator (use -1 to initialize from system time)")
 
     def __init__(self, configuration: Configuration):
         """
@@ -29,12 +29,13 @@ class TransportSystem(mesa.Model, Viewable):
         # Initialize configuration
         configuration.initialize(self)
 
-        # TODO: Mesa has its own random seed handling, see source code of Mesa.model. 
-        random.seed(self.random_seed)
+        if self.random_seed == -1:
+            self.random_seed = random.randrange(sys.maxsize)
+        self.random.seed(self.random_seed)
 
         # Create time and space
         self.schedule = mesa.time.SimultaneousActivation(self)
-        self.space = space.RoadNetworkGrid(configuration)
+        self.space = space.RoadNetworkGrid(configuration, self)
 
         # Create agents
         for i in range(self.num_agents):

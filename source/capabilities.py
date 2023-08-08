@@ -1,8 +1,6 @@
 """
 Classes that define capabilities of agents.
 """
-
-import random
 from typing import Callable
 
 import mesa
@@ -108,7 +106,7 @@ class FindDestinationCapability(Capability):
             return True
         else:
             # No destination is available here, so insert a move at the head of the agent's plan and check if that is possible.
-            new_pos = random.choice([node for node in space.roads_from(self.agent.pos) if not space.is_destination(node)])
+            new_pos = self.agent.model.random.choice([node for node in space.roads_from(self.agent.pos) if not space.is_destination(node)])
             move = MoveCapability(self.agent, new_pos)
             self.agent.plan = [move] + self.agent.plan
             return move.precondition()
