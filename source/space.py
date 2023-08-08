@@ -24,6 +24,7 @@ class RoadGridGraph(nx.DiGraph):
     A directed graph representing a 2D grid where the edges are labelled by direction in degrees.
     Roads are represented by having the node and edge attribute "road" set to True.
     Destinations are represented by having the node attribute "destination" set to True.
+    Some destinations can also have charging points.
     """
 
     def __init__(self, width: int, height: int, node_attrs: Dict[str, Any] = dict(), edge_attrs: Dict[str, Any] = dict()):
@@ -55,6 +56,7 @@ class RoadGridGraph(nx.DiGraph):
         for node in self.nodes:
             self.nodes[node]["road"] = False
             self.nodes[node]["destination"] = False
+            self.nodes[node]["charging_point"] = False
             self.nodes[node]["agent"] = []
             for (attr, value) in node_attrs.items():
                 self.nodes[node][attr] = value
@@ -96,7 +98,7 @@ class RoadGridGraph(nx.DiGraph):
             self.add_road(node, next_node)
             node = next_node
 
-    def add_destination(self, node1: Node, node2: Node):
+    def add_destination(self, node1: Node, node2: Node, charging_point: bool = False):
         """
         Adds a destination node, as a neighbor of the given node.
         Roads are added to and from the destination from the node.
@@ -105,9 +107,12 @@ class RoadGridGraph(nx.DiGraph):
         Args:
             node1 (Node): the node to be connected to the destination.
             node2 (Node): the destination.
+            charging_point (bool, optional): if True, the destination is a charging point. Defaults to False.
         """
         self.add_road(node1, node2, bidirectional = True)
         self.nodes[node2]["destination"] = True
+        if charging_point:
+            self.nodes[node2]["charging_point"] = True
 
     def has_road_to(self, source: Node, direction: Direction) -> bool:
         """
@@ -171,6 +176,8 @@ class RoadNetworkGrid(Viewable):
                             help = "the proportion of the grid to be covered by roads")
     Configuration.add_param(class_name = "RoadNetworkGrid", name = "destination_density", type = float, default = 0.3, flag = "-dd", 
                             help = "probability of generating a destination in a position where it is possible")
+    Configuration.add_param(class_name = "RoadNetworkGrid", name = "charging_point_density", type = float, default = 0.3, flag = "-cpd", 
+                            help = "probability of a destination having a charging point")
 
     def __init__(self, configuration: Configuration):
         """
@@ -250,7 +257,6 @@ class RoadNetworkGrid(Viewable):
                 if not cnw.has_road_to(node, S):
                     rnw.add_roads(subnode(node, 1, 2), [E])
             if cnw.road_degree(node) == 2:
-                # # Through roads
                 # Through roads
                 if cnw.has_road_to(node, N) and cnw.has_road_to(node, W):
                     rnw.add_roads(subnode(node, 1, 2), [E, N])
@@ -276,7 +282,8 @@ class RoadNetworkGrid(Viewable):
                 for destination in rnw.neighbors(node): 
                     if not rnw.is_road(destination):
                         if random.random() < self.destination_density:
-                            rnw.add_destination(node, destination)
+                            charging_point = random.random() < self.charging_point_density
+                            rnw.add_destination(node, destination, charging_point = charging_point)
                             break
 
     def _edge_preference(self, edge: Edge) -> float:
@@ -388,6 +395,19 @@ class RoadNetworkGrid(Viewable):
             bool: True if the node is a destination.
         """
         return self.road_network.nodes[node].get("destination", False)
+
+    def is_charging_point(self, node: Node) -> bool:
+        """
+        Checks if a node is a charging point.
+
+        Args:
+            node (Node): the node.
+
+        Returns:
+            bool: True if the node is a charging point.
+        """
+        # TODO: For now, just check if it is a destination.
+        return self.road_network.nodes[node].get("charging_point", False)
 
     def edge_direction(self, source: Node, sink: Node) -> Direction:
         """

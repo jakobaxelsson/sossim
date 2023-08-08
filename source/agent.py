@@ -14,6 +14,10 @@ class Vehicle(SoSAgent):
     # Define configuration parameters relevant to this class
     Configuration.add_param(class_name = "Vehicle", name = "max_load", type = int, default = 3, flag = "-ml", 
                             help = "maximum load of a vehicle")
+    Configuration.add_param(class_name = "Vehicle", name = "max_energy", type = int, default = 100, flag = "-me", 
+                            help = "maximum energy of a vehicle")
+    Configuration.add_param(class_name = "Vehicle", name = "charging_speed", type = int, default = 10, flag = "-cs", 
+                            help = "the charging speed of a vehicle")
     Configuration.add_param(class_name = "Vehicle", name = "parking_probability", type = float, default = 0.1, flag = "-pp", 
                             help = "probability that a vehicle will start looking for a parking")
 
@@ -32,6 +36,9 @@ class Vehicle(SoSAgent):
         # Add a load capacity of the vehicle
         self.capacity = random.choice(range(1, self.max_load + 1))
 
+        # Add an energy level and initialize it to a random value
+        self.energy_level = random.choice(range(round(0.2 * self.max_energy), self.max_energy + 1))
+
         # Randomly select a starting position which is not yet occupied by some other vehicle.
         space = self.model.space
         available_positions = [p for p in space.road_nodes() if space.is_cell_empty(p)]
@@ -44,10 +51,17 @@ class Vehicle(SoSAgent):
         """
         The vehicle creates a plan, which consists of randomly moving to one the neighbours in the road network.
         Occasionally, it chooses instead to find a parking.
+        When energy level is low, it searches for an available charging point and charges energy there.
         """
         space = self.model.space
-        if random.random() < self.parking_probability:
-            self.plan = [capabilities.ParkCapability(self)]
+        if self.energy_level < 20:
+            # Find a charging point and charge energy there.
+            print(f"Vehicle {self.unique_id} needs to charge")
+            self.plan = [capabilities.FindDestinationCapability(self, lambda pos: space.is_charging_point(pos)),
+                         capabilities.ChargeEnergyCapability(self)]
+        elif random.random() < self.parking_probability:
+            # Find a destination which is not a charging point.
+            self.plan = [capabilities.FindDestinationCapability(self, lambda pos: not space.is_charging_point(pos))]
         else:
             try:
                 new_pos = random.choice([node for node in space.roads_from(self.pos) if not space.is_destination(node)])

@@ -14,7 +14,7 @@ import mesa
 
 from agent import Vehicle
 from configuration import Configuration
-from domscript import add_event_listener, br, button, circle, dom, div, g, h3, input_, label, line, main, rect, span, svg #type: ignore
+from domscript import add_event_listener, br, button, circle, dom, div, g, h3, input_, label, line, main, polygon, rect, span, svg #type: ignore
 from model import TransportSystem
 from space import RoadNetworkGrid
 from view import View
@@ -120,11 +120,9 @@ class VehicleView(View):
 
     def print_vehicle_info(self, agent: Vehicle):
         print(f"Vehicle {agent.unique_id} clicked.")
-        print(f"position = {agent.pos}")
-        print(f"plan = {agent.plan}")
-        space = agent.model.space
-        print(f"Incoming edges from: {space.roads_from(agent.pos)}")
-        print(f"Outgoing edges to: {space.roads_to(agent.pos)}")
+        attributes = ["pos", "energy_level", "plan"]
+        for a in attributes:
+            print(a, "=", getattr(agent, a))
 
     def update(self, agent: Vehicle):
         """
@@ -163,7 +161,14 @@ class RoadNetworkGridView(View):
             for node in space.road_nodes():                
                 (x, y) = node
                 if space.is_destination(node):
-                    circle(cx =  x + 0.5, cy = y + 0.5, r = 0.25, fill = "darkgray")
+                    circle(cx =  0.5, cy = 0.5, r = 0.25, fill = "darkgray", transform = f"translate({x}, {y})")
+            # Visualize charging points
+            for node in space.road_nodes():                
+                (x, y) = node
+                if space.is_charging_point(node):
+                    with g(transform = f"translate({x}, {y})"):
+                        circle(cx =  0.5, cy = 0.5, r = 0.25, fill = "orange")
+                        polygon(points = "0.52,0.30 0.35,0.55 0.48,0.55 0.48,0.70 0.65,0.45 0.52,0.45 0.52,0.30", fill = "black")
 
 class TransportSystemView(View):
     """

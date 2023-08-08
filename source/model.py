@@ -3,7 +3,6 @@ Provides models for the SoSSim system-of-systems simulator.
 """
 import random
 import sys
-from typing import List
 
 import agent
 from configuration import Configuration
