@@ -14,6 +14,12 @@ Style sheet for the SoSSim systems-of-systems simulator.
     --destination-background: darkgray;
     --charging-point-background: orange;
     --charging-point-foreground: black;
+
+    /* Navbar */
+    --navbar-color: #e8e8e8;
+    --navbar-hover-color: lightgray;
+    --navbar-font-color: black;
+    --navbar-padding: 0.75rem;
 }
 
 /* Define styling */
@@ -37,3 +43,57 @@ Style sheet for the SoSSim systems-of-systems simulator.
         & polygon { fill: var(--charging-point-foreground);  }
     }
 }
+
+/* Navigation bar */
+nav {
+    float: left; 
+    width: 100vw;
+    background: var(--navbar-color);
+    
+    & ul {
+        list-style: none;
+        margin: 0;
+        padding-left: 0;
+    }
+
+    & li {
+        color: var(--navbar-font-color);
+        display: block;
+        float: left;
+        padding: var(--navbar-padding);
+        position: relative;
+    }
+
+    & li:hover {
+        background: var(--navbar-hover-color);
+        cursor: pointer;
+    }
+
+    & ul li ul {
+        background: var(--navbar-color);
+        visibility: hidden;
+        opacity: 0;
+        min-width: 5rem;
+        position: absolute;
+        margin-top: var(--navbar-padding);
+        left: 0;
+        display: none;
+    }
+
+    & ul li:hover > ul,
+    & ul li ul:hover {
+        visibility: visible;
+        opacity: 1;
+        display: block;
+    }
+
+    & ul li ul li {
+        clear: both;
+        width: 100%;
+    }
+}
+
+/* Main content */
+main { 
+    float: left; 
+    }

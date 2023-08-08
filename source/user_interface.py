@@ -9,7 +9,7 @@ from pyodide.ffi import create_proxy #type: ignore
 
 from agent import Vehicle
 from configuration import Configuration
-from domscript import add_event_listener, br, button, circle, details, dom, div, g, h3, input_, label, line, main, polygon, rect, span, summary, svg #type: ignore
+from domscript import add_event_listener, br, button, circle, details, dom, div, g, h3, header, input_, label, li, line, main, nav, polygon, rect, span, summary, svg, ul #type: ignore
 from model import TransportSystem
 from space import RoadNetworkGrid
 from view import View
@@ -202,13 +202,19 @@ class MenuBar:
     Main menu bar of the SoSSim user interface.
     """
     def __init__(self):
-        with dom().query("#menubar"):
+        with nav(id = "menubar"):
             with ul():
                 li("File")
-                li("View")
-                li("About")
+                with li("View"):
+                    with ul():
+                        li("Configuration")
+                        li("Agent")
+                with li("About"):
+                    # Open the project README file on Github in a separate tab.
+                    about_page = "https://github.com/jakobaxelsson/sossim/blob/master/README.md"
+                    add_event_listener("click", lambda _: js.window.open(about_page, "_blank"))
 
-class UserInteface:
+class UserInterface:
     """
     Creates the user interface of the SoSSim interactive mode.
     """
@@ -220,11 +226,8 @@ class UserInteface:
             b["style"] = "cursor: default;"
         # Setup main layout
         with dom().query("body"):
-            # TODO: Pico CSS navbar does not render as expected.
-#            with header():
-#                with nav(id = "menubar", cls = "container-fluid"): 
-#                    MenuBar()
-            with main(cls = "container"):
+            MenuBar()
+            with main():
                 with div(id = "main_grid", style = "display: grid; grid-template-columns: 2fr 1fr;"):
                     with div(id = "simulation"):
                         div(id = "controls")

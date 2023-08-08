@@ -16,7 +16,7 @@ def interactive_mode(configuration: Configuration) -> None:
 
     # Create the model and the user interface.
     mod = model.TransportSystem(configuration)
-    ui.UserInteface(mod, configuration)
+    ui.UserInterface(mod, configuration)
 
 def batch_mode(configuration: Configuration) -> None:
     """
