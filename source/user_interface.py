@@ -7,8 +7,6 @@ The user interface is provided as HTML DOM elements which is manipulated using t
 import js #type: ignore
 from pyodide.ffi import create_proxy #type: ignore
 
-import mesa
-
 from agent import Vehicle
 from configuration import Configuration
 from domscript import add_event_listener, br, button, circle, dom, div, g, h3, input_, label, line, main, polygon, rect, span, svg #type: ignore
@@ -66,7 +64,8 @@ class ConfigurationController:
                     with div(id = "configuration_" + cls):
                         h3(cls)
                         for p, v in params.items():
-                            label(p)
+                            # Add a label with the parameter name, and the help text as a tooltip
+                            label(p, title = self.configuration.params[cls][p]["help"])
                             br()
                             input_(id = p, value = v) 
                             br()

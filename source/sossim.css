@@ -7,7 +7,7 @@ Style sheet for the SoSSim systems-of-systems simulator.
     /* Fonts */
     --font-family: Arial, Helvetica, sans-serif;
 
-    /* Map colors */
+    /* Map colors and styling */
     --map-background: lightgreen;
     --map-border: 0.5px solid black;
     --road-color: lightslategray;
@@ -16,7 +16,6 @@ Style sheet for the SoSSim systems-of-systems simulator.
     --charging-point-foreground: black;
 }
 
-
 /* Define styling */
 
 /* Fonts */
@@ -24,7 +23,7 @@ Style sheet for the SoSSim systems-of-systems simulator.
     font-family: var(--font-family); 
 }
 
-/* Maps*/
+/* Maps */
 .map {
     border: var(--map-border); 
     background: var(--map-background);
