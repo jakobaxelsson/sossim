@@ -9,7 +9,7 @@ from pyodide.ffi import create_proxy #type: ignore
 
 from agent import Vehicle
 from configuration import Configuration
-from domscript import add_event_listener, br, button, circle, details, dom, div, g, h3, header, input_, label, li, line, main, nav, polygon, rect, span, summary, svg, ul #type: ignore
+from domscript import add_event_listener, br, button, circle, details, dom, div, g, h3, header, input_, label, li, line, main, nav, p, polygon, rect, span, summary, svg, ul #type: ignore
 from model import TransportSystem
 from space import RoadNetworkGrid
 from view import View
@@ -97,6 +97,9 @@ class VehicleView(View):
     """
     Renders a vehicle on the map.
     """
+    # Add a vehicle which can be selected by clicking on it, and display detailed information about it.
+    selected_vehicle_id = None
+
     def __init__(self, agent: Vehicle):
         """
         Draws the vehicle in its initial position.
@@ -107,6 +110,8 @@ class VehicleView(View):
         Args:
             agent (Vehicle): the agent which the view is connected to.
         """
+        self.agent = agent
+
         # Draw the vehicle
         self.color = "#" + "".join([agent.model.random.choice(list("0123456789abcdef")) for i in range(6)])
         (x, y) = agent.pos
@@ -115,25 +120,34 @@ class VehicleView(View):
                 height = (agent.capacity + 1) / (agent.max_load + 1) * 0.8
                 rect(x = -0.2, y = -height / 2, width = 0.4, height = height, fill = self.color)
                 # When a vehicle is clicked, print some data about it to the console.
-                add_event_listener("click", lambda _: self.print_vehicle_info(agent))
+                add_event_listener("click", lambda _: self.select_vehicle())
 
-    def print_vehicle_info(self, agent: Vehicle):
-        print(f"Vehicle {agent.unique_id} clicked.")
-        attributes = ["pos", "energy_level", "plan"]
-        for a in attributes:
-            print(a, "=", getattr(agent, a))
+    def select_vehicle(self):
+        """
+        Selects a vehicle.
+        """
+        VehicleView.selected_vehicle_id = self.agent.unique_id
+        self.update(self.agent)
 
     def update(self, agent: Vehicle):
         """
         Updates the position ahd heading of the vehicle by translating and rotating the SVG elements.
 
         Args:
-            model (Vehicle): the agent model which the view is connected to.
+            agent (Vehicle): the agent model which the view is connected to.
         """
         # Update vehicle positions
         (x, y) = agent.pos
         with dom().query(f"#vehicle_{agent.unique_id}") as g:
             g["transform"] = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"
+
+        # If this vehicle is selected, show its information
+        if agent.unique_id == VehicleView.selected_vehicle_id:
+            with dom().query("#agent_information", clear = True):
+                h3("Agent information")
+                attributes = ["unique_id", "pos", "energy_level", "plan"]
+                for a in attributes:
+                    p(f"{a}: {getattr(agent, a)}")
 
 class RoadNetworkGridView(View):
     """
@@ -207,12 +221,28 @@ class MenuBar:
                 li("File")
                 with li("View"):
                     with ul():
-                        li("Configuration")
-                        li("Agent")
+                        with li("Configuration"):
+                            add_event_listener("click", lambda _: self.select_content("#configuration"))
+                        with li("Agent"):
+                            add_event_listener("click", lambda _: self.select_content("#agent_information"))
                 with li("About"):
                     # Open the project README file on Github in a separate tab.
                     about_page = "https://github.com/jakobaxelsson/sossim/blob/master/README.md"
                     add_event_listener("click", lambda _: js.window.open(about_page, "_blank"))
+
+    def select_content(self, id: str):
+        """
+        Selects what to show on the right side of the screen.
+
+        Args:
+            id (str): the id of the element to be shown.
+        """
+        # Hide all content elements.
+        for element in dom().query("#content").dom_element.children:
+            element.style.display = "none"
+
+        # Show the selected content element.
+        dom().query(id).dom_element.style.display = "block"
 
 class UserInterface:
     """
@@ -235,6 +265,10 @@ class UserInterface:
                                 g(id = "road_network")
                                 g(id = "vehicles")
                         SimulationController(model)
-                    with div(id = "configuration"):
-                        ConfigurationController(model, configuration)
+                    with div(id = "content"):
+                        with div(id = "configuration"):
+                            ConfigurationController(model, configuration)
+                        with div(id = "agent_information", style = "display: none;"):
+                            h3("Agent information")
+                            p("Select an agent to display information about it")
         model.add_view(TransportSystemView(model))
