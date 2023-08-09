@@ -12,7 +12,7 @@ with document.query(".body"):
     with ol():
         with ul():
             with li("Item 1.1"):
-                add_event_listener("click", lambda _: print("Click"))
+                event_listener("click", lambda _: print("Click"))
             li("Item 1.2")
         with li("Item 2") as item:
             item["id"] = "item2"
@@ -138,7 +138,7 @@ def add_text(content):
         # This element is created inside a context. Add it as a child of its parent.
         tag.stack[-1].dom_element.appendChild(js.document.createTextNode(content))
 
-def add_event_listener(event, listener):
+def event_listener(event, listener):
     # Adds an event listener to the current element context.
     if tag.stack != []:
         tag.stack[-1].dom_element.addEventListener(event, create_proxy(listener))

@@ -11,7 +11,7 @@ from pyodide.ffi import create_proxy #type: ignore
 
 from agent import Vehicle
 from configuration import Configuration
-from domscript import add_event_listener, br, button, circle, details, document, div, g, h3, input_, label, li, line, main, nav, p, polygon, rect, span, summary, svg, ul #type: ignore
+from domscript import event_listener, br, button, circle, details, document, div, g, h3, input_, label, li, line, main, nav, p, polygon, rect, span, summary, svg, ul #type: ignore
 from model import TransportSystem
 from space import RoadNetworkGrid
 from view import View
@@ -43,7 +43,7 @@ class VehicleView(View):
                 height = (agent.capacity + 1) / (agent.max_load + 1) * 0.8
                 rect(x = -0.2, y = -height / 2, width = 0.4, height = height, fill = self.color)
                 # When a vehicle is clicked, print some data about it to the console.
-                add_event_listener("click", lambda _: self.select_vehicle())
+                event_listener("click", lambda _: self.select_vehicle())
 
     def select_vehicle(self):
         """
@@ -169,16 +169,31 @@ class SimulationController:
         """
         self.ui = ui
         self.timer = None
+        self.zoom_level = 1.0
+        self.x_offset = 0
+        self.y_offset = 0
         with document.query("#controls"):
             with div(id = "simulation_controls"):
                 with button("Step"):
-                    add_event_listener("click", lambda _: self.ui.model.step())
+                    event_listener("click", lambda _: self.ui.model.step())
                 with button("Run"):
-                    add_event_listener("click", lambda _: self.run())
+                    event_listener("click", lambda _: self.run())
                 with button("Stop"):
-                    add_event_listener("click", lambda _: self.stop())
+                    event_listener("click", lambda _: self.stop())
                 span("Time: ")
                 span("0", id = "time")
+                with button("Zoom in"):
+                    event_listener("click", lambda _: self.transform_map(zoom = 2.0))
+                with button("Zoom out"):
+                    event_listener("click", lambda _: self.transform_map(zoom = 0.5))
+                with button("Left"):
+                    event_listener("click", lambda _: self.transform_map(x = 1, y = 0))
+                with button("Right"):
+                    event_listener("click", lambda _: self.transform_map(x = -1, y = 0))
+                with button("Up"):
+                    event_listener("click", lambda _: self.transform_map(x = 0, y = 1))
+                with button("Down"):
+                    event_listener("click", lambda _: self.transform_map(x = 0, y = -1))
         
     def run(self):
         """
@@ -192,6 +207,21 @@ class SimulationController:
         """
         if self.timer:
             js.clearInterval(self.timer)
+
+    def transform_map(self, zoom: float = 1.0, x: int = 0, y: int = 0):
+        """
+        Zooms the map by the zoom factor, and translates it by x, y for panning.
+
+        Args:
+            zoom (float, optional): factor by which the current zoom level is multiplied. Defaults to 1.0.
+            x (int, optional): translation in x dimension. Defaults to 0.
+            y (int, optional): translation in y dimension. Defaults to 0.
+        """
+        self.zoom_level *= zoom
+        self.x_offset += x
+        self.y_offset += y
+        with document.query("#map_content") as m:
+            m["transform"] = f"scale({self.zoom_level}) translate({self.x_offset} {self.y_offset})"
 
 class ConfigurationController:
     """
@@ -221,7 +251,7 @@ class ConfigurationController:
                             input_(id = p, value = v) 
                             br()
                 with button("Generate", cls = "error"):
-                    add_event_listener("click", lambda _: self.generate())
+                    event_listener("click", lambda _: self.generate())
         with document.query("#random_seed") as field:
             field.dom_element.value = self.ui.model.random_seed
 
@@ -254,19 +284,19 @@ class MenuBar:
                 with li("File"):
                     with ul():
                         with li("Open configuration..."):
-                            add_event_listener("click", self.open_configuration)
+                            event_listener("click", self.open_configuration)
                         with li("Save configuration as..."):
-                            add_event_listener("click", self.save_configuration)
+                            event_listener("click", self.save_configuration)
                 with li("View"):
                     with ul():
                         with li("Configuration"):
-                            add_event_listener("click", lambda _: self.select_content("#configuration"))
+                            event_listener("click", lambda _: self.select_content("#configuration"))
                         with li("Agent"):
-                            add_event_listener("click", lambda _: self.select_content("#agent_information"))
+                            event_listener("click", lambda _: self.select_content("#agent_information"))
                 with li("About"):
                     # Open the project README file on Github in a separate tab.
                     about_page = "https://github.com/jakobaxelsson/sossim/blob/master/README.md"
-                    add_event_listener("click", lambda _: js.window.open(about_page, "_blank"))
+                    event_listener("click", lambda _: js.window.open(about_page, "_blank"))
 
     def select_content(self, id: str):
         """
@@ -335,6 +365,7 @@ class UserInterface:
                     with div(id = "simulation"):
                         div(id = "controls")
                         with svg(cls = "map", id = "map", width = "100%", height = "90vh"):
+                            with g(id = "map_content"):
                                 g(id = "road_network")
                                 g(id = "vehicles")
                         SimulationController(self)
