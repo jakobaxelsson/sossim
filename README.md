@@ -22,6 +22,12 @@ Then, open the link [http://127.0.0.1:8000/sossim.html](http://127.0.0.1:8000/so
 The latest commit to the Github respository is automatically published on Github pages.
 It can be accessed at [https://jakobaxelsson.github.io/sossim/source/sossim.html](https://jakobaxelsson.github.io/sossim/source/sossim.html).
 
+### Using Docker
+A Dockerfile is provided for running the software without installing Python or any libraries.
+To use, first build a Docker container using `docker build -t sossim .`.
+Then, run the interactive mode using `docker run --name sossim -d -p 8000:8000 sossim`.
+To stop the container, use `docker kill sossim` followed by `docker rm sossim` to remove the container.
+
 ### Batch mode
 
 In batch mode, the simulator can be run locally from the command line.

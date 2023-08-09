@@ -12,7 +12,7 @@ with document.query(".body"):
     with ol():
         with ul():
             with li("Item 1.1"):
-                add_event_listener("click", lambda _: js.console.log("Click"))
+                add_event_listener("click", lambda _: print("Click"))
             li("Item 1.2")
         with li("Item 2") as item:
             item["id"] = "item2"
