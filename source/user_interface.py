@@ -4,6 +4,8 @@ The user interface is based on the Model-View-Controller pattern.
 The model is a Mesa model, and this module provides simulation controller and user interface elements.
 The user interface is provided as HTML DOM elements which is manipulated using the domscript module.
 """
+from typing import Any
+
 import js #type: ignore
 from pyodide.ffi import create_proxy #type: ignore
 
@@ -13,85 +15,6 @@ from domscript import add_event_listener, br, button, circle, details, dom, div,
 from model import TransportSystem
 from space import RoadNetworkGrid
 from view import View
-
-class SimulationController:
-    """
-    Provides a simulation controller that lets the user run a simulation.
-    """
-    def __init__(self, model):
-        """
-        Sets up the simulation controller, adding the necessary DOM elements.
-        """
-        self.model = model
-        self.timer = None
-        with dom().query("#controls"):
-            with div(id = "simulation_controls"):
-                with button("Step"):
-                    add_event_listener("click", lambda _: self.model.step())
-                with button("Run"):
-                    add_event_listener("click", lambda _: self.run())
-                with button("Stop"):
-                    add_event_listener("click", lambda _: self.stop())
-                span("Time: ")
-                span("0", id = "time")
-        
-    def run(self):
-        """
-        Runs the simulation by repeatedly invoking step (with a small delay between steps).
-        """
-        self.timer = js.setInterval(create_proxy(self.model.step), 250)
-
-    def stop(self):
-        """
-        Stops a running simulation.
-        """
-        if self.timer:
-            js.clearInterval(self.timer)
-
-class ConfigurationController:
-    """
-    Provides a model configuration controller that lets the user configure the model.
-    """
-    def __init__(self, model, configuration: Configuration):
-        """
-        Sets up the configuration controller, adding the necessary DOM elements.
-        """
-        self.model = model
-        self.configuration = configuration
-        with dom().query("#configuration"):
-            h3("Configuration parameters")
-            with div(id = "configuration_controls", cls = "flex demo"):
-                for cls, params in self.configuration.data.items():
-                    with details(id = "configuration_" + cls):
-                        summary(cls)
-                        for p, v in params.items():
-                            # Add a label with the parameter name, and the help text as a tooltip
-                            label(p, title = self.configuration.params[cls][p]["help"])
-                            br()
-                            input_(id = p, value = v) 
-                            br()
-                with button("Generate", cls = "error"):
-                    add_event_listener("click", lambda _: self.generate())
-        with dom().query("#random_seed") as field:
-            field.dom_element.value = self.model.random_seed
-
-    def generate(self):
-        """
-        Generates a new model based on parameter values in the input fields in the simulation controls.
-        If no value is provided, the default parameter value is used instead.
-        """
-        for cls, params in self.configuration.data.items():
-                for p, _ in params.items():
-                    with dom().query("#" + p) as field:
-                        param_type = self.configuration.params[cls][p]["type"]
-                        if field.dom_element.value != "":
-                            self.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
-        # Reinitialize the model and its views.
-        self.model.__init__(self.configuration)
-        self.model.clear_views()
-        self.model.add_view(TransportSystemView(self.model))
-        with dom().query("#random_seed") as field:
-            field.dom_element.value = self.model.random_seed
 
 class VehicleView(View):
     """
@@ -211,14 +134,129 @@ class TransportSystemView(View):
         with dom().query("#time") as p:
             p.inner_html(t)
 
+async def open_file() -> str:
+    """
+    Opens the file picker dialog and reads the content of the file selected by the user.
+
+    Returns:
+        str | None: the content of the file, or None if file reading failed.
+    """
+    file_handles = await js.window.showOpenFilePicker()
+    file_handle = file_handles[0]
+    file = await file_handle.getFile()
+    data = await file.text()
+    return data
+
+async def save_file_as(data: str):
+    """
+    Opens the file picker dialog and saves the data to the file selected by the user.
+
+    Args:
+        data (str): the data to be saved.
+    """
+    file_handle = await js.window.showSaveFilePicker()
+    writable = await file_handle.createWritable()
+    await writable.write(data)
+    await writable.close()
+
+class SimulationController:
+    """
+    Provides a simulation controller that lets the user run a simulation.
+    """
+    def __init__(self, ui: "UserInterface"):
+        """
+        Sets up the simulation controller, adding the necessary DOM elements.
+        """
+        self.ui = ui
+        self.timer = None
+        with dom().query("#controls"):
+            with div(id = "simulation_controls"):
+                with button("Step"):
+                    add_event_listener("click", lambda _: self.ui.model.step())
+                with button("Run"):
+                    add_event_listener("click", lambda _: self.run())
+                with button("Stop"):
+                    add_event_listener("click", lambda _: self.stop())
+                span("Time: ")
+                span("0", id = "time")
+        
+    def run(self):
+        """
+        Runs the simulation by repeatedly invoking step (with a small delay between steps).
+        """
+        self.timer = js.setInterval(create_proxy(self.ui.model.step), 250)
+
+    def stop(self):
+        """
+        Stops a running simulation.
+        """
+        if self.timer:
+            js.clearInterval(self.timer)
+
+class ConfigurationController:
+    """
+    Provides a model configuration controller that lets the user configure the model.
+    """
+    def __init__(self, ui: "UserInterface"):
+        """
+        Sets up the configuration controller, adding the necessary DOM elements.
+        """
+        self.ui = ui
+        self.update()
+
+    def update(self):
+        """
+        Updates the configuration controller to match the current configuration.
+        """
+        with dom().query("#configuration", clear = True):
+            h3("Configuration parameters")
+            with div(id = "configuration_controls", cls = "flex demo"):
+                for cls, params in self.ui.configuration.data.items():
+                    with details(id = "configuration_" + cls):
+                        summary(cls)
+                        for p, v in params.items():
+                            # Add a label with the parameter name, and the help text as a tooltip
+                            label(p, title = self.ui.configuration.params[cls][p]["help"])
+                            br()
+                            input_(id = p, value = v) 
+                            br()
+                with button("Generate", cls = "error"):
+                    add_event_listener("click", lambda _: self.generate())
+        with dom().query("#random_seed") as field:
+            field.dom_element.value = self.ui.model.random_seed
+
+    def generate(self):
+        """
+        Generates a new model based on parameter values in the input fields in the simulation controls.
+        If no value is provided, the default parameter value is used instead.
+        """
+        for cls, params in self.ui.configuration.data.items():
+                for p, _ in params.items():
+                    with dom().query("#" + p) as field:
+                        param_type = self.ui.configuration.params[cls][p]["type"]
+                        if field.dom_element.value != "":
+                            self.ui.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
+        # Reinitialize the model and its views.
+        self.ui.model.__init__(self.ui.configuration)
+        self.ui.model.clear_views()
+        self.ui.model.add_view(TransportSystemView(self.ui.model))
+        with dom().query("#random_seed") as field:
+            field.dom_element.value = self.ui.model.random_seed
+
 class MenuBar:
     """
     Main menu bar of the SoSSim user interface.
     """
-    def __init__(self):
+    def __init__(self, ui: "UserInterface"):
+        self.ui = ui
         with nav(id = "menubar"):
             with ul():
-                li("File")
+                with li("File"):
+                    with ul():
+                        with li("Open configuration..."):
+                            add_event_listener("click", self.open_configuration)
+                        with li("Save configuration as..."):
+                            add_event_listener("click", self.save_configuration)
                 with li("View"):
                     with ul():
                         with li("Configuration"):
@@ -244,11 +282,46 @@ class MenuBar:
         # Show the selected content element.
         dom().query(id).dom_element.style.display = "block"
 
+    async def open_configuration(self, event: Any):
+        """
+        Event handler for the open configuration menu item.
+
+        Args:
+            event (Any): the event (not used).
+        """
+        try:
+            data = await open_file()
+            self.ui.configuration.from_json(data)
+
+            # Reinitialize the model and its views.
+            self.ui.model.__init__(self.ui.configuration)
+            self.ui.model.clear_views()
+            self.ui.model.add_view(TransportSystemView(self.ui.model))
+            self.ui.configuration_controller.update()
+        except Exception as e:
+            print("Open configuration failed with exception:", e)
+
+    async def save_configuration(self, event: Any):
+        """
+        Event handler for the save configuration as menu item.
+
+        Args:
+            event (Any): the event (not used).
+        """
+        try:
+            content = self.ui.configuration.to_json()
+            await save_file_as(content)
+        except Exception as e:
+            print("Save configuration as failed with exception:", e)
+
 class UserInterface:
     """
     Creates the user interface of the SoSSim interactive mode.
     """
     def __init__(self, model: TransportSystem, configuration: Configuration):
+        self.model = model
+        self.configuration = configuration
+
         # Remove load message and set cursor to default
         with dom().query("#load_msg") as e:
             e.remove()
@@ -256,7 +329,7 @@ class UserInterface:
             b["style"] = "cursor: default;"
         # Setup main layout
         with dom().query("body"):
-            MenuBar()
+            MenuBar(self)
             with main():
                 with div(id = "main_grid", style = "display: grid; grid-template-columns: 2fr 1fr;"):
                     with div(id = "simulation"):
@@ -264,10 +337,10 @@ class UserInterface:
                         with svg(cls = "map", id = "map", width = "100%", height = "90vh"):
                                 g(id = "road_network")
                                 g(id = "vehicles")
-                        SimulationController(model)
+                        SimulationController(self)
                     with div(id = "content"):
                         with div(id = "configuration"):
-                            ConfigurationController(model, configuration)
+                            self.configuration_controller = ConfigurationController(self)
                         with div(id = "agent_information", style = "display: none;"):
                             h3("Agent information")
                             p("Select an agent to display information about it")

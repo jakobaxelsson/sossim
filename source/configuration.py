@@ -109,8 +109,16 @@ class Configuration:
         Returns:
             str: a JSON representation of the configuration.
         """
-        # TODO: This doesn't work. The "type" field does not serialize.
-        return json.dumps(self.data, indent = 4)
+        output = dict()
+        # Convert type objects to str, to be able to serialize.
+        for cls, param in self.data.items():
+            output[cls] = dict()
+            for var, value in param.items():
+                if var == "type":
+                    output[cls][var] = value.__name__
+                else:
+                    output[cls][var] = value
+        return json.dumps(output, indent = 4)
     
     def from_json(self, text: str):
         """
@@ -119,5 +127,13 @@ class Configuration:
         Args:
             text (str): a JSON representation of a configuration.
         """
-        # TODO: This doesn't work. The "type" field does not serialize.
-        self.data = json.loads(text)
+        # Reset configuration to default values, in case some parameters have been added to code after configuration was saved.
+        self.__init__()
+        input = json.loads(text)
+        # Convert type names to types using eval.
+        for cls, param in input.items():
+            for var, value in param.items():
+                if var == "type":
+                    self.data[cls][var] = eval(value)
+                else:
+                    self.data[cls][var] = value

@@ -45,6 +45,8 @@ def batch_mode(configuration: Configuration) -> None:
 if __name__ == "__main__":
     # Check if the file is running in the browser, in which case interactive mode is chosen, and otherwise run it in batch mode.
     configuration = Configuration()
+    text = configuration.to_json()
+    configuration.from_json(text)
     if sys.platform == "emscripten":
         interactive_mode(configuration)
     else:
