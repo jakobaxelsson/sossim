@@ -11,7 +11,7 @@ from pyodide.ffi import create_proxy #type: ignore
 
 from agent import Vehicle
 from configuration import Configuration
-from domscript import add_event_listener, br, button, circle, details, dom, div, g, h3, header, input_, label, li, line, main, nav, p, polygon, rect, span, summary, svg, ul #type: ignore
+from domscript import add_event_listener, br, button, circle, details, document, div, g, h3, input_, label, li, line, main, nav, p, polygon, rect, span, summary, svg, ul #type: ignore
 from model import TransportSystem
 from space import RoadNetworkGrid
 from view import View
@@ -38,7 +38,7 @@ class VehicleView(View):
         # Draw the vehicle
         self.color = "#" + "".join([agent.model.random.choice(list("0123456789abcdef")) for i in range(6)])
         (x, y) = agent.pos
-        with dom().query("#vehicles"):
+        with document.query("#vehicles"):
             with g(id = f"vehicle_{agent.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"): 
                 height = (agent.capacity + 1) / (agent.max_load + 1) * 0.8
                 rect(x = -0.2, y = -height / 2, width = 0.4, height = height, fill = self.color)
@@ -61,12 +61,12 @@ class VehicleView(View):
         """
         # Update vehicle positions
         (x, y) = agent.pos
-        with dom().query(f"#vehicle_{agent.unique_id}") as g:
+        with document.query(f"#vehicle_{agent.unique_id}") as g:
             g["transform"] = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"
 
         # If this vehicle is selected, show its information
         if agent.unique_id == VehicleView.selected_vehicle_id:
-            with dom().query("#agent_information", clear = True):
+            with document.query("#agent_information", clear = True):
                 h3("Agent information")
                 attributes = ["unique_id", "pos", "energy_level", "plan"]
                 for a in attributes:
@@ -86,9 +86,9 @@ class RoadNetworkGridView(View):
         Args:
             model (TransportSystem): the transport system model to be reflected in the user interface.
         """
-        with dom().query("#map") as m:
+        with document.query("#map") as m:
             m["viewBox"] = f"0 0 {space.width * 4} {space.height * 4}"
-        with dom().query("#road_network", clear = True):
+        with document.query("#road_network", clear = True):
             # Visualize roads
             for (x1, y1), (x2, y2) in space.road_edges():
                 line(cls = "road", x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
@@ -118,7 +118,7 @@ class TransportSystemView(View):
         model.space.add_view(RoadNetworkGridView())
 
         # Add agent views
-        dom().query("#vehicles", clear = True)
+        document.query("#vehicles", clear = True)
         for agent in model.schedule.agents:
             if isinstance(agent, Vehicle):
                 agent.add_view(VehicleView(agent))
@@ -131,7 +131,7 @@ class TransportSystemView(View):
             model (TransportSystem): the model.
         """
         t = model.schedule.time
-        with dom().query("#time") as p:
+        with document.query("#time") as p:
             p.inner_html(t)
 
 async def open_file() -> str:
@@ -169,7 +169,7 @@ class SimulationController:
         """
         self.ui = ui
         self.timer = None
-        with dom().query("#controls"):
+        with document.query("#controls"):
             with div(id = "simulation_controls"):
                 with button("Step"):
                     add_event_listener("click", lambda _: self.ui.model.step())
@@ -208,7 +208,7 @@ class ConfigurationController:
         """
         Updates the configuration controller to match the current configuration.
         """
-        with dom().query("#configuration", clear = True):
+        with document.query("#configuration", clear = True):
             h3("Configuration parameters")
             with div(id = "configuration_controls", cls = "flex demo"):
                 for cls, params in self.ui.configuration.data.items():
@@ -222,7 +222,7 @@ class ConfigurationController:
                             br()
                 with button("Generate", cls = "error"):
                     add_event_listener("click", lambda _: self.generate())
-        with dom().query("#random_seed") as field:
+        with document.query("#random_seed") as field:
             field.dom_element.value = self.ui.model.random_seed
 
     def generate(self):
@@ -232,7 +232,7 @@ class ConfigurationController:
         """
         for cls, params in self.ui.configuration.data.items():
                 for p, _ in params.items():
-                    with dom().query("#" + p) as field:
+                    with document.query("#" + p) as field:
                         param_type = self.ui.configuration.params[cls][p]["type"]
                         if field.dom_element.value != "":
                             self.ui.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
@@ -240,7 +240,7 @@ class ConfigurationController:
         self.ui.model.__init__(self.ui.configuration)
         self.ui.model.clear_views()
         self.ui.model.add_view(TransportSystemView(self.ui.model))
-        with dom().query("#random_seed") as field:
+        with document.query("#random_seed") as field:
             field.dom_element.value = self.ui.model.random_seed
 
 class MenuBar:
@@ -276,11 +276,11 @@ class MenuBar:
             id (str): the id of the element to be shown.
         """
         # Hide all content elements.
-        for element in dom().query("#content").dom_element.children:
+        for element in document.query("#content").dom_element.children:
             element.style.display = "none"
 
         # Show the selected content element.
-        dom().query(id).dom_element.style.display = "block"
+        document.query(id).dom_element.style.display = "block"
 
     async def open_configuration(self, event: Any):
         """
@@ -323,12 +323,12 @@ class UserInterface:
         self.configuration = configuration
 
         # Remove load message and set cursor to default
-        with dom().query("#load_msg") as e:
+        with document.query("#load_msg") as e:
             e.remove()
-        with dom().query("body") as b:
+        with document.query("body") as b:
             b["style"] = "cursor: default;"
         # Setup main layout
-        with dom().query("body"):
+        with document.query("body"):
             MenuBar(self)
             with main():
                 with div(id = "main_grid", style = "display: grid; grid-template-columns: 2fr 1fr;"):

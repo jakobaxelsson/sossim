@@ -8,7 +8,7 @@ A typical usage looks as follows:
 
 from domscript import *
 
-with dom().query(".body"):
+with document.query(".body"):
     with ol():
         with ul():
             with li("Item 1.1"):
@@ -25,7 +25,7 @@ TODO:
   If an id is provided, and there is already an element with the same id, then it is reused (but cleared), and otherwise it is created anew.
 - Maybe enforce so that a block element cannot be a child of an inline element.
 - Make another module for picocss that defines its tags.
-- Add show/hide methods to the tag class. They can be used as e.g. dom().query("...").show().
+- Add show/hide methods to the tag class. They can be used as e.g. document.query("...").show().
   It should set the property "display" to "initial" or "none. self.dom_element.style.setProperty("display", "initial")
 """
 
@@ -102,7 +102,7 @@ class tag:
 
     def query(self, q, clear = False):
         # Returns a tag structure representing the DOM element indicated by the query string.
-        # A typical usage is: with dom().query(...).
+        # A typical usage is: with document.query(...).
         result = self.dom_element.querySelector(q)
         if result == None:
             raise Exception(f"Query {q} did not give any result")
@@ -127,6 +127,9 @@ class dom(tag):
     """
     def __init__(self, parent_node = js.document):
         self.dom_element = parent_node
+
+# Provide the variable document as a wrapper around js.document
+document = dom()
 
 def add_text(content):
     # Creates a text node, and attaches it in the DOM tree.
