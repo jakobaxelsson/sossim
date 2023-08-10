@@ -2,21 +2,17 @@
 Provides concrete agents for the SoSSim system-of-systems simulator.
 """
 import capabilities
-from configuration import Configuration
+from configuration import Configuration, configurable, Param
 from sos_core import SoSAgent
 from space import Node
 
+@configurable
 class Vehicle(SoSAgent):
-
     # Define configuration parameters relevant to this class
-    Configuration.add_param(class_name = "Vehicle", name = "max_load", type = int, default = 3, flag = "-ml", 
-                            help = "maximum load of a vehicle")
-    Configuration.add_param(class_name = "Vehicle", name = "max_energy", type = int, default = 100, flag = "-me", 
-                            help = "maximum energy of a vehicle")
-    Configuration.add_param(class_name = "Vehicle", name = "charging_speed", type = int, default = 10, flag = "-cs", 
-                            help = "the charging speed of a vehicle")
-    Configuration.add_param(class_name = "Vehicle", name = "parking_probability", type = float, default = 0.1, flag = "-pp", 
-                            help = "probability that a vehicle will start looking for a parking")
+    max_load:            Param(int,   flag = "-mi", help = "maximum load of a vehicle") = 3 # type: ignore
+    max_energy:          Param(int,   flag = "-me", help = "maximum energy of a vehicle") = 100 # type: ignore
+    charging_speed:      Param(int,   flag = "-cs", help = "the charging speed of a vehicle") = 10 # type: ignore
+    parking_probability: Param(float, flag = "-pp", help = "probability that a vehicle will start looking for a parking") = 0.1 # type: ignore
 
     def __init__(self, unique_id: int, model: "model.TransportSystem", configuration: Configuration):
         """

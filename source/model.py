@@ -5,17 +5,16 @@ import random
 import sys
 
 import agent
-from configuration import Configuration
+from configuration import Configuration, configurable, Param
 import mesa
 import space
 from view import Viewable
 
+@configurable
 class TransportSystem(mesa.Model, Viewable):
     # Define configuration parameters relevant to this class
-    Configuration.add_param(class_name = "TransportSystem", name = "num_agents", type = int, default = 10, flag = "-N", 
-                            help = "number of vehicles")
-    Configuration.add_param(class_name = "TransportSystem", name = "random_seed", type = int, default = -1, flag = "-r", 
-                            help = "seed for random number generator (use -1 to initialize from system time)")
+    num_agents:  Param(int, flag = "-N", help = "number of vehicles") = 10 # type: ignore
+    random_seed: Param(int, flag = "-r", help = "seed for random number generator (use -1 to initialize from system time)") = -1 # type: ignore
 
     def __init__(self, configuration: Configuration):
         """

@@ -10,7 +10,7 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple
 import networkx as nx
 import mesa
 
-from configuration import Configuration
+from configuration import Configuration, configurable, Param
 from view import Viewable
 
 # Type abbreviations for nodes, edges and directions.
@@ -161,22 +161,18 @@ def subnode(node: Node, i: int, j: int) -> Node:
     """
     return (node[0] * 4 + i, node[1] * 4 + j)
 
+@configurable
 class RoadNetworkGrid(Viewable):
     """
     A mesa space consisting of a road network which is placed on a grid.
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
     Some nodes in the road networks can be destinations, where places of interest can be placed.
     """
-    Configuration.add_param(class_name = "RoadNetworkGrid", name = "width", type = int, default = 10, flag = "-x", 
-                            help = "number of grid cells in x dimension")
-    Configuration.add_param(class_name = "RoadNetworkGrid", name = "height", type = int, default = 10, flag = "-y", 
-                            help = "number of grid cells in y dimension")
-    Configuration.add_param(class_name = "RoadNetworkGrid", name = "road_density", type = float, default = 0.3, flag = "-rd", 
-                            help = "the proportion of the grid to be covered by roads")
-    Configuration.add_param(class_name = "RoadNetworkGrid", name = "destination_density", type = float, default = 0.3, flag = "-dd", 
-                            help = "probability of generating a destination in a position where it is possible")
-    Configuration.add_param(class_name = "RoadNetworkGrid", name = "charging_point_density", type = float, default = 0.3, flag = "-cpd", 
-                            help = "probability of a destination having a charging point")
+    width:  Param(int, flag = "-x", help = "number of grid cells in x dimension") = 10 # type: ignore
+    height: Param(int, flag = "-y", help = "number of grid cells in y dimension") = 10 # type: ignore
+    road_density: Param(float, flag = "-rd", help = "the proportion of the grid to be covered by roads") = 0.3 # type: ignore
+    destination_density: Param(float, flag = "-dd", help = "probability of generating a destination in a position where it is possible") = 0.3 # type: ignore
+    charging_point_density: Param(float, flag = "-cpd", help = "probability of a destination having a charging point") = 0.3 # type: ignore
 
     def __init__(self, configuration: Configuration, model: mesa.Model):
         """

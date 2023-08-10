@@ -3,7 +3,34 @@ Defines configuration handling mechanisms.
 """
 import argparse
 import json
-from typing import Any
+from typing import get_type_hints, Any, Generic, Type, TypeVar
+
+T = TypeVar("T")
+
+class Param(Generic[T]):
+    """
+    Param is a class holding the information provided when declaring a configuration parameter using type hints.
+    It is typicall used as follows:
+
+    @configurable
+    class C:
+        p: Param(int, flag = "-p", help = "some help string")
+    """
+
+    def __init__(self, type: Type[T], flag: str, help: str):
+        self.type = type
+        self.flag = flag
+        self.help = help
+
+def configurable(cls: type) -> type:
+    """
+    A class decorator that indicates that processes Param declarations within the class.
+    """
+    for a, t in get_type_hints(cls).items():
+        if isinstance(t, Param):
+            Configuration.add_param(class_name = cls.__name__, name = a, default = getattr(cls, a), type = t.type, flag = t.flag, help = t.help) # type: ignore
+            delattr(cls, a)
+    return cls
 
 class Configuration:
     """
