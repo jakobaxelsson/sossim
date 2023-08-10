@@ -38,16 +38,27 @@ This command can take various command line options, which can be enlisted using 
 ## Implementation
 
 The core of the simulation is an agent-based model developed using the [Mesa](https://mesa.readthedocs.io/) library.
+The Mesa library has some dependencies that are not possible to use in the browser.
+Therefore, a copy of the core modules of Mesa have been included in this repository. 
+
 The simulation takes place on a grid map onto which a randomly generated road network is placed.
 The road network is implemented as a directed graph using the [NetworkX](https://networkx.org/) library.
+
+### User interface
 
 The interactive simulation is designed using the [model-view-controller](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) pattern.
 The interface components are created by manipulating the DOM elements of a web page, and the graphics are created in SVG.
 The DOM manipulation is done using the `domscript.py` module, which provides a Pythonic approach inspired by the [Dominate](https://github.com/Knio/dominate) library.
 However, `domscript.py` works directly on the DOM elements since it executes in the browser, whereas Dominate generates HTML as text and is intended for server side usage.
 
-The Mesa library has some dependencies that are not possible to use in the browser.
-Therefore, a copy of the core modules of Mesa have been included in this repository. 
+### Configurations
+
+The models and simulation have a large number of different configuration parameters.
+This are accessible both as command line arguments when running in batch mode, and as an interactive dialogue in the user interface.
+The configurations can also be saved and restored, in order to recreate a certain simulation.
+To handle the configurations in a smooth way, a Configuration class is provided which gathers all parameters.
+In that way, a single configuration object can be passed around to various functions, rather than individual specific parameters.
+Special syntax is provided to make the specification of parameters relevant to a certain class as readable as possible.
 
 ## Development
 

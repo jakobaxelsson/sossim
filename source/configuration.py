@@ -1,5 +1,29 @@
 """
 Defines configuration handling mechanisms.
+This allows all configuration parameters to be handled in a single object.
+This can be passed around to all configurable classes, allowing them to extract what information they need.
+A typical usage is as follows:
+
+    from configuration import Configuration, configurable, Param
+    ...
+    @configurable
+    class C:
+        param: Param(int, flag = "-p") = 3   # some help string
+
+        def __init__(self, configuration: Configuration):
+            configuration.initialize(self)
+            ...
+
+    configuration = Configuration()
+    obj = C(configuration)
+    obj.p  # Returns 3
+
+Here, the @configurable decorater informs that this is a class that can take configuration parameters.
+The Param type declaration adds param as a configuration parameter for the class C, with a default value of 3.
+It will have a command line argument --param by default. 
+In addition, the optional flag -p is added for a shorter command line flag.
+The help string in the comment is shown when printing the help information for the command line.
+It can also be used as tooltips in a user interface.
 """
 import argparse
 import inspect
@@ -11,13 +35,6 @@ T = TypeVar("T")
 class Param(Generic[T]):
     """
     Param is a class holding the information provided when declaring a configuration parameter using type hints.
-    It is typically used as follows:
-
-    @configurable
-    class C:
-        param: Param(int, flag = "-p") = 3   # some help string
-
-    The comment at the end of line is recuperated, and used as a help string for the parameter (unless another help string is provided).
     """
     def __init__(self, type: Type[T], flag: str = "", help: str = ""):
         self.type = type

@@ -375,8 +375,8 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.<
 </span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>    <span class="n">width</span><span class="p">:</span>                  <span class="n">Param</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;-x&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#  number of grid cells in x dimension</span>
 </span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>    <span class="n">height</span><span class="p">:</span>                 <span class="n">Param</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;-y&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#  number of grid cells in y dimension</span>
 </span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>    <span class="n">road_density</span><span class="p">:</span>           <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  the proportion of the grid to be covered by roads&quot;) = 0.3</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>    <span class="n">destination_density</span><span class="p">:</span>    <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># probability of generating a destination in a position where it is possible</span>
-</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>    <span class="n">charging_point_density</span><span class="p">:</span> <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># probability of a destination having a charging point</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>    <span class="n">destination_density</span><span class="p">:</span>    <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  probability of generating a destination in a position where it is possible</span>
+</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>    <span class="n">charging_point_density</span><span class="p">:</span> <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  probability of a destination having a charging point</span>
 </span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>
 </span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">mesa</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
 </span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1354,8 +1354,8 @@ The destination node is indicated as such using a node attribute.</p>
 </span><span id="RoadNetworkGrid-173"><a href="#RoadNetworkGrid-173"><span class="linenos">173</span></a>    <span class="n">width</span><span class="p">:</span>                  <span class="n">Param</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;-x&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#  number of grid cells in x dimension</span>
 </span><span id="RoadNetworkGrid-174"><a href="#RoadNetworkGrid-174"><span class="linenos">174</span></a>    <span class="n">height</span><span class="p">:</span>                 <span class="n">Param</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;-y&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#  number of grid cells in y dimension</span>
 </span><span id="RoadNetworkGrid-175"><a href="#RoadNetworkGrid-175"><span class="linenos">175</span></a>    <span class="n">road_density</span><span class="p">:</span>           <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  the proportion of the grid to be covered by roads&quot;) = 0.3</span>
-</span><span id="RoadNetworkGrid-176"><a href="#RoadNetworkGrid-176"><span class="linenos">176</span></a>    <span class="n">destination_density</span><span class="p">:</span>    <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># probability of generating a destination in a position where it is possible</span>
-</span><span id="RoadNetworkGrid-177"><a href="#RoadNetworkGrid-177"><span class="linenos">177</span></a>    <span class="n">charging_point_density</span><span class="p">:</span> <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># probability of a destination having a charging point</span>
+</span><span id="RoadNetworkGrid-176"><a href="#RoadNetworkGrid-176"><span class="linenos">176</span></a>    <span class="n">destination_density</span><span class="p">:</span>    <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  probability of generating a destination in a position where it is possible</span>
+</span><span id="RoadNetworkGrid-177"><a href="#RoadNetworkGrid-177"><span class="linenos">177</span></a>    <span class="n">charging_point_density</span><span class="p">:</span> <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  probability of a destination having a charging point</span>
 </span><span id="RoadNetworkGrid-178"><a href="#RoadNetworkGrid-178"><span class="linenos">178</span></a>
 </span><span id="RoadNetworkGrid-179"><a href="#RoadNetworkGrid-179"><span class="linenos">179</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">mesa</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
 </span><span id="RoadNetworkGrid-180"><a href="#RoadNetworkGrid-180"><span class="linenos">180</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1749,7 +1749,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.width" class="classattr">
                                 <div class="attr variable">
-            <span class="name">width</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x0000026334606190&gt;</span>
+            <span class="name">width</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x000002B9C957FE90&gt;</span>
 
         
     </div>
@@ -1760,7 +1760,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.height" class="classattr">
                                 <div class="attr variable">
-            <span class="name">height</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x0000026334605DD0&gt;</span>
+            <span class="name">height</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x000002B9C957FED0&gt;</span>
 
         
     </div>
@@ -1771,7 +1771,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.road_density" class="classattr">
                                 <div class="attr variable">
-            <span class="name">road_density</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x0000026334607590&gt;</span>
+            <span class="name">road_density</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x000002B9C957D2D0&gt;</span>
 
         
     </div>
@@ -1782,7 +1782,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.destination_density" class="classattr">
                                 <div class="attr variable">
-            <span class="name">destination_density</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x0000026334607E90&gt;</span>
+            <span class="name">destination_density</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x000002B9C957DD10&gt;</span>
 
         
     </div>
@@ -1793,7 +1793,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.charging_point_density" class="classattr">
                                 <div class="attr variable">
-            <span class="name">charging_point_density</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x0000026334605890&gt;</span>
+            <span class="name">charging_point_density</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x000002B9C957D290&gt;</span>
 
         
     </div>
