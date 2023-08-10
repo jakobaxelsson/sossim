@@ -42,22 +42,7 @@
 
             </li>
             <li>
-                    <a class="class" href="#Viewable">Viewable</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#Viewable.add_view">add_view</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Viewable.get_views">get_views</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Viewable.update_views">update_views</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Viewable.clear_views">clear_views</a>
-                        </li>
-                </ul>
-
+                    <a class="function" href="#viewable">viewable</a>
             </li>
     </ul>
 
@@ -85,62 +70,69 @@ view    </h1>
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">Module containing functionality for attaching views to model classes.    </span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">class</span> <span class="nc">View</span><span class="p">:</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">    Base class for views.</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewable</span><span class="p">:</span> <span class="s2">&quot;Viewable&quot;</span><span class="p">):</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewable</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">        Updates the view. This is an abstract function that is redefined in subclasses.</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">        Args:</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">            viewable (Viewable): the viewable on which the update should be based.</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">            viewable (Any): the viewable on which the update should be based.</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>        <span class="k">pass</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="k">class</span> <span class="nc">Viewable</span><span class="p">:</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="k">def</span> <span class="nf">viewable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">    A mixin for objects to which a view can be attached. It adds the methods add_view and update_views.</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="k">def</span> <span class="nf">add_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="n">View</span><span class="p">):</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="sd">        Adds a view to the viewable element.</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="sd">        Args:</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="sd">            view (Any): the view.</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">+=</span> <span class="p">[</span><span class="n">view</span><span class="p">]</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">        Returns the list of views attached to the viewable object.</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">        Returns:</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">            List[View]: the views.</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="k">def</span> <span class="nf">update_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a><span class="sd">        Updates the views.</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>            <span class="n">view</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    <span class="k">def</span> <span class="nf">clear_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="sd">        Removes all views.</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">    A mixin decorator for objects to which a view can be attached. </span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">    It adds the methods for handling views attached to the viewable.</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="k">def</span> <span class="nf">add_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="n">View</span><span class="p">):</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="sd">        Adds a view to the viewable object.</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="sd">        Args:</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="sd">            view (Any): the view.</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">+=</span> <span class="p">[</span><span class="n">view</span><span class="p">]</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">        Returns the list of views attached to the viewable object.</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">        Returns:</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">            List[View]: the views.</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="k">def</span> <span class="nf">update_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="sd">        Updates the views.</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>            <span class="n">view</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="k">def</span> <span class="nf">clear_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="sd">        Removes all views.</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>    <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;add_view&quot;</span><span class="p">,</span> <span class="n">add_view</span><span class="p">)</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>    <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;get_views&quot;</span><span class="p">,</span> <span class="n">get_views</span><span class="p">)</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>    <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;update_views&quot;</span><span class="p">,</span> <span class="n">update_views</span><span class="p">)</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>    <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;clear_views&quot;</span><span class="p">,</span> <span class="n">clear_views</span><span class="p">)</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>    <span class="k">return</span> <span class="bp">cls</span>
 </span></pre></div>
 
 
@@ -160,12 +152,12 @@ view    </h1>
 </span><span id="View-8"><a href="#View-8"><span class="linenos"> 8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="View-9"><a href="#View-9"><span class="linenos"> 9</span></a><span class="sd">    Base class for views.</span>
 </span><span id="View-10"><a href="#View-10"><span class="linenos">10</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="View-11"><a href="#View-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewable</span><span class="p">:</span> <span class="s2">&quot;Viewable&quot;</span><span class="p">):</span>
+</span><span id="View-11"><a href="#View-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewable</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
 </span><span id="View-12"><a href="#View-12"><span class="linenos">12</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="View-13"><a href="#View-13"><span class="linenos">13</span></a><span class="sd">        Updates the view. This is an abstract function that is redefined in subclasses.</span>
 </span><span id="View-14"><a href="#View-14"><span class="linenos">14</span></a>
 </span><span id="View-15"><a href="#View-15"><span class="linenos">15</span></a><span class="sd">        Args:</span>
-</span><span id="View-16"><a href="#View-16"><span class="linenos">16</span></a><span class="sd">            viewable (Viewable): the viewable on which the update should be based.</span>
+</span><span id="View-16"><a href="#View-16"><span class="linenos">16</span></a><span class="sd">            viewable (Any): the viewable on which the update should be based.</span>
 </span><span id="View-17"><a href="#View-17"><span class="linenos">17</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="View-18"><a href="#View-18"><span class="linenos">18</span></a>        <span class="k">pass</span>
 </span></pre></div>
@@ -180,18 +172,18 @@ view    </h1>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">update</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">viewable</span><span class="p">:</span> <span class="n"><a href="#Viewable">view.Viewable</a></span></span><span class="return-annotation">):</span></span>
+        <span class="name">update</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">viewable</span><span class="p">:</span> <span class="n">Any</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="View.update-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#View.update"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="View.update-11"><a href="#View.update-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewable</span><span class="p">:</span> <span class="s2">&quot;Viewable&quot;</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="View.update-11"><a href="#View.update-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewable</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
 </span><span id="View.update-12"><a href="#View.update-12"><span class="linenos">12</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="View.update-13"><a href="#View.update-13"><span class="linenos">13</span></a><span class="sd">        Updates the view. This is an abstract function that is redefined in subclasses.</span>
 </span><span id="View.update-14"><a href="#View.update-14"><span class="linenos">14</span></a>
 </span><span id="View.update-15"><a href="#View.update-15"><span class="linenos">15</span></a><span class="sd">        Args:</span>
-</span><span id="View.update-16"><a href="#View.update-16"><span class="linenos">16</span></a><span class="sd">            viewable (Viewable): the viewable on which the update should be based.</span>
+</span><span id="View.update-16"><a href="#View.update-16"><span class="linenos">16</span></a><span class="sd">            viewable (Any): the viewable on which the update should be based.</span>
 </span><span id="View.update-17"><a href="#View.update-17"><span class="linenos">17</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="View.update-18"><a href="#View.update-18"><span class="linenos">18</span></a>        <span class="k">pass</span>
 </span></pre></div>
@@ -202,194 +194,80 @@ view    </h1>
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>viewable (Viewable):</strong>  the viewable on which the update should be based.</li>
+<li><strong>viewable (Any):</strong>  the viewable on which the update should be based.</li>
 </ul>
 </div>
 
 
                             </div>
                 </section>
-                <section id="Viewable">
-                            <input id="Viewable-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">Viewable</span>:
-
-                <label class="view-source-button" for="Viewable-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#Viewable"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Viewable-20"><a href="#Viewable-20"><span class="linenos">20</span></a><span class="k">class</span> <span class="nc">Viewable</span><span class="p">:</span>
-</span><span id="Viewable-21"><a href="#Viewable-21"><span class="linenos">21</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Viewable-22"><a href="#Viewable-22"><span class="linenos">22</span></a><span class="sd">    A mixin for objects to which a view can be attached. It adds the methods add_view and update_views.</span>
-</span><span id="Viewable-23"><a href="#Viewable-23"><span class="linenos">23</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Viewable-24"><a href="#Viewable-24"><span class="linenos">24</span></a>    <span class="k">def</span> <span class="nf">add_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="n">View</span><span class="p">):</span>
-</span><span id="Viewable-25"><a href="#Viewable-25"><span class="linenos">25</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Viewable-26"><a href="#Viewable-26"><span class="linenos">26</span></a><span class="sd">        Adds a view to the viewable element.</span>
-</span><span id="Viewable-27"><a href="#Viewable-27"><span class="linenos">27</span></a>
-</span><span id="Viewable-28"><a href="#Viewable-28"><span class="linenos">28</span></a><span class="sd">        Args:</span>
-</span><span id="Viewable-29"><a href="#Viewable-29"><span class="linenos">29</span></a><span class="sd">            view (Any): the view.</span>
-</span><span id="Viewable-30"><a href="#Viewable-30"><span class="linenos">30</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Viewable-31"><a href="#Viewable-31"><span class="linenos">31</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
-</span><span id="Viewable-32"><a href="#Viewable-32"><span class="linenos">32</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="Viewable-33"><a href="#Viewable-33"><span class="linenos">33</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">+=</span> <span class="p">[</span><span class="n">view</span><span class="p">]</span>
-</span><span id="Viewable-34"><a href="#Viewable-34"><span class="linenos">34</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
-</span><span id="Viewable-35"><a href="#Viewable-35"><span class="linenos">35</span></a>
-</span><span id="Viewable-36"><a href="#Viewable-36"><span class="linenos">36</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
-</span><span id="Viewable-37"><a href="#Viewable-37"><span class="linenos">37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Viewable-38"><a href="#Viewable-38"><span class="linenos">38</span></a><span class="sd">        Returns the list of views attached to the viewable object.</span>
-</span><span id="Viewable-39"><a href="#Viewable-39"><span class="linenos">39</span></a>
-</span><span id="Viewable-40"><a href="#Viewable-40"><span class="linenos">40</span></a><span class="sd">        Returns:</span>
-</span><span id="Viewable-41"><a href="#Viewable-41"><span class="linenos">41</span></a><span class="sd">            List[View]: the views.</span>
-</span><span id="Viewable-42"><a href="#Viewable-42"><span class="linenos">42</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Viewable-43"><a href="#Viewable-43"><span class="linenos">43</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
-</span><span id="Viewable-44"><a href="#Viewable-44"><span class="linenos">44</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="Viewable-45"><a href="#Viewable-45"><span class="linenos">45</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span>
-</span><span id="Viewable-46"><a href="#Viewable-46"><span class="linenos">46</span></a>
-</span><span id="Viewable-47"><a href="#Viewable-47"><span class="linenos">47</span></a>    <span class="k">def</span> <span class="nf">update_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Viewable-48"><a href="#Viewable-48"><span class="linenos">48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Viewable-49"><a href="#Viewable-49"><span class="linenos">49</span></a><span class="sd">        Updates the views.</span>
-</span><span id="Viewable-50"><a href="#Viewable-50"><span class="linenos">50</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Viewable-51"><a href="#Viewable-51"><span class="linenos">51</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
-</span><span id="Viewable-52"><a href="#Viewable-52"><span class="linenos">52</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="Viewable-53"><a href="#Viewable-53"><span class="linenos">53</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
-</span><span id="Viewable-54"><a href="#Viewable-54"><span class="linenos">54</span></a>            <span class="n">view</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</span><span id="Viewable-55"><a href="#Viewable-55"><span class="linenos">55</span></a>
-</span><span id="Viewable-56"><a href="#Viewable-56"><span class="linenos">56</span></a>    <span class="k">def</span> <span class="nf">clear_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Viewable-57"><a href="#Viewable-57"><span class="linenos">57</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Viewable-58"><a href="#Viewable-58"><span class="linenos">58</span></a><span class="sd">        Removes all views.</span>
-</span><span id="Viewable-59"><a href="#Viewable-59"><span class="linenos">59</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Viewable-60"><a href="#Viewable-60"><span class="linenos">60</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>A mixin for objects to which a view can be attached. It adds the methods add_view and update_views.</p>
-</div>
-
-
-                            <div id="Viewable.add_view" class="classattr">
-                                        <input id="Viewable.add_view-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                <section id="viewable">
+                            <input id="viewable-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">add_view</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">view</span><span class="p">:</span> <span class="n"><a href="#View">view.View</a></span></span><span class="return-annotation">):</span></span>
+        <span class="name">viewable</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">cls</span></span><span class="return-annotation">):</span></span>
 
-                <label class="view-source-button" for="Viewable.add_view-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="viewable-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#Viewable.add_view"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Viewable.add_view-24"><a href="#Viewable.add_view-24"><span class="linenos">24</span></a>    <span class="k">def</span> <span class="nf">add_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="n">View</span><span class="p">):</span>
-</span><span id="Viewable.add_view-25"><a href="#Viewable.add_view-25"><span class="linenos">25</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Viewable.add_view-26"><a href="#Viewable.add_view-26"><span class="linenos">26</span></a><span class="sd">        Adds a view to the viewable element.</span>
-</span><span id="Viewable.add_view-27"><a href="#Viewable.add_view-27"><span class="linenos">27</span></a>
-</span><span id="Viewable.add_view-28"><a href="#Viewable.add_view-28"><span class="linenos">28</span></a><span class="sd">        Args:</span>
-</span><span id="Viewable.add_view-29"><a href="#Viewable.add_view-29"><span class="linenos">29</span></a><span class="sd">            view (Any): the view.</span>
-</span><span id="Viewable.add_view-30"><a href="#Viewable.add_view-30"><span class="linenos">30</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Viewable.add_view-31"><a href="#Viewable.add_view-31"><span class="linenos">31</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
-</span><span id="Viewable.add_view-32"><a href="#Viewable.add_view-32"><span class="linenos">32</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="Viewable.add_view-33"><a href="#Viewable.add_view-33"><span class="linenos">33</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">+=</span> <span class="p">[</span><span class="n">view</span><span class="p">]</span>
-</span><span id="Viewable.add_view-34"><a href="#Viewable.add_view-34"><span class="linenos">34</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
+    <a class="headerlink" href="#viewable"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="viewable-20"><a href="#viewable-20"><span class="linenos">20</span></a><span class="k">def</span> <span class="nf">viewable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+</span><span id="viewable-21"><a href="#viewable-21"><span class="linenos">21</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="viewable-22"><a href="#viewable-22"><span class="linenos">22</span></a><span class="sd">    A mixin decorator for objects to which a view can be attached. </span>
+</span><span id="viewable-23"><a href="#viewable-23"><span class="linenos">23</span></a><span class="sd">    It adds the methods for handling views attached to the viewable.</span>
+</span><span id="viewable-24"><a href="#viewable-24"><span class="linenos">24</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="viewable-25"><a href="#viewable-25"><span class="linenos">25</span></a>    <span class="k">def</span> <span class="nf">add_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="n">View</span><span class="p">):</span>
+</span><span id="viewable-26"><a href="#viewable-26"><span class="linenos">26</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="viewable-27"><a href="#viewable-27"><span class="linenos">27</span></a><span class="sd">        Adds a view to the viewable object.</span>
+</span><span id="viewable-28"><a href="#viewable-28"><span class="linenos">28</span></a>
+</span><span id="viewable-29"><a href="#viewable-29"><span class="linenos">29</span></a><span class="sd">        Args:</span>
+</span><span id="viewable-30"><a href="#viewable-30"><span class="linenos">30</span></a><span class="sd">            view (Any): the view.</span>
+</span><span id="viewable-31"><a href="#viewable-31"><span class="linenos">31</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="viewable-32"><a href="#viewable-32"><span class="linenos">32</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
+</span><span id="viewable-33"><a href="#viewable-33"><span class="linenos">33</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="viewable-34"><a href="#viewable-34"><span class="linenos">34</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">+=</span> <span class="p">[</span><span class="n">view</span><span class="p">]</span>
+</span><span id="viewable-35"><a href="#viewable-35"><span class="linenos">35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
+</span><span id="viewable-36"><a href="#viewable-36"><span class="linenos">36</span></a>
+</span><span id="viewable-37"><a href="#viewable-37"><span class="linenos">37</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
+</span><span id="viewable-38"><a href="#viewable-38"><span class="linenos">38</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="viewable-39"><a href="#viewable-39"><span class="linenos">39</span></a><span class="sd">        Returns the list of views attached to the viewable object.</span>
+</span><span id="viewable-40"><a href="#viewable-40"><span class="linenos">40</span></a>
+</span><span id="viewable-41"><a href="#viewable-41"><span class="linenos">41</span></a><span class="sd">        Returns:</span>
+</span><span id="viewable-42"><a href="#viewable-42"><span class="linenos">42</span></a><span class="sd">            List[View]: the views.</span>
+</span><span id="viewable-43"><a href="#viewable-43"><span class="linenos">43</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="viewable-44"><a href="#viewable-44"><span class="linenos">44</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
+</span><span id="viewable-45"><a href="#viewable-45"><span class="linenos">45</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="viewable-46"><a href="#viewable-46"><span class="linenos">46</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span>
+</span><span id="viewable-47"><a href="#viewable-47"><span class="linenos">47</span></a>
+</span><span id="viewable-48"><a href="#viewable-48"><span class="linenos">48</span></a>    <span class="k">def</span> <span class="nf">update_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="viewable-49"><a href="#viewable-49"><span class="linenos">49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="viewable-50"><a href="#viewable-50"><span class="linenos">50</span></a><span class="sd">        Updates the views.</span>
+</span><span id="viewable-51"><a href="#viewable-51"><span class="linenos">51</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="viewable-52"><a href="#viewable-52"><span class="linenos">52</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
+</span><span id="viewable-53"><a href="#viewable-53"><span class="linenos">53</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="viewable-54"><a href="#viewable-54"><span class="linenos">54</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
+</span><span id="viewable-55"><a href="#viewable-55"><span class="linenos">55</span></a>            <span class="n">view</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</span><span id="viewable-56"><a href="#viewable-56"><span class="linenos">56</span></a>
+</span><span id="viewable-57"><a href="#viewable-57"><span class="linenos">57</span></a>    <span class="k">def</span> <span class="nf">clear_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="viewable-58"><a href="#viewable-58"><span class="linenos">58</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="viewable-59"><a href="#viewable-59"><span class="linenos">59</span></a><span class="sd">        Removes all views.</span>
+</span><span id="viewable-60"><a href="#viewable-60"><span class="linenos">60</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="viewable-61"><a href="#viewable-61"><span class="linenos">61</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="viewable-62"><a href="#viewable-62"><span class="linenos">62</span></a>
+</span><span id="viewable-63"><a href="#viewable-63"><span class="linenos">63</span></a>    <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;add_view&quot;</span><span class="p">,</span> <span class="n">add_view</span><span class="p">)</span>
+</span><span id="viewable-64"><a href="#viewable-64"><span class="linenos">64</span></a>    <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;get_views&quot;</span><span class="p">,</span> <span class="n">get_views</span><span class="p">)</span>
+</span><span id="viewable-65"><a href="#viewable-65"><span class="linenos">65</span></a>    <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;update_views&quot;</span><span class="p">,</span> <span class="n">update_views</span><span class="p">)</span>
+</span><span id="viewable-66"><a href="#viewable-66"><span class="linenos">66</span></a>    <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;clear_views&quot;</span><span class="p">,</span> <span class="n">clear_views</span><span class="p">)</span>
+</span><span id="viewable-67"><a href="#viewable-67"><span class="linenos">67</span></a>    <span class="k">return</span> <span class="bp">cls</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Adds a view to the viewable element.</p>
-
-<h6 id="arguments">Arguments:</h6>
-
-<ul>
-<li><strong>view (Any):</strong>  the view.</li>
-</ul>
+            <div class="docstring"><p>A mixin decorator for objects to which a view can be attached. 
+It adds the methods for handling views attached to the viewable.</p>
 </div>
 
 
-                            </div>
-                            <div id="Viewable.get_views" class="classattr">
-                                        <input id="Viewable.get_views-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n"><a href="#View">view.View</a></span><span class="p">]</span>:</span></span>
-
-                <label class="view-source-button" for="Viewable.get_views-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#Viewable.get_views"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Viewable.get_views-36"><a href="#Viewable.get_views-36"><span class="linenos">36</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
-</span><span id="Viewable.get_views-37"><a href="#Viewable.get_views-37"><span class="linenos">37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Viewable.get_views-38"><a href="#Viewable.get_views-38"><span class="linenos">38</span></a><span class="sd">        Returns the list of views attached to the viewable object.</span>
-</span><span id="Viewable.get_views-39"><a href="#Viewable.get_views-39"><span class="linenos">39</span></a>
-</span><span id="Viewable.get_views-40"><a href="#Viewable.get_views-40"><span class="linenos">40</span></a><span class="sd">        Returns:</span>
-</span><span id="Viewable.get_views-41"><a href="#Viewable.get_views-41"><span class="linenos">41</span></a><span class="sd">            List[View]: the views.</span>
-</span><span id="Viewable.get_views-42"><a href="#Viewable.get_views-42"><span class="linenos">42</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Viewable.get_views-43"><a href="#Viewable.get_views-43"><span class="linenos">43</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
-</span><span id="Viewable.get_views-44"><a href="#Viewable.get_views-44"><span class="linenos">44</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="Viewable.get_views-45"><a href="#Viewable.get_views-45"><span class="linenos">45</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Returns the list of views attached to the viewable object.</p>
-
-<h6 id="returns">Returns:</h6>
-
-<blockquote>
-  <p>List[View]: the views.</p>
-</blockquote>
-</div>
-
-
-                            </div>
-                            <div id="Viewable.update_views" class="classattr">
-                                        <input id="Viewable.update_views-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">update_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="Viewable.update_views-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#Viewable.update_views"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Viewable.update_views-47"><a href="#Viewable.update_views-47"><span class="linenos">47</span></a>    <span class="k">def</span> <span class="nf">update_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Viewable.update_views-48"><a href="#Viewable.update_views-48"><span class="linenos">48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Viewable.update_views-49"><a href="#Viewable.update_views-49"><span class="linenos">49</span></a><span class="sd">        Updates the views.</span>
-</span><span id="Viewable.update_views-50"><a href="#Viewable.update_views-50"><span class="linenos">50</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Viewable.update_views-51"><a href="#Viewable.update_views-51"><span class="linenos">51</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
-</span><span id="Viewable.update_views-52"><a href="#Viewable.update_views-52"><span class="linenos">52</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="Viewable.update_views-53"><a href="#Viewable.update_views-53"><span class="linenos">53</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
-</span><span id="Viewable.update_views-54"><a href="#Viewable.update_views-54"><span class="linenos">54</span></a>            <span class="n">view</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Updates the views.</p>
-</div>
-
-
-                            </div>
-                            <div id="Viewable.clear_views" class="classattr">
-                                        <input id="Viewable.clear_views-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">clear_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="Viewable.clear_views-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#Viewable.clear_views"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Viewable.clear_views-56"><a href="#Viewable.clear_views-56"><span class="linenos">56</span></a>    <span class="k">def</span> <span class="nf">clear_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Viewable.clear_views-57"><a href="#Viewable.clear_views-57"><span class="linenos">57</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Viewable.clear_views-58"><a href="#Viewable.clear_views-58"><span class="linenos">58</span></a><span class="sd">        Removes all views.</span>
-</span><span id="Viewable.clear_views-59"><a href="#Viewable.clear_views-59"><span class="linenos">59</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Viewable.clear_views-60"><a href="#Viewable.clear_views-60"><span class="linenos">60</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Removes all views.</p>
-</div>
-
-
-                            </div>
                 </section>
     </main>
 <script>

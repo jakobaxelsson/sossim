@@ -192,7 +192,14 @@ class RoadNetworkGrid:
 
         # Generate roads and destinations
         self.generate_roads()
- 
+        # import cProfile, pstats
+        # with cProfile.Profile() as pr:
+        #     self.generate_roads()
+        #     stats = pstats.Stats(pr)
+        #     stats.strip_dirs()
+        #     stats.sort_stats("cumtime")
+        #     stats.print_stats()
+
     def generate_roads(self):
         """
         Generates the road network. This is a two step process.
@@ -208,21 +215,28 @@ class RoadNetworkGrid:
 
         # Step 1. Create a connected graph whose nodes are a subset of the grid cells.
         start_node = (self.width // 2, self.height //2)
-        edge_candidates = [(start_node, neighbor) for neighbor in cnw.neighbors(start_node)]
+        edge_candidates = { (start_node, neighbor) : self._edge_preference((start_node, neighbor)) for neighbor in cnw.neighbors(start_node) }
 
         # The number of nodes is determined by the road_density parameter.
         remaining_nodes = self.width * self.height * self.road_density
         while remaining_nodes > 0:
             # Pick an edge to add, removing it from the candidates and adding it to the graph
-            (source, sink) = self.model.random.choices(edge_candidates, weights = [self._edge_preference(e) for e in edge_candidates])[0]
+            (source, sink) = self.model.random.choices(list(edge_candidates.keys()), weights = [w for _, w in edge_candidates.items()])[0]
 
             # If the sink of the new edge is new in the graph, add edges to its neighbors as new edge candidates
             if not cnw.is_road(sink):
-                edge_candidates += [(sink, neighbor) for neighbor in cnw.neighbors(sink)]
+                new_edge_candidates = { (sink, neighbor) : self._edge_preference((sink, neighbor)) for neighbor in cnw.neighbors(sink) }
+                edge_candidates.update(new_edge_candidates)
+
             # Add the new edge (and implicitly its nodes), and remove the edge as a candidate.
             cnw.add_road(source, sink, bidirectional = True)
             remaining_nodes -= 1
-            edge_candidates.remove((source, sink))
+            del edge_candidates[(source, sink)]
+
+            # Update the edge preferences for all connections to neighbours of source and sink
+            for node in [source, sink]:
+                for neighbor in cnw.neighbors(node):
+                    edge_candidates[(node, neighbor)] = self._edge_preference((node, neighbor))
 
         # Step 2. Add lanes and roundabouts.
         # Create a new graph, this time directed. Each node in the coarse graph maps to 4 x 4 nodes in the new graph.

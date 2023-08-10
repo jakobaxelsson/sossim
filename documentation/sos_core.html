@@ -50,6 +50,18 @@
                         <li>
                                 <a class="function" href="#SoSAgent.advance">advance</a>
                         </li>
+                        <li>
+                                <a class="function" href="#SoSAgent.add_view">add_view</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SoSAgent.get_views">get_views</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SoSAgent.update_views">update_views</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SoSAgent.clear_views">clear_views</a>
+                        </li>
                 </ul>
 
             </li>
@@ -104,100 +116,101 @@ sos_core    </h1>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span> <span class="nn">mesa</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span> <span class="nn">view</span> <span class="kn">import</span> <span class="n">Viewable</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span> <span class="nn">view</span> <span class="kn">import</span> <span class="n">viewable</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="k">class</span> <span class="nc">SoSAgent</span><span class="p">(</span><span class="n">mesa</span><span class="o">.</span><span class="n">Agent</span><span class="p">,</span> <span class="n">Viewable</span><span class="p">):</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">mesa</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="sd">        Creates a SoS agent in a simulation model.</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="sd">        Args:</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">            unique_id (int): the unique id of the agent.</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">            model (mesa.Model): the model in which the agent is situated.</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">unique_id</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>    <span class="k">def</span> <span class="nf">create_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="sd">        Creates a plan for the agent, consisting of a list of capability instances.</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>        <span class="k">pass</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="sd">        The first part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">        If the agent does not have a plan, it creates one.</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">        Then it checks that the preconditions of the first action in the plan are fulfilled.</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">create_plan</span><span class="p">()</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">precondition</span><span class="p">()</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">        The second part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">        If the precondition of the first action in the current plan was fullfilled, that action is now carried out.</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">        If this leads to the action&#39;s postcondition being fulfilled, the action is removed from the plan.</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">        Finally, if the agent has a view, that view is updated.</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span><span class="p">:</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>            <span class="n">action</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">postcondition</span><span class="p">():</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>        <span class="c1"># Update the views of the agent</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="k">class</span> <span class="nc">Capability</span><span class="p">:</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">    A generic capability, serving as a base class for specific capabilities.</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">SoSAgent</span><span class="p">):</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">        Creates the capability for a certain agent.</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">        Args:</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">            agent (mesa.Agent): the agent who should have this capability.</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">        Returns a string representation of the capability.        </span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">        Returns:</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">        Returns:</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">        Carries out the capability.</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="k">pass</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="nd">@viewable</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="k">class</span> <span class="nc">SoSAgent</span><span class="p">(</span><span class="n">mesa</span><span class="o">.</span><span class="n">Agent</span><span class="p">):</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">mesa</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="sd">        Creates a SoS agent in a simulation model.</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">        Args:</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">            unique_id (int): the unique id of the agent.</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">            model (mesa.Model): the model in which the agent is situated.</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">unique_id</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="k">def</span> <span class="nf">create_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">        Creates a plan for the agent, consisting of a list of capability instances.</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>        <span class="k">pass</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">        The first part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">        If the agent does not have a plan, it creates one.</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">        Then it checks that the preconditions of the first action in the plan are fulfilled.</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">create_plan</span><span class="p">()</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">precondition</span><span class="p">()</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">        The second part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">        If the precondition of the first action in the current plan was fullfilled, that action is now carried out.</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">        If this leads to the action&#39;s postcondition being fulfilled, the action is removed from the plan.</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">        Finally, if the agent has a view, that view is updated.</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span><span class="p">:</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>            <span class="n">action</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">postcondition</span><span class="p">():</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>        <span class="c1"># Update the views of the agent</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="k">class</span> <span class="nc">Capability</span><span class="p">:</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">    A generic capability, serving as a base class for specific capabilities.</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">SoSAgent</span><span class="p">):</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        Creates the capability for a certain agent.</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">        Args:</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">            agent (mesa.Agent): the agent who should have this capability.</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">        Returns a string representation of the capability.        </span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">        Returns:</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">        Returns:</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">        Carries out the capability.</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -205,61 +218,63 @@ sos_core    </h1>
                 <section id="SoSAgent">
                             <input id="SoSAgent-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
-            
+                    <div class="decorator">@viewable</div>
+
     <span class="def">class</span>
-    <span class="name">SoSAgent</span><wbr>(<span class="base">mesa.agent.Agent</span>, <span class="base"><a href="view.html#Viewable">view.Viewable</a></span>):
+    <span class="name">SoSAgent</span><wbr>(<span class="base">mesa.agent.Agent</span>):
 
                 <label class="view-source-button" for="SoSAgent-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#SoSAgent"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent-11"><a href="#SoSAgent-11"><span class="linenos">11</span></a><span class="k">class</span> <span class="nc">SoSAgent</span><span class="p">(</span><span class="n">mesa</span><span class="o">.</span><span class="n">Agent</span><span class="p">,</span> <span class="n">Viewable</span><span class="p">):</span>
-</span><span id="SoSAgent-12"><a href="#SoSAgent-12"><span class="linenos">12</span></a>
-</span><span id="SoSAgent-13"><a href="#SoSAgent-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">mesa</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-</span><span id="SoSAgent-14"><a href="#SoSAgent-14"><span class="linenos">14</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SoSAgent-15"><a href="#SoSAgent-15"><span class="linenos">15</span></a><span class="sd">        Creates a SoS agent in a simulation model.</span>
-</span><span id="SoSAgent-16"><a href="#SoSAgent-16"><span class="linenos">16</span></a>
-</span><span id="SoSAgent-17"><a href="#SoSAgent-17"><span class="linenos">17</span></a><span class="sd">        Args:</span>
-</span><span id="SoSAgent-18"><a href="#SoSAgent-18"><span class="linenos">18</span></a><span class="sd">            unique_id (int): the unique id of the agent.</span>
-</span><span id="SoSAgent-19"><a href="#SoSAgent-19"><span class="linenos">19</span></a><span class="sd">            model (mesa.Model): the model in which the agent is situated.</span>
-</span><span id="SoSAgent-20"><a href="#SoSAgent-20"><span class="linenos">20</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SoSAgent-21"><a href="#SoSAgent-21"><span class="linenos">21</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">unique_id</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
-</span><span id="SoSAgent-22"><a href="#SoSAgent-22"><span class="linenos">22</span></a>
-</span><span id="SoSAgent-23"><a href="#SoSAgent-23"><span class="linenos">23</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
-</span><span id="SoSAgent-24"><a href="#SoSAgent-24"><span class="linenos">24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="SoSAgent-25"><a href="#SoSAgent-25"><span class="linenos">25</span></a>
-</span><span id="SoSAgent-26"><a href="#SoSAgent-26"><span class="linenos">26</span></a>    <span class="k">def</span> <span class="nf">create_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="SoSAgent-27"><a href="#SoSAgent-27"><span class="linenos">27</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SoSAgent-28"><a href="#SoSAgent-28"><span class="linenos">28</span></a><span class="sd">        Creates a plan for the agent, consisting of a list of capability instances.</span>
-</span><span id="SoSAgent-29"><a href="#SoSAgent-29"><span class="linenos">29</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SoSAgent-30"><a href="#SoSAgent-30"><span class="linenos">30</span></a>        <span class="k">pass</span>
-</span><span id="SoSAgent-31"><a href="#SoSAgent-31"><span class="linenos">31</span></a>
-</span><span id="SoSAgent-32"><a href="#SoSAgent-32"><span class="linenos">32</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="SoSAgent-33"><a href="#SoSAgent-33"><span class="linenos">33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SoSAgent-34"><a href="#SoSAgent-34"><span class="linenos">34</span></a><span class="sd">        The first part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
-</span><span id="SoSAgent-35"><a href="#SoSAgent-35"><span class="linenos">35</span></a><span class="sd">        If the agent does not have a plan, it creates one.</span>
-</span><span id="SoSAgent-36"><a href="#SoSAgent-36"><span class="linenos">36</span></a><span class="sd">        Then it checks that the preconditions of the first action in the plan are fulfilled.</span>
-</span><span id="SoSAgent-37"><a href="#SoSAgent-37"><span class="linenos">37</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SoSAgent-38"><a href="#SoSAgent-38"><span class="linenos">38</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span>
-</span><span id="SoSAgent-39"><a href="#SoSAgent-39"><span class="linenos">39</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">create_plan</span><span class="p">()</span>
-</span><span id="SoSAgent-40"><a href="#SoSAgent-40"><span class="linenos">40</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="SoSAgent-41"><a href="#SoSAgent-41"><span class="linenos">41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">precondition</span><span class="p">()</span>
-</span><span id="SoSAgent-42"><a href="#SoSAgent-42"><span class="linenos">42</span></a>
-</span><span id="SoSAgent-43"><a href="#SoSAgent-43"><span class="linenos">43</span></a>    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="SoSAgent-44"><a href="#SoSAgent-44"><span class="linenos">44</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SoSAgent-45"><a href="#SoSAgent-45"><span class="linenos">45</span></a><span class="sd">        The second part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
-</span><span id="SoSAgent-46"><a href="#SoSAgent-46"><span class="linenos">46</span></a><span class="sd">        If the precondition of the first action in the current plan was fullfilled, that action is now carried out.</span>
-</span><span id="SoSAgent-47"><a href="#SoSAgent-47"><span class="linenos">47</span></a><span class="sd">        If this leads to the action&#39;s postcondition being fulfilled, the action is removed from the plan.</span>
-</span><span id="SoSAgent-48"><a href="#SoSAgent-48"><span class="linenos">48</span></a><span class="sd">        Finally, if the agent has a view, that view is updated.</span>
-</span><span id="SoSAgent-49"><a href="#SoSAgent-49"><span class="linenos">49</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SoSAgent-50"><a href="#SoSAgent-50"><span class="linenos">50</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="SoSAgent-51"><a href="#SoSAgent-51"><span class="linenos">51</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span><span class="p">:</span>
-</span><span id="SoSAgent-52"><a href="#SoSAgent-52"><span class="linenos">52</span></a>            <span class="n">action</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
-</span><span id="SoSAgent-53"><a href="#SoSAgent-53"><span class="linenos">53</span></a>        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">postcondition</span><span class="p">():</span>
-</span><span id="SoSAgent-54"><a href="#SoSAgent-54"><span class="linenos">54</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-</span><span id="SoSAgent-55"><a href="#SoSAgent-55"><span class="linenos">55</span></a>
-</span><span id="SoSAgent-56"><a href="#SoSAgent-56"><span class="linenos">56</span></a>        <span class="c1"># Update the views of the agent</span>
-</span><span id="SoSAgent-57"><a href="#SoSAgent-57"><span class="linenos">57</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent-11"><a href="#SoSAgent-11"><span class="linenos">11</span></a><span class="nd">@viewable</span>
+</span><span id="SoSAgent-12"><a href="#SoSAgent-12"><span class="linenos">12</span></a><span class="k">class</span> <span class="nc">SoSAgent</span><span class="p">(</span><span class="n">mesa</span><span class="o">.</span><span class="n">Agent</span><span class="p">):</span>
+</span><span id="SoSAgent-13"><a href="#SoSAgent-13"><span class="linenos">13</span></a>
+</span><span id="SoSAgent-14"><a href="#SoSAgent-14"><span class="linenos">14</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">mesa</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+</span><span id="SoSAgent-15"><a href="#SoSAgent-15"><span class="linenos">15</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent-16"><a href="#SoSAgent-16"><span class="linenos">16</span></a><span class="sd">        Creates a SoS agent in a simulation model.</span>
+</span><span id="SoSAgent-17"><a href="#SoSAgent-17"><span class="linenos">17</span></a>
+</span><span id="SoSAgent-18"><a href="#SoSAgent-18"><span class="linenos">18</span></a><span class="sd">        Args:</span>
+</span><span id="SoSAgent-19"><a href="#SoSAgent-19"><span class="linenos">19</span></a><span class="sd">            unique_id (int): the unique id of the agent.</span>
+</span><span id="SoSAgent-20"><a href="#SoSAgent-20"><span class="linenos">20</span></a><span class="sd">            model (mesa.Model): the model in which the agent is situated.</span>
+</span><span id="SoSAgent-21"><a href="#SoSAgent-21"><span class="linenos">21</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent-22"><a href="#SoSAgent-22"><span class="linenos">22</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">unique_id</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+</span><span id="SoSAgent-23"><a href="#SoSAgent-23"><span class="linenos">23</span></a>
+</span><span id="SoSAgent-24"><a href="#SoSAgent-24"><span class="linenos">24</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
+</span><span id="SoSAgent-25"><a href="#SoSAgent-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="SoSAgent-26"><a href="#SoSAgent-26"><span class="linenos">26</span></a>
+</span><span id="SoSAgent-27"><a href="#SoSAgent-27"><span class="linenos">27</span></a>    <span class="k">def</span> <span class="nf">create_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SoSAgent-28"><a href="#SoSAgent-28"><span class="linenos">28</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent-29"><a href="#SoSAgent-29"><span class="linenos">29</span></a><span class="sd">        Creates a plan for the agent, consisting of a list of capability instances.</span>
+</span><span id="SoSAgent-30"><a href="#SoSAgent-30"><span class="linenos">30</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent-31"><a href="#SoSAgent-31"><span class="linenos">31</span></a>        <span class="k">pass</span>
+</span><span id="SoSAgent-32"><a href="#SoSAgent-32"><span class="linenos">32</span></a>
+</span><span id="SoSAgent-33"><a href="#SoSAgent-33"><span class="linenos">33</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SoSAgent-34"><a href="#SoSAgent-34"><span class="linenos">34</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent-35"><a href="#SoSAgent-35"><span class="linenos">35</span></a><span class="sd">        The first part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
+</span><span id="SoSAgent-36"><a href="#SoSAgent-36"><span class="linenos">36</span></a><span class="sd">        If the agent does not have a plan, it creates one.</span>
+</span><span id="SoSAgent-37"><a href="#SoSAgent-37"><span class="linenos">37</span></a><span class="sd">        Then it checks that the preconditions of the first action in the plan are fulfilled.</span>
+</span><span id="SoSAgent-38"><a href="#SoSAgent-38"><span class="linenos">38</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent-39"><a href="#SoSAgent-39"><span class="linenos">39</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span>
+</span><span id="SoSAgent-40"><a href="#SoSAgent-40"><span class="linenos">40</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">create_plan</span><span class="p">()</span>
+</span><span id="SoSAgent-41"><a href="#SoSAgent-41"><span class="linenos">41</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="SoSAgent-42"><a href="#SoSAgent-42"><span class="linenos">42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">precondition</span><span class="p">()</span>
+</span><span id="SoSAgent-43"><a href="#SoSAgent-43"><span class="linenos">43</span></a>
+</span><span id="SoSAgent-44"><a href="#SoSAgent-44"><span class="linenos">44</span></a>    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SoSAgent-45"><a href="#SoSAgent-45"><span class="linenos">45</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent-46"><a href="#SoSAgent-46"><span class="linenos">46</span></a><span class="sd">        The second part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
+</span><span id="SoSAgent-47"><a href="#SoSAgent-47"><span class="linenos">47</span></a><span class="sd">        If the precondition of the first action in the current plan was fullfilled, that action is now carried out.</span>
+</span><span id="SoSAgent-48"><a href="#SoSAgent-48"><span class="linenos">48</span></a><span class="sd">        If this leads to the action&#39;s postcondition being fulfilled, the action is removed from the plan.</span>
+</span><span id="SoSAgent-49"><a href="#SoSAgent-49"><span class="linenos">49</span></a><span class="sd">        Finally, if the agent has a view, that view is updated.</span>
+</span><span id="SoSAgent-50"><a href="#SoSAgent-50"><span class="linenos">50</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent-51"><a href="#SoSAgent-51"><span class="linenos">51</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="SoSAgent-52"><a href="#SoSAgent-52"><span class="linenos">52</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span><span class="p">:</span>
+</span><span id="SoSAgent-53"><a href="#SoSAgent-53"><span class="linenos">53</span></a>            <span class="n">action</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+</span><span id="SoSAgent-54"><a href="#SoSAgent-54"><span class="linenos">54</span></a>        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">postcondition</span><span class="p">():</span>
+</span><span id="SoSAgent-55"><a href="#SoSAgent-55"><span class="linenos">55</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</span><span id="SoSAgent-56"><a href="#SoSAgent-56"><span class="linenos">56</span></a>
+</span><span id="SoSAgent-57"><a href="#SoSAgent-57"><span class="linenos">57</span></a>        <span class="c1"># Update the views of the agent</span>
+</span><span id="SoSAgent-58"><a href="#SoSAgent-58"><span class="linenos">58</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -277,18 +292,18 @@ sos_core    </h1>
 
     </div>
     <a class="headerlink" href="#SoSAgent.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.__init__-13"><a href="#SoSAgent.__init__-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">mesa</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-</span><span id="SoSAgent.__init__-14"><a href="#SoSAgent.__init__-14"><span class="linenos">14</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SoSAgent.__init__-15"><a href="#SoSAgent.__init__-15"><span class="linenos">15</span></a><span class="sd">        Creates a SoS agent in a simulation model.</span>
-</span><span id="SoSAgent.__init__-16"><a href="#SoSAgent.__init__-16"><span class="linenos">16</span></a>
-</span><span id="SoSAgent.__init__-17"><a href="#SoSAgent.__init__-17"><span class="linenos">17</span></a><span class="sd">        Args:</span>
-</span><span id="SoSAgent.__init__-18"><a href="#SoSAgent.__init__-18"><span class="linenos">18</span></a><span class="sd">            unique_id (int): the unique id of the agent.</span>
-</span><span id="SoSAgent.__init__-19"><a href="#SoSAgent.__init__-19"><span class="linenos">19</span></a><span class="sd">            model (mesa.Model): the model in which the agent is situated.</span>
-</span><span id="SoSAgent.__init__-20"><a href="#SoSAgent.__init__-20"><span class="linenos">20</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SoSAgent.__init__-21"><a href="#SoSAgent.__init__-21"><span class="linenos">21</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">unique_id</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
-</span><span id="SoSAgent.__init__-22"><a href="#SoSAgent.__init__-22"><span class="linenos">22</span></a>
-</span><span id="SoSAgent.__init__-23"><a href="#SoSAgent.__init__-23"><span class="linenos">23</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
-</span><span id="SoSAgent.__init__-24"><a href="#SoSAgent.__init__-24"><span class="linenos">24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.__init__-14"><a href="#SoSAgent.__init__-14"><span class="linenos">14</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">mesa</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+</span><span id="SoSAgent.__init__-15"><a href="#SoSAgent.__init__-15"><span class="linenos">15</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent.__init__-16"><a href="#SoSAgent.__init__-16"><span class="linenos">16</span></a><span class="sd">        Creates a SoS agent in a simulation model.</span>
+</span><span id="SoSAgent.__init__-17"><a href="#SoSAgent.__init__-17"><span class="linenos">17</span></a>
+</span><span id="SoSAgent.__init__-18"><a href="#SoSAgent.__init__-18"><span class="linenos">18</span></a><span class="sd">        Args:</span>
+</span><span id="SoSAgent.__init__-19"><a href="#SoSAgent.__init__-19"><span class="linenos">19</span></a><span class="sd">            unique_id (int): the unique id of the agent.</span>
+</span><span id="SoSAgent.__init__-20"><a href="#SoSAgent.__init__-20"><span class="linenos">20</span></a><span class="sd">            model (mesa.Model): the model in which the agent is situated.</span>
+</span><span id="SoSAgent.__init__-21"><a href="#SoSAgent.__init__-21"><span class="linenos">21</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent.__init__-22"><a href="#SoSAgent.__init__-22"><span class="linenos">22</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">unique_id</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+</span><span id="SoSAgent.__init__-23"><a href="#SoSAgent.__init__-23"><span class="linenos">23</span></a>
+</span><span id="SoSAgent.__init__-24"><a href="#SoSAgent.__init__-24"><span class="linenos">24</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
+</span><span id="SoSAgent.__init__-25"><a href="#SoSAgent.__init__-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span></pre></div>
 
 
@@ -326,11 +341,11 @@ sos_core    </h1>
 
     </div>
     <a class="headerlink" href="#SoSAgent.create_plan"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.create_plan-26"><a href="#SoSAgent.create_plan-26"><span class="linenos">26</span></a>    <span class="k">def</span> <span class="nf">create_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="SoSAgent.create_plan-27"><a href="#SoSAgent.create_plan-27"><span class="linenos">27</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SoSAgent.create_plan-28"><a href="#SoSAgent.create_plan-28"><span class="linenos">28</span></a><span class="sd">        Creates a plan for the agent, consisting of a list of capability instances.</span>
-</span><span id="SoSAgent.create_plan-29"><a href="#SoSAgent.create_plan-29"><span class="linenos">29</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SoSAgent.create_plan-30"><a href="#SoSAgent.create_plan-30"><span class="linenos">30</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.create_plan-27"><a href="#SoSAgent.create_plan-27"><span class="linenos">27</span></a>    <span class="k">def</span> <span class="nf">create_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SoSAgent.create_plan-28"><a href="#SoSAgent.create_plan-28"><span class="linenos">28</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent.create_plan-29"><a href="#SoSAgent.create_plan-29"><span class="linenos">29</span></a><span class="sd">        Creates a plan for the agent, consisting of a list of capability instances.</span>
+</span><span id="SoSAgent.create_plan-30"><a href="#SoSAgent.create_plan-30"><span class="linenos">30</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent.create_plan-31"><a href="#SoSAgent.create_plan-31"><span class="linenos">31</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -350,16 +365,16 @@ sos_core    </h1>
 
     </div>
     <a class="headerlink" href="#SoSAgent.step"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.step-32"><a href="#SoSAgent.step-32"><span class="linenos">32</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="SoSAgent.step-33"><a href="#SoSAgent.step-33"><span class="linenos">33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SoSAgent.step-34"><a href="#SoSAgent.step-34"><span class="linenos">34</span></a><span class="sd">        The first part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
-</span><span id="SoSAgent.step-35"><a href="#SoSAgent.step-35"><span class="linenos">35</span></a><span class="sd">        If the agent does not have a plan, it creates one.</span>
-</span><span id="SoSAgent.step-36"><a href="#SoSAgent.step-36"><span class="linenos">36</span></a><span class="sd">        Then it checks that the preconditions of the first action in the plan are fulfilled.</span>
-</span><span id="SoSAgent.step-37"><a href="#SoSAgent.step-37"><span class="linenos">37</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SoSAgent.step-38"><a href="#SoSAgent.step-38"><span class="linenos">38</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span>
-</span><span id="SoSAgent.step-39"><a href="#SoSAgent.step-39"><span class="linenos">39</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">create_plan</span><span class="p">()</span>
-</span><span id="SoSAgent.step-40"><a href="#SoSAgent.step-40"><span class="linenos">40</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="SoSAgent.step-41"><a href="#SoSAgent.step-41"><span class="linenos">41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">precondition</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.step-33"><a href="#SoSAgent.step-33"><span class="linenos">33</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SoSAgent.step-34"><a href="#SoSAgent.step-34"><span class="linenos">34</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent.step-35"><a href="#SoSAgent.step-35"><span class="linenos">35</span></a><span class="sd">        The first part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
+</span><span id="SoSAgent.step-36"><a href="#SoSAgent.step-36"><span class="linenos">36</span></a><span class="sd">        If the agent does not have a plan, it creates one.</span>
+</span><span id="SoSAgent.step-37"><a href="#SoSAgent.step-37"><span class="linenos">37</span></a><span class="sd">        Then it checks that the preconditions of the first action in the plan are fulfilled.</span>
+</span><span id="SoSAgent.step-38"><a href="#SoSAgent.step-38"><span class="linenos">38</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent.step-39"><a href="#SoSAgent.step-39"><span class="linenos">39</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span>
+</span><span id="SoSAgent.step-40"><a href="#SoSAgent.step-40"><span class="linenos">40</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">create_plan</span><span class="p">()</span>
+</span><span id="SoSAgent.step-41"><a href="#SoSAgent.step-41"><span class="linenos">41</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="SoSAgent.step-42"><a href="#SoSAgent.step-42"><span class="linenos">42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">precondition</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -381,21 +396,21 @@ Then it checks that the preconditions of the first action in the plan are fulfil
 
     </div>
     <a class="headerlink" href="#SoSAgent.advance"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.advance-43"><a href="#SoSAgent.advance-43"><span class="linenos">43</span></a>    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="SoSAgent.advance-44"><a href="#SoSAgent.advance-44"><span class="linenos">44</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SoSAgent.advance-45"><a href="#SoSAgent.advance-45"><span class="linenos">45</span></a><span class="sd">        The second part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
-</span><span id="SoSAgent.advance-46"><a href="#SoSAgent.advance-46"><span class="linenos">46</span></a><span class="sd">        If the precondition of the first action in the current plan was fullfilled, that action is now carried out.</span>
-</span><span id="SoSAgent.advance-47"><a href="#SoSAgent.advance-47"><span class="linenos">47</span></a><span class="sd">        If this leads to the action&#39;s postcondition being fulfilled, the action is removed from the plan.</span>
-</span><span id="SoSAgent.advance-48"><a href="#SoSAgent.advance-48"><span class="linenos">48</span></a><span class="sd">        Finally, if the agent has a view, that view is updated.</span>
-</span><span id="SoSAgent.advance-49"><a href="#SoSAgent.advance-49"><span class="linenos">49</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SoSAgent.advance-50"><a href="#SoSAgent.advance-50"><span class="linenos">50</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="SoSAgent.advance-51"><a href="#SoSAgent.advance-51"><span class="linenos">51</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span><span class="p">:</span>
-</span><span id="SoSAgent.advance-52"><a href="#SoSAgent.advance-52"><span class="linenos">52</span></a>            <span class="n">action</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
-</span><span id="SoSAgent.advance-53"><a href="#SoSAgent.advance-53"><span class="linenos">53</span></a>        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">postcondition</span><span class="p">():</span>
-</span><span id="SoSAgent.advance-54"><a href="#SoSAgent.advance-54"><span class="linenos">54</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-</span><span id="SoSAgent.advance-55"><a href="#SoSAgent.advance-55"><span class="linenos">55</span></a>
-</span><span id="SoSAgent.advance-56"><a href="#SoSAgent.advance-56"><span class="linenos">56</span></a>        <span class="c1"># Update the views of the agent</span>
-</span><span id="SoSAgent.advance-57"><a href="#SoSAgent.advance-57"><span class="linenos">57</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.advance-44"><a href="#SoSAgent.advance-44"><span class="linenos">44</span></a>    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SoSAgent.advance-45"><a href="#SoSAgent.advance-45"><span class="linenos">45</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent.advance-46"><a href="#SoSAgent.advance-46"><span class="linenos">46</span></a><span class="sd">        The second part of a simulation round when using the Mesa simultaneous activation scheduler.</span>
+</span><span id="SoSAgent.advance-47"><a href="#SoSAgent.advance-47"><span class="linenos">47</span></a><span class="sd">        If the precondition of the first action in the current plan was fullfilled, that action is now carried out.</span>
+</span><span id="SoSAgent.advance-48"><a href="#SoSAgent.advance-48"><span class="linenos">48</span></a><span class="sd">        If this leads to the action&#39;s postcondition being fulfilled, the action is removed from the plan.</span>
+</span><span id="SoSAgent.advance-49"><a href="#SoSAgent.advance-49"><span class="linenos">49</span></a><span class="sd">        Finally, if the agent has a view, that view is updated.</span>
+</span><span id="SoSAgent.advance-50"><a href="#SoSAgent.advance-50"><span class="linenos">50</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent.advance-51"><a href="#SoSAgent.advance-51"><span class="linenos">51</span></a>        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="SoSAgent.advance-52"><a href="#SoSAgent.advance-52"><span class="linenos">52</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_advance</span><span class="p">:</span>
+</span><span id="SoSAgent.advance-53"><a href="#SoSAgent.advance-53"><span class="linenos">53</span></a>            <span class="n">action</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+</span><span id="SoSAgent.advance-54"><a href="#SoSAgent.advance-54"><span class="linenos">54</span></a>        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">postcondition</span><span class="p">():</span>
+</span><span id="SoSAgent.advance-55"><a href="#SoSAgent.advance-55"><span class="linenos">55</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</span><span id="SoSAgent.advance-56"><a href="#SoSAgent.advance-56"><span class="linenos">56</span></a>
+</span><span id="SoSAgent.advance-57"><a href="#SoSAgent.advance-57"><span class="linenos">57</span></a>        <span class="c1"># Update the views of the agent</span>
+</span><span id="SoSAgent.advance-58"><a href="#SoSAgent.advance-58"><span class="linenos">58</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -403,6 +418,128 @@ Then it checks that the preconditions of the first action in the plan are fulfil
 If the precondition of the first action in the current plan was fullfilled, that action is now carried out.
 If this leads to the action's postcondition being fulfilled, the action is removed from the plan.
 Finally, if the agent has a view, that view is updated.</p>
+</div>
+
+
+                            </div>
+                            <div id="SoSAgent.add_view" class="classattr">
+                                        <input id="SoSAgent.add_view-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">add_view</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">view</span><span class="p">:</span> <span class="n"><a href="view.html#View">view.View</a></span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="SoSAgent.add_view-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SoSAgent.add_view"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.add_view-25"><a href="#SoSAgent.add_view-25"><span class="linenos">25</span></a>    <span class="k">def</span> <span class="nf">add_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="n">View</span><span class="p">):</span>
+</span><span id="SoSAgent.add_view-26"><a href="#SoSAgent.add_view-26"><span class="linenos">26</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent.add_view-27"><a href="#SoSAgent.add_view-27"><span class="linenos">27</span></a><span class="sd">        Adds a view to the viewable object.</span>
+</span><span id="SoSAgent.add_view-28"><a href="#SoSAgent.add_view-28"><span class="linenos">28</span></a>
+</span><span id="SoSAgent.add_view-29"><a href="#SoSAgent.add_view-29"><span class="linenos">29</span></a><span class="sd">        Args:</span>
+</span><span id="SoSAgent.add_view-30"><a href="#SoSAgent.add_view-30"><span class="linenos">30</span></a><span class="sd">            view (Any): the view.</span>
+</span><span id="SoSAgent.add_view-31"><a href="#SoSAgent.add_view-31"><span class="linenos">31</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent.add_view-32"><a href="#SoSAgent.add_view-32"><span class="linenos">32</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
+</span><span id="SoSAgent.add_view-33"><a href="#SoSAgent.add_view-33"><span class="linenos">33</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="SoSAgent.add_view-34"><a href="#SoSAgent.add_view-34"><span class="linenos">34</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">+=</span> <span class="p">[</span><span class="n">view</span><span class="p">]</span>
+</span><span id="SoSAgent.add_view-35"><a href="#SoSAgent.add_view-35"><span class="linenos">35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">update_views</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Adds a view to the viewable object.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>view (Any):</strong>  the view.</li>
+</ul>
+</div>
+
+
+                            </div>
+                            <div id="SoSAgent.get_views" class="classattr">
+                                        <input id="SoSAgent.get_views-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n"><a href="view.html#View">view.View</a></span><span class="p">]</span>:</span></span>
+
+                <label class="view-source-button" for="SoSAgent.get_views-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SoSAgent.get_views"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.get_views-37"><a href="#SoSAgent.get_views-37"><span class="linenos">37</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
+</span><span id="SoSAgent.get_views-38"><a href="#SoSAgent.get_views-38"><span class="linenos">38</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent.get_views-39"><a href="#SoSAgent.get_views-39"><span class="linenos">39</span></a><span class="sd">        Returns the list of views attached to the viewable object.</span>
+</span><span id="SoSAgent.get_views-40"><a href="#SoSAgent.get_views-40"><span class="linenos">40</span></a>
+</span><span id="SoSAgent.get_views-41"><a href="#SoSAgent.get_views-41"><span class="linenos">41</span></a><span class="sd">        Returns:</span>
+</span><span id="SoSAgent.get_views-42"><a href="#SoSAgent.get_views-42"><span class="linenos">42</span></a><span class="sd">            List[View]: the views.</span>
+</span><span id="SoSAgent.get_views-43"><a href="#SoSAgent.get_views-43"><span class="linenos">43</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent.get_views-44"><a href="#SoSAgent.get_views-44"><span class="linenos">44</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
+</span><span id="SoSAgent.get_views-45"><a href="#SoSAgent.get_views-45"><span class="linenos">45</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="SoSAgent.get_views-46"><a href="#SoSAgent.get_views-46"><span class="linenos">46</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Returns the list of views attached to the viewable object.</p>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>List[View]: the views.</p>
+</blockquote>
+</div>
+
+
+                            </div>
+                            <div id="SoSAgent.update_views" class="classattr">
+                                        <input id="SoSAgent.update_views-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">update_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="SoSAgent.update_views-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SoSAgent.update_views"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.update_views-48"><a href="#SoSAgent.update_views-48"><span class="linenos">48</span></a>    <span class="k">def</span> <span class="nf">update_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SoSAgent.update_views-49"><a href="#SoSAgent.update_views-49"><span class="linenos">49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent.update_views-50"><a href="#SoSAgent.update_views-50"><span class="linenos">50</span></a><span class="sd">        Updates the views.</span>
+</span><span id="SoSAgent.update_views-51"><a href="#SoSAgent.update_views-51"><span class="linenos">51</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent.update_views-52"><a href="#SoSAgent.update_views-52"><span class="linenos">52</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
+</span><span id="SoSAgent.update_views-53"><a href="#SoSAgent.update_views-53"><span class="linenos">53</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="SoSAgent.update_views-54"><a href="#SoSAgent.update_views-54"><span class="linenos">54</span></a>        <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_views</span><span class="p">:</span>
+</span><span id="SoSAgent.update_views-55"><a href="#SoSAgent.update_views-55"><span class="linenos">55</span></a>            <span class="n">view</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Updates the views.</p>
+</div>
+
+
+                            </div>
+                            <div id="SoSAgent.clear_views" class="classattr">
+                                        <input id="SoSAgent.clear_views-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">clear_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="SoSAgent.clear_views-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SoSAgent.clear_views"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SoSAgent.clear_views-57"><a href="#SoSAgent.clear_views-57"><span class="linenos">57</span></a>    <span class="k">def</span> <span class="nf">clear_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SoSAgent.clear_views-58"><a href="#SoSAgent.clear_views-58"><span class="linenos">58</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SoSAgent.clear_views-59"><a href="#SoSAgent.clear_views-59"><span class="linenos">59</span></a><span class="sd">        Removes all views.</span>
+</span><span id="SoSAgent.clear_views-60"><a href="#SoSAgent.clear_views-60"><span class="linenos">60</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SoSAgent.clear_views-61"><a href="#SoSAgent.clear_views-61"><span class="linenos">61</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Removes all views.</p>
 </div>
 
 
@@ -415,13 +552,6 @@ Finally, if the agent has a view, that view is updated.</p>
                 <dd id="SoSAgent.model" class="variable">model</dd>
                 <dd id="SoSAgent.pos" class="variable">pos</dd>
                 <dd id="SoSAgent.random" class="variable">random</dd>
-
-            </div>
-            <div><dt><a href="view.html#Viewable">view.Viewable</a></dt>
-                                <dd id="SoSAgent.add_view" class="function"><a href="view.html#Viewable.add_view">add_view</a></dd>
-                <dd id="SoSAgent.get_views" class="function"><a href="view.html#Viewable.get_views">get_views</a></dd>
-                <dd id="SoSAgent.update_views" class="function"><a href="view.html#Viewable.update_views">update_views</a></dd>
-                <dd id="SoSAgent.clear_views" class="function"><a href="view.html#Viewable.clear_views">clear_views</a></dd>
 
             </div>
                                 </dl>
@@ -438,50 +568,50 @@ Finally, if the agent has a view, that view is updated.</p>
 
     </div>
     <a class="headerlink" href="#Capability"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability-59"><a href="#Capability-59"><span class="linenos"> 59</span></a><span class="k">class</span> <span class="nc">Capability</span><span class="p">:</span>
-</span><span id="Capability-60"><a href="#Capability-60"><span class="linenos"> 60</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-61"><a href="#Capability-61"><span class="linenos"> 61</span></a><span class="sd">    A generic capability, serving as a base class for specific capabilities.</span>
-</span><span id="Capability-62"><a href="#Capability-62"><span class="linenos"> 62</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Capability-63"><a href="#Capability-63"><span class="linenos"> 63</span></a>
-</span><span id="Capability-64"><a href="#Capability-64"><span class="linenos"> 64</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">SoSAgent</span><span class="p">):</span>
-</span><span id="Capability-65"><a href="#Capability-65"><span class="linenos"> 65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-66"><a href="#Capability-66"><span class="linenos"> 66</span></a><span class="sd">        Creates the capability for a certain agent.</span>
-</span><span id="Capability-67"><a href="#Capability-67"><span class="linenos"> 67</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
-</span><span id="Capability-68"><a href="#Capability-68"><span class="linenos"> 68</span></a>
-</span><span id="Capability-69"><a href="#Capability-69"><span class="linenos"> 69</span></a><span class="sd">        Args:</span>
-</span><span id="Capability-70"><a href="#Capability-70"><span class="linenos"> 70</span></a><span class="sd">            agent (mesa.Agent): the agent who should have this capability.</span>
-</span><span id="Capability-71"><a href="#Capability-71"><span class="linenos"> 71</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-72"><a href="#Capability-72"><span class="linenos"> 72</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
-</span><span id="Capability-73"><a href="#Capability-73"><span class="linenos"> 73</span></a>
-</span><span id="Capability-74"><a href="#Capability-74"><span class="linenos"> 74</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="Capability-75"><a href="#Capability-75"><span class="linenos"> 75</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-76"><a href="#Capability-76"><span class="linenos"> 76</span></a><span class="sd">        Returns a string representation of the capability.        </span>
-</span><span id="Capability-77"><a href="#Capability-77"><span class="linenos"> 77</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-78"><a href="#Capability-78"><span class="linenos"> 78</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-</span><span id="Capability-79"><a href="#Capability-79"><span class="linenos"> 79</span></a>
-</span><span id="Capability-80"><a href="#Capability-80"><span class="linenos"> 80</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Capability-81"><a href="#Capability-81"><span class="linenos"> 81</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-82"><a href="#Capability-82"><span class="linenos"> 82</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
-</span><span id="Capability-83"><a href="#Capability-83"><span class="linenos"> 83</span></a>
-</span><span id="Capability-84"><a href="#Capability-84"><span class="linenos"> 84</span></a><span class="sd">        Returns:</span>
-</span><span id="Capability-85"><a href="#Capability-85"><span class="linenos"> 85</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
-</span><span id="Capability-86"><a href="#Capability-86"><span class="linenos"> 86</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-87"><a href="#Capability-87"><span class="linenos"> 87</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="Capability-88"><a href="#Capability-88"><span class="linenos"> 88</span></a>    
-</span><span id="Capability-89"><a href="#Capability-89"><span class="linenos"> 89</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Capability-90"><a href="#Capability-90"><span class="linenos"> 90</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-91"><a href="#Capability-91"><span class="linenos"> 91</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
-</span><span id="Capability-92"><a href="#Capability-92"><span class="linenos"> 92</span></a>
-</span><span id="Capability-93"><a href="#Capability-93"><span class="linenos"> 93</span></a><span class="sd">        Returns:</span>
-</span><span id="Capability-94"><a href="#Capability-94"><span class="linenos"> 94</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
-</span><span id="Capability-95"><a href="#Capability-95"><span class="linenos"> 95</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-96"><a href="#Capability-96"><span class="linenos"> 96</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="Capability-97"><a href="#Capability-97"><span class="linenos"> 97</span></a>    
-</span><span id="Capability-98"><a href="#Capability-98"><span class="linenos"> 98</span></a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Capability-99"><a href="#Capability-99"><span class="linenos"> 99</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-100"><a href="#Capability-100"><span class="linenos">100</span></a><span class="sd">        Carries out the capability.</span>
-</span><span id="Capability-101"><a href="#Capability-101"><span class="linenos">101</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-102"><a href="#Capability-102"><span class="linenos">102</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability-60"><a href="#Capability-60"><span class="linenos"> 60</span></a><span class="k">class</span> <span class="nc">Capability</span><span class="p">:</span>
+</span><span id="Capability-61"><a href="#Capability-61"><span class="linenos"> 61</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-62"><a href="#Capability-62"><span class="linenos"> 62</span></a><span class="sd">    A generic capability, serving as a base class for specific capabilities.</span>
+</span><span id="Capability-63"><a href="#Capability-63"><span class="linenos"> 63</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Capability-64"><a href="#Capability-64"><span class="linenos"> 64</span></a>
+</span><span id="Capability-65"><a href="#Capability-65"><span class="linenos"> 65</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">SoSAgent</span><span class="p">):</span>
+</span><span id="Capability-66"><a href="#Capability-66"><span class="linenos"> 66</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-67"><a href="#Capability-67"><span class="linenos"> 67</span></a><span class="sd">        Creates the capability for a certain agent.</span>
+</span><span id="Capability-68"><a href="#Capability-68"><span class="linenos"> 68</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
+</span><span id="Capability-69"><a href="#Capability-69"><span class="linenos"> 69</span></a>
+</span><span id="Capability-70"><a href="#Capability-70"><span class="linenos"> 70</span></a><span class="sd">        Args:</span>
+</span><span id="Capability-71"><a href="#Capability-71"><span class="linenos"> 71</span></a><span class="sd">            agent (mesa.Agent): the agent who should have this capability.</span>
+</span><span id="Capability-72"><a href="#Capability-72"><span class="linenos"> 72</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-73"><a href="#Capability-73"><span class="linenos"> 73</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
+</span><span id="Capability-74"><a href="#Capability-74"><span class="linenos"> 74</span></a>
+</span><span id="Capability-75"><a href="#Capability-75"><span class="linenos"> 75</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="Capability-76"><a href="#Capability-76"><span class="linenos"> 76</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-77"><a href="#Capability-77"><span class="linenos"> 77</span></a><span class="sd">        Returns a string representation of the capability.        </span>
+</span><span id="Capability-78"><a href="#Capability-78"><span class="linenos"> 78</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-79"><a href="#Capability-79"><span class="linenos"> 79</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+</span><span id="Capability-80"><a href="#Capability-80"><span class="linenos"> 80</span></a>
+</span><span id="Capability-81"><a href="#Capability-81"><span class="linenos"> 81</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Capability-82"><a href="#Capability-82"><span class="linenos"> 82</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-83"><a href="#Capability-83"><span class="linenos"> 83</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
+</span><span id="Capability-84"><a href="#Capability-84"><span class="linenos"> 84</span></a>
+</span><span id="Capability-85"><a href="#Capability-85"><span class="linenos"> 85</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability-86"><a href="#Capability-86"><span class="linenos"> 86</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
+</span><span id="Capability-87"><a href="#Capability-87"><span class="linenos"> 87</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-88"><a href="#Capability-88"><span class="linenos"> 88</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="Capability-89"><a href="#Capability-89"><span class="linenos"> 89</span></a>    
+</span><span id="Capability-90"><a href="#Capability-90"><span class="linenos"> 90</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Capability-91"><a href="#Capability-91"><span class="linenos"> 91</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-92"><a href="#Capability-92"><span class="linenos"> 92</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
+</span><span id="Capability-93"><a href="#Capability-93"><span class="linenos"> 93</span></a>
+</span><span id="Capability-94"><a href="#Capability-94"><span class="linenos"> 94</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability-95"><a href="#Capability-95"><span class="linenos"> 95</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
+</span><span id="Capability-96"><a href="#Capability-96"><span class="linenos"> 96</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-97"><a href="#Capability-97"><span class="linenos"> 97</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="Capability-98"><a href="#Capability-98"><span class="linenos"> 98</span></a>    
+</span><span id="Capability-99"><a href="#Capability-99"><span class="linenos"> 99</span></a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Capability-100"><a href="#Capability-100"><span class="linenos">100</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-101"><a href="#Capability-101"><span class="linenos">101</span></a><span class="sd">        Carries out the capability.</span>
+</span><span id="Capability-102"><a href="#Capability-102"><span class="linenos">102</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-103"><a href="#Capability-103"><span class="linenos">103</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -499,15 +629,15 @@ Finally, if the agent has a view, that view is updated.</p>
 
     </div>
     <a class="headerlink" href="#Capability.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.__init__-64"><a href="#Capability.__init__-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">SoSAgent</span><span class="p">):</span>
-</span><span id="Capability.__init__-65"><a href="#Capability.__init__-65"><span class="linenos">65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability.__init__-66"><a href="#Capability.__init__-66"><span class="linenos">66</span></a><span class="sd">        Creates the capability for a certain agent.</span>
-</span><span id="Capability.__init__-67"><a href="#Capability.__init__-67"><span class="linenos">67</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
-</span><span id="Capability.__init__-68"><a href="#Capability.__init__-68"><span class="linenos">68</span></a>
-</span><span id="Capability.__init__-69"><a href="#Capability.__init__-69"><span class="linenos">69</span></a><span class="sd">        Args:</span>
-</span><span id="Capability.__init__-70"><a href="#Capability.__init__-70"><span class="linenos">70</span></a><span class="sd">            agent (mesa.Agent): the agent who should have this capability.</span>
-</span><span id="Capability.__init__-71"><a href="#Capability.__init__-71"><span class="linenos">71</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability.__init__-72"><a href="#Capability.__init__-72"><span class="linenos">72</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.__init__-65"><a href="#Capability.__init__-65"><span class="linenos">65</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">SoSAgent</span><span class="p">):</span>
+</span><span id="Capability.__init__-66"><a href="#Capability.__init__-66"><span class="linenos">66</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.__init__-67"><a href="#Capability.__init__-67"><span class="linenos">67</span></a><span class="sd">        Creates the capability for a certain agent.</span>
+</span><span id="Capability.__init__-68"><a href="#Capability.__init__-68"><span class="linenos">68</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
+</span><span id="Capability.__init__-69"><a href="#Capability.__init__-69"><span class="linenos">69</span></a>
+</span><span id="Capability.__init__-70"><a href="#Capability.__init__-70"><span class="linenos">70</span></a><span class="sd">        Args:</span>
+</span><span id="Capability.__init__-71"><a href="#Capability.__init__-71"><span class="linenos">71</span></a><span class="sd">            agent (mesa.Agent): the agent who should have this capability.</span>
+</span><span id="Capability.__init__-72"><a href="#Capability.__init__-72"><span class="linenos">72</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.__init__-73"><a href="#Capability.__init__-73"><span class="linenos">73</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
 </span></pre></div>
 
 
@@ -545,14 +675,14 @@ Subclasses can add parameters for how to use a certain capability.</p>
 
     </div>
     <a class="headerlink" href="#Capability.precondition"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.precondition-80"><a href="#Capability.precondition-80"><span class="linenos">80</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Capability.precondition-81"><a href="#Capability.precondition-81"><span class="linenos">81</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability.precondition-82"><a href="#Capability.precondition-82"><span class="linenos">82</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
-</span><span id="Capability.precondition-83"><a href="#Capability.precondition-83"><span class="linenos">83</span></a>
-</span><span id="Capability.precondition-84"><a href="#Capability.precondition-84"><span class="linenos">84</span></a><span class="sd">        Returns:</span>
-</span><span id="Capability.precondition-85"><a href="#Capability.precondition-85"><span class="linenos">85</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
-</span><span id="Capability.precondition-86"><a href="#Capability.precondition-86"><span class="linenos">86</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability.precondition-87"><a href="#Capability.precondition-87"><span class="linenos">87</span></a>        <span class="k">return</span> <span class="kc">True</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.precondition-81"><a href="#Capability.precondition-81"><span class="linenos">81</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Capability.precondition-82"><a href="#Capability.precondition-82"><span class="linenos">82</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.precondition-83"><a href="#Capability.precondition-83"><span class="linenos">83</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
+</span><span id="Capability.precondition-84"><a href="#Capability.precondition-84"><span class="linenos">84</span></a>
+</span><span id="Capability.precondition-85"><a href="#Capability.precondition-85"><span class="linenos">85</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability.precondition-86"><a href="#Capability.precondition-86"><span class="linenos">86</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
+</span><span id="Capability.precondition-87"><a href="#Capability.precondition-87"><span class="linenos">87</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.precondition-88"><a href="#Capability.precondition-88"><span class="linenos">88</span></a>        <span class="k">return</span> <span class="kc">True</span>
 </span></pre></div>
 
 
@@ -578,14 +708,14 @@ Subclasses can add parameters for how to use a certain capability.</p>
 
     </div>
     <a class="headerlink" href="#Capability.postcondition"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.postcondition-89"><a href="#Capability.postcondition-89"><span class="linenos">89</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Capability.postcondition-90"><a href="#Capability.postcondition-90"><span class="linenos">90</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability.postcondition-91"><a href="#Capability.postcondition-91"><span class="linenos">91</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
-</span><span id="Capability.postcondition-92"><a href="#Capability.postcondition-92"><span class="linenos">92</span></a>
-</span><span id="Capability.postcondition-93"><a href="#Capability.postcondition-93"><span class="linenos">93</span></a><span class="sd">        Returns:</span>
-</span><span id="Capability.postcondition-94"><a href="#Capability.postcondition-94"><span class="linenos">94</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
-</span><span id="Capability.postcondition-95"><a href="#Capability.postcondition-95"><span class="linenos">95</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability.postcondition-96"><a href="#Capability.postcondition-96"><span class="linenos">96</span></a>        <span class="k">return</span> <span class="kc">True</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.postcondition-90"><a href="#Capability.postcondition-90"><span class="linenos">90</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Capability.postcondition-91"><a href="#Capability.postcondition-91"><span class="linenos">91</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.postcondition-92"><a href="#Capability.postcondition-92"><span class="linenos">92</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
+</span><span id="Capability.postcondition-93"><a href="#Capability.postcondition-93"><span class="linenos">93</span></a>
+</span><span id="Capability.postcondition-94"><a href="#Capability.postcondition-94"><span class="linenos">94</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability.postcondition-95"><a href="#Capability.postcondition-95"><span class="linenos">95</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
+</span><span id="Capability.postcondition-96"><a href="#Capability.postcondition-96"><span class="linenos">96</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.postcondition-97"><a href="#Capability.postcondition-97"><span class="linenos">97</span></a>        <span class="k">return</span> <span class="kc">True</span>
 </span></pre></div>
 
 
@@ -611,11 +741,11 @@ Subclasses can add parameters for how to use a certain capability.</p>
 
     </div>
     <a class="headerlink" href="#Capability.activate"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.activate-98"><a href="#Capability.activate-98"><span class="linenos"> 98</span></a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Capability.activate-99"><a href="#Capability.activate-99"><span class="linenos"> 99</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability.activate-100"><a href="#Capability.activate-100"><span class="linenos">100</span></a><span class="sd">        Carries out the capability.</span>
-</span><span id="Capability.activate-101"><a href="#Capability.activate-101"><span class="linenos">101</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability.activate-102"><a href="#Capability.activate-102"><span class="linenos">102</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.activate-99"><a href="#Capability.activate-99"><span class="linenos"> 99</span></a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Capability.activate-100"><a href="#Capability.activate-100"><span class="linenos">100</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.activate-101"><a href="#Capability.activate-101"><span class="linenos">101</span></a><span class="sd">        Carries out the capability.</span>
+</span><span id="Capability.activate-102"><a href="#Capability.activate-102"><span class="linenos">102</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.activate-103"><a href="#Capability.activate-103"><span class="linenos">103</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
