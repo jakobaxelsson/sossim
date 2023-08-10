@@ -294,6 +294,8 @@ class MenuBar:
                             event_listener("click", self.open_configuration)
                         with li("Save configuration as..."):
                             event_listener("click", self.save_configuration)
+                        with li("Save map as SVG..."):
+                            event_listener("click", self.save_map_as_SVG)
                 with li("View"):
                     with ul():
                         with li("Configuration"):
@@ -348,6 +350,20 @@ class MenuBar:
         try:
             content = self.ui.configuration.to_json()
             await save_file_as(content)
+        except Exception as e:
+            print("Save configuration as failed with exception:", e)
+
+    async def save_map_as_SVG(self, event: Any):
+        """
+        Event handler for the save map as SVG menu item.
+
+        Args:
+            event (Any): the event (not used).
+        """
+        try:
+            with document.query("#map") as m:
+                content = js.XMLSerializer.new().serializeToString(m.dom_element)
+                await save_file_as(content)
         except Exception as e:
             print("Save configuration as failed with exception:", e)
 
