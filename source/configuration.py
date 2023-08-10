@@ -5,14 +5,13 @@ This can be passed around to all configurable classes, allowing them to extract 
 A typical usage is as follows:
 
     from configuration import Configuration, configurable, Param
-    ...
+
     @configurable
     class C:
         param: Param(int, flag = "-p") = 3   # some help string
 
         def __init__(self, configuration: Configuration):
             configuration.initialize(self)
-            ...
 
     configuration = Configuration()
     obj = C(configuration)

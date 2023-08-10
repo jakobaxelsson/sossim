@@ -67,7 +67,7 @@ class Capability:
         Subclasses can add parameters for how to use a certain capability.
 
         Args:
-            agent (mesa.Agent): the agent who should have this capability.
+            agent (SoSAgent): the agent who should have this capability.
         """
         self.agent = agent
 

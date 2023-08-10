@@ -17,10 +17,11 @@ The browser fetches the necessary files from a web server.
 
 To run the interactive mode locally run `python source/sossim.py -i`.
 This starts a local web server from which the files can be fetched to a browser running on the same machine.
-Then, open the link [http://127.0.0.1:8000/sossim.html](http://127.0.0.1:8000/sossim.html) in the browser.
+Then, open the link [http://127.0.0.1:8000/source/sossim.html](http://127.0.0.1:8000/source/sossim.html) in the browser.
 
 The latest commit to the Github respository is automatically published on Github pages.
 It can be accessed at [https://jakobaxelsson.github.io/sossim/source/sossim.html](https://jakobaxelsson.github.io/sossim/source/sossim.html).
+This does not require any local installations whatsoever.
 
 ### Using Docker
 A Dockerfile is provided for running the software without installing Python or any libraries.
@@ -37,9 +38,13 @@ This command can take various command line options, which can be enlisted using 
 
 ## Implementation
 
+In this section, some more details are provided on how the software is implemented.
+
+### Dependencies
+
 The core of the simulation is an agent-based model developed using the [Mesa](https://mesa.readthedocs.io/) library.
 The Mesa library has some dependencies that are not possible to use in the browser.
-Therefore, a copy of the core modules of Mesa have been included in this repository. 
+Therefore, a copy of the core modules of Mesa has been included in this repository. 
 
 The simulation takes place on a grid map onto which a randomly generated road network is placed.
 The road network is implemented as a directed graph using the [NetworkX](https://networkx.org/) library.

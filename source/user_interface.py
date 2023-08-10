@@ -170,9 +170,10 @@ class SimulationController:
         self.ui = ui
         self.timer = None
         self.zoom_level = 1.0
-        self.x_offset = 0
-        self.y_offset = 0
-        with document.query("#controls"):
+        # The panning state is calculated for the center of the map to make zooming perform correctly
+        self.pan_x = self.ui.model.space.width / 2
+        self.pan_y = self.ui.model.space.height / 2
+        with document.query("#controls", clear = True):
             with div(id = "simulation_controls"):
                 with button("Step"):
                     event_listener("click", lambda _: self.ui.model.step())
@@ -183,9 +184,9 @@ class SimulationController:
                 span("Time: ")
                 span("0", id = "time")
                 with button("Zoom in"):
-                    event_listener("click", lambda _: self.transform_map(zoom = 2.0))
+                    event_listener("click", lambda _: self.transform_map(zoom = 1))
                 with button("Zoom out"):
-                    event_listener("click", lambda _: self.transform_map(zoom = 0.5))
+                    event_listener("click", lambda _: self.transform_map(zoom = -1))
                 with button("Left"):
                     event_listener("click", lambda _: self.transform_map(x = 1, y = 0))
                 with button("Right"):
@@ -194,6 +195,7 @@ class SimulationController:
                     event_listener("click", lambda _: self.transform_map(x = 0, y = 1))
                 with button("Down"):
                     event_listener("click", lambda _: self.transform_map(x = 0, y = -1))
+        self.transform_map()
         
     def run(self):
         """
@@ -208,20 +210,22 @@ class SimulationController:
         if self.timer:
             js.clearInterval(self.timer)
 
-    def transform_map(self, zoom: float = 1.0, x: int = 0, y: int = 0):
+    def transform_map(self, zoom: int = 0, x: int = 0, y: int = 0):
         """
         Zooms the map by the zoom factor, and translates it by x, y for panning.
 
         Args:
-            zoom (float, optional): factor by which the current zoom level is multiplied. Defaults to 1.0.
+            zoom (int, optional): factor by which the current zoom level is increased. Defaults to 0.
             x (int, optional): translation in x dimension. Defaults to 0.
             y (int, optional): translation in y dimension. Defaults to 0.
         """
-        self.zoom_level *= zoom
-        self.x_offset += x
-        self.y_offset += y
+        self.zoom_level = max(self.zoom_level + zoom, 1) # At zoom level 1, the whole map shows so no reason to go below
+        self.pan_x += x
+        self.pan_y += y
+        offset_x = self.pan_x - self.ui.model.space.width / 2 / self.zoom_level
+        offset_y = self.pan_y - self.ui.model.space.height / 2 / self.zoom_level
         with document.query("#map_content") as m:
-            m["transform"] = f"scale({self.zoom_level}) translate({self.x_offset} {self.y_offset})"
+            m["transform"] = f"scale({self.zoom_level}) translate({offset_x} {offset_y})"
 
 class ConfigurationController:
     """
@@ -270,6 +274,7 @@ class ConfigurationController:
         self.ui.model.__init__(self.ui.configuration)
         self.ui.model.clear_views()
         self.ui.model.add_view(TransportSystemView(self.ui.model))
+        self.ui.simulation_controller.__init__(self.ui)
         with document.query("#random_seed") as field:
             field.dom_element.value = self.ui.model.random_seed
 
@@ -368,7 +373,7 @@ class UserInterface:
                             with g(id = "map_content"):
                                 g(id = "road_network")
                                 g(id = "vehicles")
-                        SimulationController(self)
+                        self.simulation_controller = SimulationController(self)
                     with div(id = "content"):
                         with div(id = "configuration"):
                             self.configuration_controller = ConfigurationController(self)
