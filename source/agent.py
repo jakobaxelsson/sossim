@@ -49,7 +49,6 @@ class Vehicle(SoSAgent):
         space = self.model.space
         if self.energy_level < 30:
             # Find a charging point and charge energy there.
-            print(f"Vehicle {self.unique_id} needs to charge")
             self.plan = [capabilities.FindDestinationCapability(self, lambda pos: space.is_charging_point(pos)),
                          capabilities.ChargeEnergyCapability(self)]
         elif self.model.random.random() < self.parking_probability:

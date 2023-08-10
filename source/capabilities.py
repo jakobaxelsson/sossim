@@ -157,8 +157,6 @@ class ChargeEnergyCapability(Capability):
         Returns:
             bool: True if the capability has been fulfilled, False otherwise
         """
-        if self.agent.energy_level == self.agent.max_energy:
-            print(f"Vehicle {self.agent.unique_id} has completed charging")
         return self.agent.energy_level == self.agent.max_energy
     
     def activate(self):
