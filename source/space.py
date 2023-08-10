@@ -169,11 +169,11 @@ class RoadNetworkGrid:
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
     Some nodes in the road networks can be destinations, where places of interest can be placed.
     """
-    width:  Param(int, flag = "-x", help = "number of grid cells in x dimension") = 10 # type: ignore
-    height: Param(int, flag = "-y", help = "number of grid cells in y dimension") = 10 # type: ignore
-    road_density: Param(float, flag = "-rd", help = "the proportion of the grid to be covered by roads") = 0.3 # type: ignore
-    destination_density: Param(float, flag = "-dd", help = "probability of generating a destination in a position where it is possible") = 0.3 # type: ignore
-    charging_point_density: Param(float, flag = "-cpd", help = "probability of a destination having a charging point") = 0.3 # type: ignore
+    width:                  Param(int, flag = "-x") = 10   #  number of grid cells in x dimension
+    height:                 Param(int, flag = "-y") = 10   #  number of grid cells in y dimension
+    road_density:           Param(float)            = 0.3  #  the proportion of the grid to be covered by roads") = 0.3
+    destination_density:    Param(float)            = 0.3  # probability of generating a destination in a position where it is possible
+    charging_point_density: Param(float)            = 0.3  # probability of a destination having a charging point
 
     def __init__(self, configuration: Configuration, model: mesa.Model):
         """

@@ -14,8 +14,8 @@ from view import viewable
 @viewable
 class TransportSystem(mesa.Model):
     # Define configuration parameters relevant to this class
-    num_agents:  Param(int, flag = "-N", help = "number of vehicles") = 10 # type: ignore
-    random_seed: Param(int, flag = "-r", help = "seed for random number generator (use -1 to initialize from system time)") = -1 # type: ignore
+    num_agents:  Param(int, flag = "-N") = 10 # number of vehicles
+    random_seed: Param(int, flag = "-r") = -1 # seed for random number generator (use -1 to initialize from system time)
 
     def __init__(self, configuration: Configuration):
         """

@@ -2,6 +2,7 @@
 Defines configuration handling mechanisms.
 """
 import argparse
+import inspect
 import json
 from typing import get_type_hints, Any, Generic, Type, TypeVar
 
@@ -10,17 +11,36 @@ T = TypeVar("T")
 class Param(Generic[T]):
     """
     Param is a class holding the information provided when declaring a configuration parameter using type hints.
-    It is typicall used as follows:
+    It is typically used as follows:
 
     @configurable
     class C:
-        p: Param(int, flag = "-p", help = "some help string")
-    """
+        param: Param(int, flag = "-p") = 3   # some help string
 
-    def __init__(self, type: Type[T], flag: str, help: str):
+    The comment at the end of line is recuperated, and used as a help string for the parameter (unless another help string is provided).
+    """
+    def __init__(self, type: Type[T], flag: str = "", help: str = ""):
         self.type = type
         self.flag = flag
-        self.help = help
+        if help:
+            self.help = help
+        else:
+            # Fetch the help message from a comment at the end of the line where the Param was created.
+            # Get the caller's frame
+            frame = inspect.currentframe().f_back
+            # Get the file line number where the call to Param occured
+            code_line = frame.f_lineno # This is the line in the file
+            # Get the source code of the class and the line in the file where the class definition starts
+            source_code, start_line = inspect.getsourcelines(frame)
+            # Get the relevant source line
+            source_line = source_code[code_line - start_line]
+            # Extract the comment at the end of the line
+            try:
+                comment = source_line.split("#")[1].strip()
+            except Exception:
+                comment = ""
+            if comment:
+                self.help = comment
 
 def configurable(cls: type) -> type:
     """
@@ -85,7 +105,10 @@ class Configuration:
         p["flag"] = flag
         p["help"] = help
         # Update the command line arguments parser.
-        cls.parser.add_argument(flag, "--" + name, type = type, default = default, help = help)
+        if flag:
+            cls.parser.add_argument(flag, "--" + name, type = type, default = default, help = help)
+        else:
+            cls.parser.add_argument("--" + name, type = type, default = default, help = help)
 
     def set_param_value(self, cls: str, name: str, value: Any) -> None:
         """

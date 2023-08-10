@@ -9,10 +9,10 @@ from space import Node
 @configurable
 class Vehicle(SoSAgent):
     # Define configuration parameters relevant to this class
-    max_load:            Param(int,   flag = "-mi", help = "maximum load of a vehicle") = 3 # type: ignore
-    max_energy:          Param(int,   flag = "-me", help = "maximum energy of a vehicle") = 100 # type: ignore
-    charging_speed:      Param(int,   flag = "-cs", help = "the charging speed of a vehicle") = 10 # type: ignore
-    parking_probability: Param(float, flag = "-pp", help = "probability that a vehicle will start looking for a parking") = 0.1 # type: ignore
+    max_load:            Param(int)   = 3     # maximum load of a vehicle
+    max_energy:          Param(int)   = 100   # maximum energy of a vehicle
+    charging_speed:      Param(int)   = 10    # the charging speed of a vehicle
+    parking_probability: Param(float) = 0.1   # probability that a vehicle will start looking for a parkingS
 
     def __init__(self, unique_id: int, model: "model.TransportSystem", configuration: Configuration):
         """
@@ -35,7 +35,7 @@ class Vehicle(SoSAgent):
         # Randomly select a starting position which is not yet occupied by some other vehicle.
         space = self.model.space
         available_positions = [p for p in space.road_nodes() if space.is_cell_empty(p)]
-        space.place_agent(self, self.model. random.choice(available_positions))
+        space.place_agent(self, self.model.random.choice(available_positions))
 
         # Set the initial heading of the vehicle to that of the heading of one of the roads leading into the current position.
         self.heading = space.edge_direction(space.roads_to(self.pos)[0], self.pos)
