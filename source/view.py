@@ -1,28 +1,29 @@
 """
 Module containing functionality for attaching views to model classes.    
 """
-from typing import List
+from typing import List, Any
 
 class View:
     """
     Base class for views.
     """
-    def update(self, viewable: "Viewable"):
+    def update(self, viewable: Any):
         """
         Updates the view. This is an abstract function that is redefined in subclasses.
 
         Args:
-            viewable (Viewable): the viewable on which the update should be based.
+            viewable (Any): the viewable on which the update should be based.
         """
         pass
 
-class Viewable:
+def viewable(cls):
     """
-    A mixin for objects to which a view can be attached. It adds the methods add_view and update_views.
+    A mixin decorator for objects to which a view can be attached. 
+    It adds the methods for handling views attached to the viewable.
     """
     def add_view(self, view: View):
         """
-        Adds a view to the viewable element.
+        Adds a view to the viewable object.
 
         Args:
             view (Any): the view.
@@ -57,3 +58,9 @@ class Viewable:
         Removes all views.
         """
         self._views = []
+
+    setattr(cls, "add_view", add_view)
+    setattr(cls, "get_views", get_views)
+    setattr(cls, "update_views", update_views)
+    setattr(cls, "clear_views", clear_views)
+    return cls

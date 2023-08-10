@@ -5,9 +5,10 @@ Provides abstract classes representing the core concepts of systems-of-systems.
 from typing import List
 
 import mesa
-from view import Viewable
+from view import viewable
 
-class SoSAgent(mesa.Agent, Viewable):
+@viewable
+class SoSAgent(mesa.Agent):
 
     def __init__(self, unique_id: int, model: mesa.Model):
         """

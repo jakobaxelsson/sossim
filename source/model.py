@@ -8,10 +8,11 @@ import agent
 from configuration import Configuration, configurable, Param
 import mesa
 import space
-from view import Viewable
+from view import viewable
 
 @configurable
-class TransportSystem(mesa.Model, Viewable):
+@viewable
+class TransportSystem(mesa.Model):
     # Define configuration parameters relevant to this class
     num_agents:  Param(int, flag = "-N", help = "number of vehicles") = 10 # type: ignore
     random_seed: Param(int, flag = "-r", help = "seed for random number generator (use -1 to initialize from system time)") = -1 # type: ignore

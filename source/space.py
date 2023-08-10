@@ -11,7 +11,7 @@ import networkx as nx
 import mesa
 
 from configuration import Configuration, configurable, Param
-from view import Viewable
+from view import viewable
 
 # Type abbreviations for nodes, edges and directions.
 Node = Tuple[int, int]
@@ -162,7 +162,8 @@ def subnode(node: Node, i: int, j: int) -> Node:
     return (node[0] * 4 + i, node[1] * 4 + j)
 
 @configurable
-class RoadNetworkGrid(Viewable):
+@viewable
+class RoadNetworkGrid:
     """
     A mesa space consisting of a road network which is placed on a grid.
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
