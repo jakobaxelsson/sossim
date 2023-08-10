@@ -171,8 +171,9 @@ class SimulationController:
         self.timer = None
         self.zoom_level = 1.0
         # The panning state is calculated for the center of the map to make zooming perform correctly
-        self.pan_x = self.ui.model.space.width / 2
-        self.pan_y = self.ui.model.space.height / 2
+        # Note that width and height are here in the coarse network units, so multiply by 4 everywhere
+        self.pan_x = self.ui.model.space.width  * 4 / 2
+        self.pan_y = self.ui.model.space.height * 4 / 2
         with document.query("#controls", clear = True):
             with div(id = "simulation_controls"):
                 with button("Step"):
@@ -184,9 +185,9 @@ class SimulationController:
                 span("Time: ")
                 span("0", id = "time")
                 with button("Zoom in"):
-                    event_listener("click", lambda _: self.transform_map(zoom = 1))
+                    event_listener("click", lambda _: self.transform_map(zoom = 1.25))
                 with button("Zoom out"):
-                    event_listener("click", lambda _: self.transform_map(zoom = -1))
+                    event_listener("click", lambda _: self.transform_map(zoom = 0.8))
                 with button("Left"):
                     event_listener("click", lambda _: self.transform_map(x = 1, y = 0))
                 with button("Right"):
@@ -210,7 +211,7 @@ class SimulationController:
         if self.timer:
             js.clearInterval(self.timer)
 
-    def transform_map(self, zoom: int = 0, x: int = 0, y: int = 0):
+    def transform_map(self, zoom: float = 1.0, x: int = 0, y: int = 0):
         """
         Zooms the map by the zoom factor, and translates it by x, y for panning.
 
@@ -219,13 +220,14 @@ class SimulationController:
             x (int, optional): translation in x dimension. Defaults to 0.
             y (int, optional): translation in y dimension. Defaults to 0.
         """
-        self.zoom_level = max(self.zoom_level + zoom, 1) # At zoom level 1, the whole map shows so no reason to go below
-        self.pan_x += x
-        self.pan_y += y
-        offset_x = self.pan_x - self.ui.model.space.width / 2 / self.zoom_level
-        offset_y = self.pan_y - self.ui.model.space.height / 2 / self.zoom_level
+        self.zoom_level *= zoom
+        self.pan_x -= 4 * x
+        self.pan_y -= 4 * y
+        offset_x = -self.pan_x + self.ui.model.space.width  * 4 / 2 / self.zoom_level
+        offset_y = -self.pan_y + self.ui.model.space.height * 4 / 2 / self.zoom_level
         with document.query("#map_content") as m:
             m["transform"] = f"scale({self.zoom_level}) translate({offset_x} {offset_y})"
+            print(f"scale({self.zoom_level}) translate({offset_x} {offset_y})")
 
 class ConfigurationController:
     """
