@@ -5,7 +5,7 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.
 """
 import itertools
 import math
-from typing import Any, Dict, Iterator, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
 
 import networkx as nx
 import mesa
@@ -341,7 +341,7 @@ class RoadNetworkGrid:
 
         # If from_node is a destination, all other nodes going into to_node have priority.
         if self.is_destination(from_node):
-            return [n for n in self.roads_to(to_node) if n != from_node]
+            return self.roads_to(to_node, lambda node: node != from_node)
 
         # In a roundabout, a vehicle going S yields to one going W, E to S, N to E, and W to N.
         priority_rule = { 180 : 270, 90 : 180, 0 : 90, 270 : 0 }
@@ -354,14 +354,29 @@ class RoadNetworkGrid:
         else:
             return []
 
-    def road_nodes(self) -> List[Node]:
+    def road_nodes(self, condition: Callable[[Node], bool] = lambda _: True) -> List[Node]:
         """
         Returns a list of all nodes which are connected by roads.
+
+        Args:
+            condition: a condition that the nodes must satisfy. Defaults to always True.
 
         Returns:
             List[Node]: the nodes connected by roads.
         """
-        return [n for n in self.road_network.nodes if self.road_network.is_road(n)]
+        return [n for n in self.road_network.nodes if self.road_network.is_road(n) and condition(n)]
+
+    def destination_nodes(self, condition: Callable[[Node], bool] = lambda _: True) -> List[Node]:
+        """
+        Returns a list of all nodes which are destinations.
+
+        Args:
+            condition: a condition that the nodes must satisfy. Defaults to always True.
+
+        Returns:
+            List[Node]: the destinations.
+        """
+        return [n for n in self.road_network.nodes if self.is_destination(n) and condition(n)]
 
     def road_edges(self) -> List[Edge]:
         """
@@ -370,31 +385,35 @@ class RoadNetworkGrid:
         Returns:
             List[Node]: the nodes connected by roads.
         """
-        return [(n1, n2) for (n1, n2) in self.road_network.edges if self.road_network.is_road(n1, n2)]
+        return [(n1, n2) for (n1, n2) in self.road_network.edges if self.is_road(n1, n2)]
 
-    def roads_from(self, source: Node) -> List[Node]:
+    def roads_from(self, source: Node, condition: Optional[Callable[[Node], bool]] = lambda _ : True) -> List[Node]:
         """
         Returns a list of all nodes that can be reached by road from a given source node.
+        If a condition function is provided, only nodes fulfilling that condition are returned.
 
         Args:
             source (Node): the source node.
-
+            condition (Callable[[Node], bool], optional): a condition on the nodes. Defaults to always True.
+            
         Returns:
             List[Node]: a list of nodes reachable by road.
         """
-        return [sink for _, sink, has_road in self.road_network.out_edges(source, data = "road") if has_road]
+        return [sink for _, sink, has_road in self.road_network.out_edges(source, data = "road") if has_road and condition(sink)]
 
-    def roads_to(self, sink: Node) -> List[Node]:
+    def roads_to(self, sink: Node, condition: Optional[Callable[[Node], bool]] = lambda _ : True) -> List[Node]:
         """
         Returns a list of all nodes that can reach the given sink node by road.
+        If a condition function is provided, only nodes fulfilling that condition are returned.
 
         Args:
             sink (Node): the sink node.
+            condition (Callable[[Node], bool], optional): a condition on the nodes. Defaults to always True.
 
         Returns:
             List[Node]: a list of nodes from which the sink node can be reached by road.
         """
-        return [source for source, _, has_road in self.road_network.in_edges(sink, data = "road") if has_road]
+        return [source for source, _, has_road in self.road_network.in_edges(sink, data = "road") if has_road and condition(source)]
 
     def is_destination(self, node: Node) -> bool:
         """
@@ -434,6 +453,35 @@ class RoadNetworkGrid:
         """
         return self.road_network[source][sink]["direction"]
 
+    def shortest_path(self, source: Node, target: Node) -> List[Node]:
+        """
+        Returns the shortest path from source to sink as a list of nodes.
+
+        Args:
+            source (Node): the source node.
+            target (Node): the target node.
+
+        Returns:
+            List[Node]: the path.
+        """
+        return nx.shortest_path(self.road_network, source = source, target = target,
+                                weight = lambda n1, n2, attributes: 1 if attributes["road"] else 10000000)
+
+    def path_to_nearest(self, source: Node, targets: List[Node]) -> List[Node]:
+        """
+        Given a source node and a list of target nodes, return the path to the nearest of the targets.
+
+        Args:
+            source (Node): the source node.
+            targets (List[Node]): the list of target nodes.
+
+        Returns:
+            List[Node]: the path to the nearest target node.
+        """
+        shortest_paths = [self.shortest_path(source, target) for target in targets]
+        shortest_paths.sort(key = len)
+        return shortest_paths[0]
+    
     # Provide reference to some of the RoadGridNetwork methods directly in the space.
 
     def has_road_to(self, source: Node, direction: Direction) -> bool:
@@ -475,7 +523,8 @@ class RoadNetworkGrid:
 
     def move_agent(self, agent: mesa.Agent, node_id: Node) -> None:
         """Move an agent from its current node to a new node."""
-        agent.heading = self.road_network[agent.pos][node_id]["direction"]
+        if hasattr(agent, "heading"):
+            agent.heading = self.road_network[agent.pos][node_id]["direction"]
         self.remove_agent(agent)
         self.place_agent(agent, node_id)
 

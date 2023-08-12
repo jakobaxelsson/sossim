@@ -14,6 +14,7 @@ Style sheet for the SoSSim systems-of-systems simulator.
     --destination-background: darkgray;
     --charging-point-background: orange;
     --charging-point-foreground: black;
+    --cargo-color: red;
 
     /* Navbar */
     --navbar-color: #e8e8e8;
@@ -41,6 +42,10 @@ Style sheet for the SoSSim systems-of-systems simulator.
     & .charging_point {
         & circle { fill: var(--charging-point-background); }
         & polygon { fill: var(--charging-point-foreground);  }
+    }
+
+    & .cargo {
+        & circle { fill: var(--cargo-color); }
     }
 }
 

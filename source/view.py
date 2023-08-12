@@ -19,7 +19,7 @@ class View:
 def viewable(cls):
     """
     A mixin decorator for objects to which a view can be attached. 
-    It adds the methods for handling views attached to the viewable.
+    It adds the methods for handling views attached to the viewable, unless such a method already exists.
     """
     def add_view(self, view: View):
         """

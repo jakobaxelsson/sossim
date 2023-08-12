@@ -4,7 +4,7 @@ Provides models for the SoSSim system-of-systems simulator.
 import random
 import sys
 
-import agent
+from entities import Cargo, Vehicle
 from configuration import Configuration, configurable, Param
 import mesa
 import space
@@ -14,8 +14,9 @@ from view import viewable
 @viewable
 class TransportSystem(mesa.Model):
     # Define configuration parameters relevant to this class
-    num_agents:  Param(int, flag = "-N") = 10 # number of vehicles
-    random_seed: Param(int, flag = "-r") = -1 # seed for random number generator (use -1 to initialize from system time)
+    num_vehicles: Param(int, flag = "-N") = 10   # number of vehicles
+    num_cargos:   Param(int) = 10                # number of cargos
+    random_seed:  Param(int, flag = "-r") = -1   # seed for random number generator (use -1 to initialize from system time)
 
     def __init__(self, configuration: Configuration):
         """
@@ -33,14 +34,19 @@ class TransportSystem(mesa.Model):
             self.random_seed = random.randrange(sys.maxsize)
         self.random.seed(self.random_seed)
 
-        # Create time and space
-        self.schedule = mesa.time.SimultaneousActivation(self)
+        # Create time and space, using a staged activation scheduler based on the OODA loop
+        self.schedule = mesa.time.StagedActivation(self, ["observe", "orient", "decide", "act"])
         self.space = space.RoadNetworkGrid(configuration, self)
 
-        # Create agents
-        for i in range(self.num_agents):
-            a = agent.Vehicle(i, self, configuration)
+        # Create vehicles
+        for i in range(self.num_vehicles):
+            a = Vehicle(self, configuration)
             self.schedule.add(a)
+
+        # Create cargos
+        for i in range(self.num_cargos):
+            c = Cargo(self, configuration)
+            self.schedule.add(c)
 
     def step(self):
         """
