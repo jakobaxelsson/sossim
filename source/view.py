@@ -1,11 +1,11 @@
 """
 Module containing functionality for attaching views to model classes.    
 """
-from typing import List, Any
+from typing import Any, List, Protocol
 
-class View:
+class View(Protocol):
     """
-    Base class for views.
+    Interface class for views.
     """
     def update(self, viewable: Any):
         """
@@ -14,7 +14,6 @@ class View:
         Args:
             viewable (Any): the viewable on which the update should be based.
         """
-        pass
 
 def viewable(cls):
     """

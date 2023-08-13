@@ -6,13 +6,13 @@ import sys
 
 from entities import Cargo, Vehicle
 from configuration import Configuration, configurable, Param
-import mesa
+import core
 import space
 from view import viewable
 
 @configurable
 @viewable
-class TransportSystem(mesa.Model):
+class TransportSystem(core.Model):
     # Define configuration parameters relevant to this class
     num_vehicles: Param(int, flag = "-N") = 10   # number of vehicles
     num_cargos:   Param(int) = 10                # number of cargos
@@ -25,28 +25,25 @@ class TransportSystem(mesa.Model):
         Args:
             configuration (Configuration): the configuration of parameters from which the model is generated.
         """
+        # Initialize superclass and configuration
         super().__init__()
-
-        # Initialize configuration
         configuration.initialize(self)
-
+        
+        # Setup random number generation.
         if self.random_seed == -1:
             self.random_seed = random.randrange(sys.maxsize)
         self.random.seed(self.random_seed)
 
-        # Create time and space, using a staged activation scheduler based on the OODA loop
-        self.schedule = mesa.time.StagedActivation(self, ["observe", "orient", "decide", "act"])
+        # Create the space
         self.space = space.RoadNetworkGrid(configuration, self)
 
         # Create vehicles
         for i in range(self.num_vehicles):
-            a = Vehicle(self, configuration)
-            self.schedule.add(a)
+            Vehicle(self, configuration)
 
         # Create cargos
         for i in range(self.num_cargos):
-            c = Cargo(self, configuration)
-            self.schedule.add(c)
+            Cargo(self, configuration)
 
     def step(self):
         """

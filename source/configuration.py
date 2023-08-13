@@ -1,7 +1,7 @@
 """
-Defines configuration handling mechanisms.
+Defines a generic configuration handling mechanisms.
 This allows all configuration parameters to be handled in a single object.
-This can be passed around to all configurable classes, allowing them to extract what information they need.
+That object can be passed around to all configurable classes, allowing them to extract whatever information they need.
 A typical usage is as follows:
 
     from configuration import Configuration, configurable, Param
@@ -19,7 +19,7 @@ A typical usage is as follows:
 
 Here, the @configurable decorater informs that this is a class that can take configuration parameters.
 The Param type declaration adds param as a configuration parameter for the class C, with a default value of 3.
-It will have a command line argument --param by default. 
+It is given a command line argument --param by default. 
 In addition, the optional flag -p is added for a shorter command line flag.
 The help string in the comment is shown when printing the help information for the command line.
 It can also be used as tooltips in a user interface.
@@ -27,7 +27,7 @@ It can also be used as tooltips in a user interface.
 import argparse
 import inspect
 import json
-from typing import get_type_hints, Any, Generic, Type, TypeVar
+from typing import get_type_hints, Any, Dict, Generic, Type, TypeVar
 
 T = TypeVar("T")
 
@@ -45,26 +45,26 @@ class Param(Generic[T]):
             else:
                 # Fetch the help message from a comment at the end of the line where the Param was created.
                 # Get the caller's frame
-                frame = inspect.currentframe().f_back
+                frame = inspect.currentframe().f_back # type: ignore
                 # Get the file line number where the call to Param occured
-                code_line = frame.f_lineno # This is the line in the file
+                code_line = frame.f_lineno # type: ignore
                 # Get the source code of the class and the line in the file where the class definition starts
-                source_code, start_line = inspect.getsourcelines(frame)
+                source_code, start_line = inspect.getsourcelines(frame) # type: ignore
                 # Get the relevant source line
                 source_line = source_code[code_line - start_line]
                 # Extract the comment at the end of the line
                 try:
                     comment = source_line.split("#")[1].strip()
-                except Exception:
+                except:
                     comment = ""
                 if comment:
                     self.help = comment
-        except Exception:
+        except:
             print("Error in Param. Param can only be used in classes decorated as @configurable.")
 
 def configurable(cls: type) -> type:
     """
-    A class decorator that indicates that processes Param declarations within the class.
+    A class decorator that processes Param declarations within the class.
     """
     for a, t in get_type_hints(cls).items():
         if isinstance(t, Param):
@@ -77,25 +77,26 @@ class Configuration:
     Configurations are objects that contain all settings for generating a model and running the simulation.
     The intention is that instead of passing individual parameters when creating model objects, the whole configuration is passed.
     The parameters are grouped under different object classes, to which they apply.
-    A configuration object can be initialized from command line arguments or a JSON string.
+    A configuration object can be initialized from command line arguments or from a JSON string.
     """
 
     # Params are stored in a three level dictionary which is defined on the class.
     # The first level is class names, the second is parameter names, and the third is parameter information.
     # The parameter information is type, default, flag (for command line arguments), and help string.
-    params = dict()
+    params: Dict[str, Dict[str, Dict[str, Any]]] = dict()
+
     # Create a command line parser for the parameters.
-    parser = argparse.ArgumentParser(prog = "SoSSIM", 
-                                     description = "A system-of-systems simulator for a transport system")
+    parser = argparse.ArgumentParser()
 
     def __init__(self):
         """
         Creates a configuration object with all parameters set to default values.
         """
-        # Values are stored in a three level dictionary defined on the object.
+        # Values are stored in a three level data dictionary defined on the object.
         # The first level is class names, the second is parameter names, and the third is the value.        
         self.data = dict()
-        # Initialize all params to their default values
+
+        # Initialize all params in the data to their default values
         for c, ps in self.params.items():
             for p, d in ps.items():
                 self.set_param_value(c, p, d["default"])
@@ -119,11 +120,13 @@ class Configuration:
         if class_name not in cls.params:
             cls.params[class_name] = dict()
         p = cls.params[class_name][name] = dict()
+
         # Add the parameter information
         p["type"] = type
         p["default"] = default
         p["flag"] = flag
         p["help"] = help
+        
         # Update the command line arguments parser.
         if flag:
             cls.parser.add_argument(flag, "--" + name, type = type, default = default, help = help)
@@ -166,7 +169,6 @@ class Configuration:
             Any: the parsed command line arguments.
         """
         args = self.parser.parse_args()
-        # TODO: Updata the data from the parsed arguments.
         for c, ps in self.params.items():
             for p, _ in ps.items():
                 self.set_param_value(c, p, getattr(args, p))
@@ -179,7 +181,7 @@ class Configuration:
         Returns:
             str: a JSON representation of the configuration.
         """
-        output = dict()
+        output: Dict[str, Dict[str, Any]] = dict()
         # Convert type objects to str, to be able to serialize.
         for cls, param in self.data.items():
             output[cls] = dict()
@@ -197,9 +199,10 @@ class Configuration:
         Args:
             text (str): a JSON representation of a configuration.
         """
-        # Reset configuration to default values, in case some parameters have been added to code after configuration was saved.
-        self.__init__()
+        # Reset configuration to default values, in case the configuration was saved using a software version with fewer parameters.
+        Configuration.__init__(self)
         input = json.loads(text)
+
         # Convert type names to types using eval.
         for cls, param in input.items():
             for var, value in param.items():

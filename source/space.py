@@ -8,10 +8,9 @@ import math
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
 
 import networkx as nx
-import mesa
 
 from configuration import Configuration, configurable, Param
-from view import viewable
+import core
 
 # Type abbreviations for nodes, edges and directions.
 Node = Tuple[int, int]
@@ -133,7 +132,7 @@ class RoadGridGraph(nx.DiGraph):
 
         Args:
             node1 (Node): a node.
-            node2 (Optional[Node], optional): a second node, if checking an edge. Defaults to None.
+            node2 (Node, optional): a second node, if checking an edge. Defaults to None.
 
         Returns:
             bool: True if the node or edge is a road.
@@ -162,10 +161,9 @@ def subnode(node: Node, i: int, j: int) -> Node:
     return (node[0] * 4 + i, node[1] * 4 + j)
 
 @configurable
-@viewable
-class RoadNetworkGrid:
+class RoadNetworkGrid(core.Space):
     """
-    A mesa space consisting of a road network which is placed on a grid.
+    An agent space consisting of a road network which is placed on a grid.
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
     Some nodes in the road networks can be destinations, where places of interest can be placed.
     """
@@ -175,13 +173,13 @@ class RoadNetworkGrid:
     destination_density:    Param(float)            = 0.3  #  probability of generating a destination in a position where it is possible
     charging_point_density: Param(float)            = 0.3  #  probability of a destination having a charging point
 
-    def __init__(self, configuration: Configuration, model: mesa.Model):
+    def __init__(self, configuration: Configuration, model: core.Model):
         """
         Creates a grid of size (width, height), and adds a road network to it.
         
         Args:
             configuration (Configuration): the configuration of parameters from which the road network is generated.
-            model (mesa.Model): the model of which this space is to be a part.
+            model (core.Model): the model of which this space is to be a part.
         """
         # Setup parameters and superclass
         super().__init__()
@@ -437,7 +435,6 @@ class RoadNetworkGrid:
         Returns:
             bool: True if the node is a charging point.
         """
-        # TODO: For now, just check if it is a destination.
         return self.road_network.nodes[node].get("charging_point", False)
 
     def edge_direction(self, source: Node, sink: Node) -> Direction:
@@ -498,7 +495,7 @@ class RoadNetworkGrid:
 
     # Mesa space API (adapted from mesa.space.NetworkGrid)
 
-    def place_agent(self, agent: mesa.Agent, node_id: Node) -> None:
+    def place_agent(self, agent: core.Agent, node_id: Node) -> None:
         """Place an agent in a node."""
         self.road_network.nodes[node_id]["agent"].append(agent)
         agent.pos = node_id
@@ -516,19 +513,19 @@ class RoadNetworkGrid:
             neighborhood = sorted(neighbors_with_distance.keys())
         return neighborhood
 
-    def get_neighbors(self, node_id: Node, include_center: bool = False) -> list[mesa.Agent]:
+    def get_neighbors(self, node_id: Node, include_center: bool = False) -> list[core.Agent]:
         """Get all agents in adjacent nodes."""
         neighborhood = self.get_neighborhood(node_id, include_center)
         return self.get_cell_list_contents(neighborhood)
 
-    def move_agent(self, agent: mesa.Agent, node_id: Node) -> None:
+    def move_agent(self, agent: core.Agent, node_id: Node) -> None:
         """Move an agent from its current node to a new node."""
         if hasattr(agent, "heading"):
             agent.heading = self.road_network[agent.pos][node_id]["direction"]
         self.remove_agent(agent)
         self.place_agent(agent, node_id)
 
-    def remove_agent(self, agent: mesa.Agent) -> None:
+    def remove_agent(self, agent: core.Agent) -> None:
         """Remove the agent from the network and set its pos attribute to None."""
         node_id = agent.pos
         self.road_network.nodes[node_id]["agent"].remove(agent)
@@ -538,17 +535,17 @@ class RoadNetworkGrid:
         """Returns a bool of the contents of a cell."""
         return self.road_network.nodes[node_id]["agent"] == []
 
-    def get_cell_list_contents(self, cell_list: list[Node]) -> list[mesa.Agent]:
+    def get_cell_list_contents(self, cell_list: list[Node]) -> list[core.Agent]:
         """Returns a list of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """
         return list(self.iter_cell_list_contents(cell_list))
 
-    def get_all_cell_contents(self) -> list[mesa.Agent]:
+    def get_all_cell_contents(self) -> list[core.Agent]:
         """Returns a list of all the agents in the network."""
         return self.get_cell_list_contents(self.road_network)
 
-    def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[mesa.Agent]:
+    def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[core.Agent]:
         """Returns an iterator of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """

@@ -1,14 +1,48 @@
 """
 Provides abstract classes representing the core concepts of systems-of-systems.
 """
-
 from typing import List, Self
 
 import mesa
 from view import viewable
 
 @viewable
-class SoSEntity(mesa.Agent): 
+class Model(mesa.Model):
+    """
+    A comman base class for SoS models.
+    """
+    def __init__(self):
+        super().__init__()
+
+        # Create time and space, using a staged activation scheduler based on the OODA loop
+        self.schedule = mesa.time.StagedActivation(self, ["observe", "orient", "decide", "act"])
+
+    def agents(self) -> List["Agent"]:
+        """
+        Returns the agents in the model.
+
+        Returns:
+            List[Agent]: the agents
+        """
+        return self.schedule.agents
+    
+    def time(self) -> float:
+        """
+        Returns the current time of the simulation.
+
+        Returns:
+            Float: the time.
+        """
+        return self.schedule.time
+
+@viewable
+class Space:
+    """
+    A comman base class for SoS spaces.
+    """
+
+@viewable
+class Entity(mesa.Agent): 
     """
     A common abstract baseclass for entities within a SoS.
     All entities are treated as agents, but not all of them have behavior.
@@ -16,10 +50,13 @@ class SoSEntity(mesa.Agent):
     """
     id_counter = 0 # Counter for generating unique id.
 
-    def __init__(self, model: mesa.Model):
+    def __init__(self, model: Model):
         # Generate unique id based on counter.
-        super().__init__(SoSEntity.id_counter, model)
-        SoSEntity.id_counter += 1
+        super().__init__(Entity.id_counter, model)
+        Entity.id_counter += 1
+
+        # Add agent to the scheduler
+        model.schedule.add(self)
 
     def __repr__(self) -> str:
         """
@@ -68,15 +105,15 @@ class SoSEntity(mesa.Agent):
         """        
         self.update_views()
 
-class SoSAgent(SoSEntity):
+class Agent(Entity):
 
-    def __init__(self, model: mesa.Model):
+    def __init__(self, model: Model):
         """
         Creates a SoS agent in a simulation model.
 
         Args:
             unique_id (int): the unique id of the agent.
-            model (mesa.Model): the model in which the agent is situated.
+            model (core.Model): the model in which the agent is situated.
         """
         super().__init__(model)
 
@@ -124,7 +161,7 @@ class SoSAgent(SoSEntity):
         Then, any further actions specified in the superclass are carried out.
         """
         if self.plan and self.ready_to_act:
-            self.plan[0].activate()
+            self.plan[0].act()
         super().act()
 
 class Capability:
@@ -132,13 +169,13 @@ class Capability:
     A generic capability, serving as a base class for specific capabilities.
     """
 
-    def __init__(self, agent: SoSAgent):
+    def __init__(self, agent: Agent):
         """
         Creates the capability for a certain agent.
         Subclasses can add parameters for how to use a certain capability.
 
         Args:
-            agent (SoSAgent): the agent who should have this capability.
+            agent (core.Agent): the agent who should have this capability.
         """
         self.agent = agent
 
@@ -161,6 +198,12 @@ class Capability:
         """
         return True
     
+    def act(self):
+        """
+        Carries out the capability during one time step.
+        """
+        pass
+
     def postcondition(self) -> bool:
         """
         Checks if the postcondition for this capability is fulfilled.
@@ -169,9 +212,3 @@ class Capability:
             bool: True if the capability has been fulfilled, False otherwise
         """
         return True
-    
-    def activate(self):
-        """
-        Carries out the capability.
-        """
-        pass

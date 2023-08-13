@@ -1,15 +1,15 @@
 """
-Provides concrete agents for the SoSSim system-of-systems simulator.
+Provides concrete agents and other entities.
 """
 from typing import List, Optional
 
 import capabilities
 from configuration import Configuration, configurable, Param
-from sos_core import SoSEntity, SoSAgent
+import core 
 from space import Node
 
 @configurable
-class Vehicle(SoSAgent):
+class Vehicle(core.Agent):
     # Define configuration parameters relevant to this class
     max_load:            Param(int)   = 3     # maximum load of a vehicle
     max_energy:          Param(int)   = 100   # maximum energy of a vehicle
@@ -20,16 +20,15 @@ class Vehicle(SoSAgent):
         Creates a vehicle agent in a simulation model.
 
         Args:
-            unique_id (int): the unique id of the agent.
             model (model.TransportSystem): the model in which the agent is situated.
+            configuration (Configuration): the configuration parameters.
         """
         super().__init__(model)
         configuration.initialize(self)
-        self.pos: Node = (0, 0)
 
         # Add a load capacity of the vehicle and a list of cargos
         self.capacity = self.model.random.choice(range(self.max_load)) + 1
-        self.cargos = []
+        self.cargos: List["Cargo"] = []
 
         # Add an energy level and initialize it to a random value
         self.energy_level = self.model.random.choice(range(round(0.2 * self.max_energy), self.max_energy + 1))
@@ -42,13 +41,13 @@ class Vehicle(SoSAgent):
         # Set the initial heading of the vehicle to that of the heading of one of the roads leading into the current position.
         self.heading = space.edge_direction(space.roads_to(self.pos)[0], self.pos)
 
-    def can_coexist(self, other: SoSEntity) -> bool:
+    def can_coexist(self, other: core.Entity) -> bool:
         """
         Returns True if this entity can coexist in the same cell with the other entity.
         Vehicles are not allowed to coexist with other vehicles.
 
         Args:
-            other (SoSEntity): another entity.
+            other (core.Entity): another entity.
 
         Returns:
             bool: True if coexistance is possible.
@@ -56,7 +55,12 @@ class Vehicle(SoSAgent):
         return not isinstance(other, Vehicle)
 
     def available_cargo(self, node: Node) -> List["Cargo"]:
-        # Returns the list of available cargos in a destination node that the vehicle can carry.
+        """
+        Returns the list of available cargos in a destination node that the vehicle can carry.
+        
+        Returns:
+            List[Cargo]: the list of cargo.
+        """
         space = self.model.space
         if space.is_destination(node):
             return [e for e in space.get_cell_list_contents([node]) if isinstance(e, Cargo) and e.weight <= self.load_capacity()]
@@ -112,7 +116,6 @@ class Vehicle(SoSAgent):
             self.plan[0].route and \
             space.is_destination(self.plan[0].route[0]) and \
             not all(self.can_coexist(other) for other in space.get_cell_list_contents([self.plan[0].route[0]])):
-            print("Resolving deadlock at destination", self.plan[0].route)
             route = [self.model.random.choice(space.roads_from(self.pos, lambda node: not space.is_destination(node)))]
             self.plan = [capabilities.Move(self, route)]
 
@@ -160,7 +163,7 @@ class Vehicle(SoSAgent):
         cargo.unload()
 
 @configurable
-class Cargo(SoSEntity):
+class Cargo(core.Entity):
     """
     A cargo is an entity which can be transported by vehicles.
     It has a weight, a position, a destination, and a carrier.
@@ -168,6 +171,13 @@ class Cargo(SoSEntity):
     max_cargo_weight: Param(int) = 3  # The maximum weight of a cargo.
 
     def __init__(self, model: "model.TransportSystem", configuration: Configuration):
+        """
+        Creates a cargo entitiy in a simulation model.
+
+        Args:
+            model (model.TransportSystem): the model in which the cargo is situated.
+            configuration (Configuration): the configuration parameters.
+        """
         super().__init__(model)
         configuration.initialize(self)
 
@@ -177,14 +187,14 @@ class Cargo(SoSEntity):
 
         self.weight = self.model.random.choice(range(self.max_cargo_weight)) + 1
         self.select_destination()
-        self.carrier = None
+        self.carrier: Vehicle | None = None
 
     def select_destination(self, destination: Optional[Node] = None):
         """
         Selects a destination for the cargo. If no destination is provided, a random one is picked.
 
         Args:
-            destination (Optional[Node], optional): the new destination. Defaults to None.
+            destination (Node, optional): the new destination. Defaults to None.
         """
         if destination:
             self.destination = destination

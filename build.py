@@ -47,7 +47,7 @@ if __name__ == "__main__":
         for module_name in pdoc.extract.walk_specs(modules):
             try:
                 all_modules[module_name] = pdoc.doc.Module.from_name(module_name)
-            except Exception:
+            except:
                 print("Cannot document module", module_name)
 
         for module in all_modules.values():

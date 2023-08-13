@@ -3,18 +3,18 @@ Classes that define capabilities of agents.
 """
 from typing import Callable, List, Optional
 
-from sos_core import Capability, SoSEntity, SoSAgent
+import core
 from space import Node
 
-class Move(Capability):
+class Move(core.Capability):
     
-    def __init__(self, agent: SoSAgent, route: List[Node]):
+    def __init__(self, agent: core.Agent, route: List[Node]):
         """
-        Defines the capability of an agent to move to a new position.
-        The capability can be given to an agent which has a pos attribute and has a model with a space containing a road network
+        Defines the capability of an agent to move to a new position along a route of nodes.
+        The capability can be given to an agent which has a pos attribute and has a model with a space containing a road network.
 
         Args:
-            agent (SoSAgent): the agent who should be given this capability.
+            agent (core.Agent): the agent who should be given this capability.
             route (Position): the route to be traversed in space.
         """
         super().__init__(agent)
@@ -26,7 +26,8 @@ class Move(Capability):
     def precondition(self) -> bool:
         """
         Defines the preconditions to make a move:
-        - There is a road to the new node from the current node.
+        - There is a non-empty route.
+        - There is a road to the next node from the current node.
         - There is no conflicting traffic.
         - The agent has sufficient energy.
 
@@ -39,7 +40,7 @@ class Move(Capability):
         space = self.agent.model.space
         target = self.route[0]
 
-        # There is no road to the new node from the current node.
+        # There is no road to the next node from the current node.
         if target not in space.roads_from(self.agent.pos):
             return False
 
@@ -58,22 +59,22 @@ class Move(Capability):
             return False
 
         return super().precondition()
+    
+    def act(self):
+        """
+        Performs a move to the next node in the route, and remove that node from the route.
+        """
+        self.agent.move(self.route[0])
+        self.route = self.route[1:]
 
     def postcondition(self) -> bool:
         """
-        The postcondition of a move is that the actual position is the same as the target.
+        The postcondition of a move is that the route is empty.
 
         Returns:
             bool: True if and only if the final position of the route has been reached, meaning that the route is empty.
         """
         return self.route == []
-    
-    def activate(self):
-        """
-        Performs the move and remove the first node from the route.
-        """
-        self.agent.move(self.route[0])
-        self.route = self.route[1:]
 
 class FindDestination(Move):
     """
@@ -82,7 +83,7 @@ class FindDestination(Move):
     It can take an optional condition specifying what types of destinations are acceptable.
     """
 
-    def __init__(self, agent: SoSAgent, condition: Optional[Callable[[Node], bool]] = None, final: Optional[Node] = None):
+    def __init__(self, agent: core.Agent, condition: Optional[Callable[[Node], bool]] = None, final: Optional[Node] = None):
         """
         Defines the capability of an agent to move to a new position.
         The capability can be given to an agent which has a pos attribute and has a model with a space containing a road network.
@@ -90,7 +91,7 @@ class FindDestination(Move):
         If a final node is provided, only that node is accepted as a the final destination.
 
         Args:
-            agent (SoSAgent): the agent who should be given this capability.
+            agent (core.Agent): the agent who should be given this capability.
             condition (Callable[Position, bool], optional): a condition to be fulfilled by the destination. Defaults to always True.
             final (Node, optional): a final node to be achieved. Defaults to None.
         """
@@ -105,27 +106,33 @@ class FindDestination(Move):
         If there is already a route, do nothing.
         If a final node has been provided, calculate the shortest route to it.
         If there is an adjacent destination that fulfils the condition, set that as the target.
-        Otherwise, randomly select a different non-destination as the target.
+        Otherwise, randomly move one step.
         """
         space = self.agent.model.space
 
+        # There is already a route, so no need to change it.
         if self.route:
             return
+        # A final node is provided, so find the shortest path to it and use that as the route
         if self.final:
             self.route = space.shortest_path(self.agent.pos, self.final)[1:]
             return
 
+        # Find all adjacent nodes that are destinations.
         destinations = space.roads_from(self.agent.pos, space.is_destination)
-        if destinations and all(self.agent.can_coexist(other) for other in space.get_cell_list_contents(destinations)) and self.check_condition(destinations[0]):
+        if destinations and self.check_condition(destinations[0]) and all(self.agent.can_coexist(other) for other in space.get_cell_list_contents(destinations)):
+            # If there is an adjacent destination which meets the provided condition, and which is possible to enter for this agent, set that destination as the route. 
             self.route = [destinations[0]]
         else:
+            # Otherwise, randomly choose one of the neighboring non-destination nodes as the next node.
             self.route = [self.agent.model.random.choice(space.roads_from(self.agent.pos, lambda node: not space.is_destination(node)))]
 
     def check_condition(self, node: Node) -> bool:
         """
         Check if the condition is fulfilled in the node. For the result to be True, the following must be fulfilled:
+        If a final destination was provided, the node must be equal to that destination.
         If the condition was provided, the value of that function must be True.
-        If a destination was provided, the node must be equal to that destination.
+        If neither was provided, the condition is True.
 
         Args:
             node (Node): the node.
@@ -133,11 +140,16 @@ class FindDestination(Move):
         Returns:
             bool: True if the node fulfils the condition.
         """
-        if self.final and self.final != node:
-            return False
-        if self.condition and not self.condition(node):
-            return False
-        return True
+        return (not self.final or self.final == node) and (not self.condition or self.condition(node))
+    
+    def act(self):
+        """
+        Performs the move and selects a new route.
+        """
+        super().act()
+
+        # Select a new route
+        self.select_route()
 
     def postcondition(self) -> bool:
         """
@@ -147,28 +159,18 @@ class FindDestination(Move):
             bool: True if and only if the current position is a destination which fulfils the specified condition.
         """
         return self.agent.model.space.is_destination(self.agent.pos) and self.check_condition(self.agent.pos)
-    
-    def activate(self):
-        """
-        Performs the move and selects a new route.
-        """
-        super().activate()
 
-        # Select a new route
-        self.select_route()
-
-class LoadCargo(Capability):
+class LoadCargo(core.Capability):
     
-    def __init__(self, agent: SoSAgent, cargo: SoSEntity):
+    def __init__(self, agent: core.Agent, cargo: core.Entity):
         """
         Defines the capability of an agent to load a cargo.
-        The capability can be given to an agent which has a pos attribute and has a model with a space containing a road network.
-        It should also have a max_load attribute.
+        The capability can be given to an agent which has a pos attribute and a max_load attribute.
         The entity constituting the cargo should also have a position and a weight.
 
         Args:
-            agent (SoSAgent): the agent who should be given this capability.
-            cargo (SoSEntity): the cargo.
+            agent (core.Agent): the agent who should be given this capability.
+            cargo (core.Entity): the cargo.
         """
         super().__init__(agent)
         self.cargo = cargo
@@ -196,6 +198,12 @@ class LoadCargo(Capability):
             return False
 
         return super().precondition()
+    
+    def act(self):
+        """
+        Performs the loading.
+        """
+        self.agent.load_cargo(self.cargo)
 
     def postcondition(self) -> bool:
         """
@@ -205,24 +213,17 @@ class LoadCargo(Capability):
             bool: True if and only if the cargo has been loaded.
         """
         return self.cargo in self.agent.cargos
-    
-    def activate(self):
-        """
-        Performs the loading.
-        """
-        self.agent.load_cargo(self.cargo)
-        print("Agent", self.agent.unique_id, "loaded cargo", self.cargo.unique_id, "in position", self.agent.pos, "with destination", self.cargo.destination)
 
-class UnloadCargo(Capability):
+class UnloadCargo(core.Capability):
     
-    def __init__(self, agent: SoSAgent, cargo: SoSEntity):
+    def __init__(self, agent: core.Agent, cargo: core.Entity):
         """
         Defines the capability of an agent to unload a cargo.
-        The capability can be given to an agent which carries a cargo.
+        The capability can be given to an agent which can carry a cargo.
  
         Args:
-            agent (SoSAgent): the agent who should be given this capability.
-            cargo (SoSEntity): the cargo.
+            agent (core.Agent): the agent who should be given this capability.
+            cargo (core.Entity): the cargo.
         """
         super().__init__(agent)
         self.cargo = cargo
@@ -245,6 +246,12 @@ class UnloadCargo(Capability):
             return False
 
         return super().precondition()
+    
+    def act(self):
+        """
+        Performs the unloading.
+        """
+        self.agent.unload_cargo(self.cargo)
 
     def postcondition(self) -> bool:
         """
@@ -254,21 +261,14 @@ class UnloadCargo(Capability):
             bool: True if and only if the cargo has been loaded.
         """
         return self.cargo.carrier != self.agent
-    
-    def activate(self):
-        """
-        Performs the unloading.
-        """
-        self.agent.unload_cargo(self.cargo)
-        print("Agent", self.agent.unique_id, "unloaded cargo", self.cargo.unique_id)
 
-class ChargeEnergy(Capability):
+class ChargeEnergy(core.Capability):
     """
     Defines the capability of an agent to charge energy.
     This capability can be given to any agent which has the attributes energy_level and max_energy.
     
     Args:
-        agent (SoSAgent): the agent who should have this capability.
+        agent (core.Agent): the agent who should have this capability.
     """
 
     def precondition(self) -> bool:
@@ -280,6 +280,12 @@ class ChargeEnergy(Capability):
         """
         return self.agent.model.space.is_charging_point(self.agent.pos)
     
+    def act(self):
+        """
+        Charge energy.
+        """
+        self.agent.energy_level = min(self.agent.max_energy, self.agent.energy_level + self.agent.charging_speed)
+
     def postcondition(self) -> bool:
         """
         The postcondition is that the energy level has reached the maximum.
@@ -288,9 +294,3 @@ class ChargeEnergy(Capability):
             bool: True if the capability has been fulfilled, False otherwise
         """
         return self.agent.energy_level >= self.agent.max_energy
-    
-    def activate(self):
-        """
-        Charge energy.
-        """
-        self.agent.energy_level = min(self.agent.max_energy, self.agent.energy_level + self.agent.charging_speed)
