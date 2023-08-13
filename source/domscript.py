@@ -6,6 +6,7 @@ This also makes it possible to add event listeners, modify the DOM dynamically, 
 
 A typical usage looks as follows:
 
+```
 from domscript import *
 
 # Get the body element of the document, clearing its current children, and adding new ones.
@@ -18,6 +19,7 @@ with document.query(".body").clear():
         with li("Item 2") as item:
             item["id"] = "item2"
         li("Item 3", id = "item3")
+```
 """
 
 """

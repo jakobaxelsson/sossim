@@ -4,6 +4,7 @@ This allows all configuration parameters to be handled in a single object.
 That object can be passed around to all configurable classes, allowing them to extract whatever information they need.
 A typical usage is as follows:
 
+```
     from configuration import Configuration, configurable, Param
 
     @configurable
@@ -16,6 +17,7 @@ A typical usage is as follows:
     configuration = Configuration()
     obj = C(configuration)
     obj.p  # Returns 3
+```
 
 Here, the @configurable decorater informs that this is a class that can take configuration parameters.
 The Param type declaration adds param as a configuration parameter for the class C, with a default value of 3.
