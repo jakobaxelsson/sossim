@@ -16,8 +16,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Build steps.
     source_dir = Path("source")
+
+    # Build steps.
 
     # Typechecking.
     if args.typecheck or args.all:

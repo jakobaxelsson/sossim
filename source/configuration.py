@@ -5,11 +5,12 @@ That object can be passed around to all configurable classes, allowing them to e
 A typical usage is as follows:
 
 ```
-    from configuration import Configuration, configurable, Param
+    from configuration import Configuration, configurable
+    from typing import Annotated
 
     @configurable
     class C:
-        param: Param(int) = 3   # some help string
+        param: Annotated[int, "Param", "some help string"] = 3
 
         def __init__(self, configuration: Configuration):
             configuration.initialize(self)
@@ -20,50 +21,22 @@ A typical usage is as follows:
 ```
 
 Here, the @configurable decorater informs that this is a class that can take configuration parameters.
-The Param type declaration adds param as a configuration parameter for the class C, with a default value of 3.
+The type annotated variable param specifies that this is a configuration parameter, with a help string and a default value of 3.
 It is given a command line argument --param <value>. 
-The help string in the comment is shown when printing the help information for the command line.
+The help string is shown when printing the help information for the command line.
 It can also be used as tooltips in a user interface.
 """
 import argparse
-import inspect
 import json
-from typing import get_type_hints, Any, Generic, TypeVar
-
-T = TypeVar("T")
-
-class Param(Generic[T]):
-    """
-    Param is a class holding the information provided when declaring a configuration parameter using type hints.
-    If this is used in a class which is not decorated as configurable, an error is raised.
-    """
-    def __init__(self, type: type[T]):
-        try:
-            self.type = type
-            # Fetch the help message from a comment at the end of the line where the Param was created.
-            # Get the caller's frame
-            frame = inspect.currentframe().f_back # type: ignore
-            # Get the file line number where the call to Param occured
-            code_line = frame.f_lineno # type: ignore
-            # Get the source code of the class and the line in the file where the class definition starts
-            source_code, start_line = inspect.getsourcelines(frame) # type: ignore
-            # Get the relevant source line
-            source_line = source_code[code_line - start_line]
-            # Extract the comment at the end of the line
-            try:
-                self.help = source_line.split("#")[1].strip()
-            except:
-                self.help = ""
-        except:
-            print("Error in Param. Param can only be used in classes decorated as @configurable.")
+from typing import get_type_hints, Any
 
 def configurable(cls: type) -> type:
     """
     A class decorator that processes Param declarations within the class.
     """
-    for a, t in get_type_hints(cls).items():
-        if isinstance(t, Param):
-            Configuration.add_param(class_name = cls.__name__, name = a, default = getattr(cls, a), type = t.type, help = t.help) # type: ignore
+    for a, t in get_type_hints(cls, include_extras = True).items():
+        if t.__metadata__[0] == "Param":
+            Configuration.add_param(class_name = cls.__name__, name = a, default = getattr(cls, a), type = t.__origin__, help = t.__metadata__[1]) # type: ignore
             delattr(cls, a)
     return cls
 
@@ -119,7 +92,7 @@ class Configuration:
         p["type"] = type
         p["default"] = default
         p["help"] = help
-        
+
         # Update the command line arguments parser.
         cls.parser.add_argument("--" + name, type = type, default = default, help = help)
 

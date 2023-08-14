@@ -3,9 +3,10 @@ Provides models for the SoSSim system-of-systems simulator.
 """
 import random
 import sys
+from typing import Annotated
 
 from entities import Cargo, Vehicle
-from configuration import Configuration, configurable, Param
+from configuration import Configuration, configurable
 import core
 import space
 from view import viewable
@@ -14,9 +15,9 @@ from view import viewable
 @viewable
 class TransportSystem(core.Model):
     # Define configuration parameters relevant to this class
-    num_vehicles: Param(int) = 10   # number of vehicles
-    num_cargos:   Param(int) = 10                # number of cargos
-    random_seed:  Param(int) = -1   # seed for random number generator (use -1 to initialize from system time)
+    num_vehicles: Annotated[int, "Param", "number of vehicles"] = 10 
+    num_cargos:   Annotated[int, "Param", "number of cargos"] = 10
+    random_seed:  Annotated[int, "Param", "seed for random number generator (use -1 to initialize from system time)"] = -1
 
     def __init__(self, configuration: Configuration):
         """

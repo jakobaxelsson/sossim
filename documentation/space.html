@@ -205,16 +205,16 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.<
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">import</span> <span class="nn">itertools</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span> <span class="nn">math</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Optional</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span> <span class="nn">configuration</span> <span class="kn">import</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">configurable</span><span class="p">,</span> <span class="n">Param</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span> <span class="nn">configuration</span> <span class="kn">import</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">configurable</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">import</span> <span class="nn">core</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="c1"># Type abbreviations for nodes, edges and directions.</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="n">Node</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="n">Edge</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">&quot;Edge&quot;</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Node</span><span class="p">,</span> <span class="n">Node</span><span class="p">])</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="n">Node</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">&quot;Node&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="n">Edge</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">&quot;Edge&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Node</span><span class="p">,</span> <span class="n">Node</span><span class="p">])</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="n">Direction</span> <span class="o">=</span> <span class="nb">int</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="k">class</span> <span class="nc">RoadGridGraph</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">):</span>
@@ -358,7 +358,7 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.<
 </span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a><span class="sd">    Returns the detailed network subnode (i, j) of a coarse network node.</span>
 </span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">j</span><span class="p">)</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>    <span class="k">return</span> <span class="n">Node</span><span class="p">((</span><span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">j</span><span class="p">))</span>
 </span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>
 </span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="nd">@configurable</span>
 </span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="k">class</span> <span class="nc">RoadNetworkGrid</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Space</span><span class="p">):</span>
@@ -367,11 +367,11 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.<
 </span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="sd">    The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.</span>
 </span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="sd">    Some nodes in the road networks can be destinations, where places of interest can be placed.</span>
 </span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>    <span class="n">width</span><span class="p">:</span>                  <span class="n">Param</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;-x&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#  number of grid cells in x dimension</span>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>    <span class="n">height</span><span class="p">:</span>                 <span class="n">Param</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;-y&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#  number of grid cells in y dimension</span>
-</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>    <span class="n">road_density</span><span class="p">:</span>           <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  the proportion of the grid to be covered by roads&quot;) = 0.3</span>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>    <span class="n">destination_density</span><span class="p">:</span>    <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  probability of generating a destination in a position where it is possible</span>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>    <span class="n">charging_point_density</span><span class="p">:</span> <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  probability of a destination having a charging point</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>    <span class="n">width</span><span class="p">:</span>                  <span class="n">Annotated</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span>   <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;number of grid cells in x dimension&quot;</span><span class="p">]</span>   <span class="o">=</span> <span class="mi">10</span>  
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>    <span class="n">height</span><span class="p">:</span>                 <span class="n">Annotated</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span>   <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;number of grid cells in y dimension&quot;</span><span class="p">]</span>   <span class="o">=</span> <span class="mi">10</span>   
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>    <span class="n">road_density</span><span class="p">:</span>           <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;the proportion of the grid to be covered by roads&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>    <span class="n">destination_density</span><span class="p">:</span>    <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;probability of generating a destination in a position where it is possible&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span> 
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>    <span class="n">charging_point_density</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;probability of a destination having a charging point&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
 </span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>
 </span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">core</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
 </span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -760,7 +760,7 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.<
                 <section id="Node">
                     <div class="attr variable">
             <span class="name">Node</span>        =
-<span class="default_value">typing.Tuple[int, int]</span>
+<span class="default_value"><a href="#Node">space.Node</a></span>
 
         
     </div>
@@ -1031,7 +1031,7 @@ Two dictionaries are provided that give optional default attributes to nodes and
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">add_road</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">source</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">sink</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">bidirectional</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">):</span></span>
+        <span class="name">add_road</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">source</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>,</span><span class="param">	<span class="n">sink</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>,</span><span class="param">	<span class="n">bidirectional</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="RoadGridGraph.add_road-view-source"><span>View Source</span></label>
 
@@ -1072,7 +1072,7 @@ Two dictionaries are provided that give optional default attributes to nodes and
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">add_roads</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>, </span><span class="param"><span class="n">directions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
+        <span class="name">add_roads</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">directions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="RoadGridGraph.add_roads-view-source"><span>View Source</span></label>
 
@@ -1110,7 +1110,7 @@ Two dictionaries are provided that give optional default attributes to nodes and
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">add_destination</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">node1</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">node2</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">charging_point</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">):</span></span>
+        <span class="name">add_destination</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">node1</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>,</span><span class="param">	<span class="n">node2</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>,</span><span class="param">	<span class="n">charging_point</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="RoadGridGraph.add_destination-view-source"><span>View Source</span></label>
 
@@ -1154,7 +1154,7 @@ The destination node is indicated as such using a node attribute.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">has_road_to</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">source</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>, </span><span class="param"><span class="n">direction</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">has_road_to</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">source</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">direction</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RoadGridGraph.has_road_to-view-source"><span>View Source</span></label>
 
@@ -1199,7 +1199,7 @@ The destination node is indicated as such using a node attribute.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_road</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">node1</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">node2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">is_road</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node1</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">node2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RoadGridGraph.is_road-view-source"><span>View Source</span></label>
 
@@ -1246,7 +1246,7 @@ The destination node is indicated as such using a node attribute.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">road_degree</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+        <span class="name">road_degree</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
 
                 <label class="view-source-button" for="RoadGridGraph.road_degree-view-source"><span>View Source</span></label>
 
@@ -1354,7 +1354,7 @@ The destination node is indicated as such using a node attribute.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">subnode</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">node</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>, </span><span class="param"><span class="n">i</span><span class="p">:</span> <span class="nb">int</span>, </span><span class="param"><span class="n">j</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
+        <span class="name">subnode</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">node</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">i</span><span class="p">:</span> <span class="nb">int</span>, </span><span class="param"><span class="n">j</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="n"><a href="#Node">space.Node</a></span>:</span></span>
 
                 <label class="view-source-button" for="subnode-view-source"><span>View Source</span></label>
 
@@ -1364,7 +1364,7 @@ The destination node is indicated as such using a node attribute.</p>
 </span><span id="subnode-159"><a href="#subnode-159"><span class="linenos">159</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="subnode-160"><a href="#subnode-160"><span class="linenos">160</span></a><span class="sd">    Returns the detailed network subnode (i, j) of a coarse network node.</span>
 </span><span id="subnode-161"><a href="#subnode-161"><span class="linenos">161</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="subnode-162"><a href="#subnode-162"><span class="linenos">162</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">j</span><span class="p">)</span>
+</span><span id="subnode-162"><a href="#subnode-162"><span class="linenos">162</span></a>    <span class="k">return</span> <span class="n">Node</span><span class="p">((</span><span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">j</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -1392,11 +1392,11 @@ The destination node is indicated as such using a node attribute.</p>
 </span><span id="RoadNetworkGrid-168"><a href="#RoadNetworkGrid-168"><span class="linenos">168</span></a><span class="sd">    The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.</span>
 </span><span id="RoadNetworkGrid-169"><a href="#RoadNetworkGrid-169"><span class="linenos">169</span></a><span class="sd">    Some nodes in the road networks can be destinations, where places of interest can be placed.</span>
 </span><span id="RoadNetworkGrid-170"><a href="#RoadNetworkGrid-170"><span class="linenos">170</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="RoadNetworkGrid-171"><a href="#RoadNetworkGrid-171"><span class="linenos">171</span></a>    <span class="n">width</span><span class="p">:</span>                  <span class="n">Param</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;-x&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#  number of grid cells in x dimension</span>
-</span><span id="RoadNetworkGrid-172"><a href="#RoadNetworkGrid-172"><span class="linenos">172</span></a>    <span class="n">height</span><span class="p">:</span>                 <span class="n">Param</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;-y&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#  number of grid cells in y dimension</span>
-</span><span id="RoadNetworkGrid-173"><a href="#RoadNetworkGrid-173"><span class="linenos">173</span></a>    <span class="n">road_density</span><span class="p">:</span>           <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  the proportion of the grid to be covered by roads&quot;) = 0.3</span>
-</span><span id="RoadNetworkGrid-174"><a href="#RoadNetworkGrid-174"><span class="linenos">174</span></a>    <span class="n">destination_density</span><span class="p">:</span>    <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  probability of generating a destination in a position where it is possible</span>
-</span><span id="RoadNetworkGrid-175"><a href="#RoadNetworkGrid-175"><span class="linenos">175</span></a>    <span class="n">charging_point_density</span><span class="p">:</span> <span class="n">Param</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1">#  probability of a destination having a charging point</span>
+</span><span id="RoadNetworkGrid-171"><a href="#RoadNetworkGrid-171"><span class="linenos">171</span></a>    <span class="n">width</span><span class="p">:</span>                  <span class="n">Annotated</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span>   <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;number of grid cells in x dimension&quot;</span><span class="p">]</span>   <span class="o">=</span> <span class="mi">10</span>  
+</span><span id="RoadNetworkGrid-172"><a href="#RoadNetworkGrid-172"><span class="linenos">172</span></a>    <span class="n">height</span><span class="p">:</span>                 <span class="n">Annotated</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span>   <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;number of grid cells in y dimension&quot;</span><span class="p">]</span>   <span class="o">=</span> <span class="mi">10</span>   
+</span><span id="RoadNetworkGrid-173"><a href="#RoadNetworkGrid-173"><span class="linenos">173</span></a>    <span class="n">road_density</span><span class="p">:</span>           <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;the proportion of the grid to be covered by roads&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+</span><span id="RoadNetworkGrid-174"><a href="#RoadNetworkGrid-174"><span class="linenos">174</span></a>    <span class="n">destination_density</span><span class="p">:</span>    <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;probability of generating a destination in a position where it is possible&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span> 
+</span><span id="RoadNetworkGrid-175"><a href="#RoadNetworkGrid-175"><span class="linenos">175</span></a>    <span class="n">charging_point_density</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Param&quot;</span><span class="p">,</span> <span class="s2">&quot;probability of a destination having a charging point&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
 </span><span id="RoadNetworkGrid-176"><a href="#RoadNetworkGrid-176"><span class="linenos">176</span></a>
 </span><span id="RoadNetworkGrid-177"><a href="#RoadNetworkGrid-177"><span class="linenos">177</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">core</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
 </span><span id="RoadNetworkGrid-178"><a href="#RoadNetworkGrid-178"><span class="linenos">178</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1838,7 +1838,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.width" class="classattr">
                                 <div class="attr variable">
-            <span class="name">width</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x0000025783905ED0&gt;</span>
+            <span class="name">width</span><span class="annotation">: typing.Annotated[int, &#39;Param&#39;, &#39;number of grid cells in x dimension&#39;]</span>
 
         
     </div>
@@ -1849,7 +1849,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.height" class="classattr">
                                 <div class="attr variable">
-            <span class="name">height</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x0000025783905F90&gt;</span>
+            <span class="name">height</span><span class="annotation">: typing.Annotated[int, &#39;Param&#39;, &#39;number of grid cells in y dimension&#39;]</span>
 
         
     </div>
@@ -1860,7 +1860,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.road_density" class="classattr">
                                 <div class="attr variable">
-            <span class="name">road_density</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x0000025783904C50&gt;</span>
+            <span class="name">road_density</span><span class="annotation">: typing.Annotated[float, &#39;Param&#39;, &#39;the proportion of the grid to be covered by roads&#39;]</span>
 
         
     </div>
@@ -1871,7 +1871,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.destination_density" class="classattr">
                                 <div class="attr variable">
-            <span class="name">destination_density</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x00000257838EA4D0&gt;</span>
+            <span class="name">destination_density</span><span class="annotation">: typing.Annotated[float, &#39;Param&#39;, &#39;probability of generating a destination in a position where it is possible&#39;]</span>
 
         
     </div>
@@ -1882,7 +1882,7 @@ Some nodes in the road networks can be destinations, where places of interest ca
                             </div>
                             <div id="RoadNetworkGrid.charging_point_density" class="classattr">
                                 <div class="attr variable">
-            <span class="name">charging_point_density</span><span class="annotation">: &lt;<a href="configuration.html#Param">configuration.Param</a> object at 0x00000257838EB110&gt;</span>
+            <span class="name">charging_point_density</span><span class="annotation">: typing.Annotated[float, &#39;Param&#39;, &#39;probability of a destination having a charging point&#39;]</span>
 
         
     </div>
@@ -2052,7 +2052,7 @@ The network keeps track of what agents are currently in a node.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">priority_nodes</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">from_node</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">to_node</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>:</span></span>
+        <span class="name">priority_nodes</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">from_node</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">to_node</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.priority_nodes-view-source"><span>View Source</span></label>
 
@@ -2114,7 +2114,7 @@ This is traffic coming from the left in a roundabout, and any traffic when leavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">road_nodes</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">condition</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">RoadNetworkGrid</span><span class="o">.&lt;</span><span class="k">lambda</span><span class="o">&gt;&gt;</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>:</span></span>
+        <span class="name">road_nodes</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">condition</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">RoadNetworkGrid</span><span class="o">.&lt;</span><span class="k">lambda</span><span class="o">&gt;&gt;</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.road_nodes-view-source"><span>View Source</span></label>
 
@@ -2156,7 +2156,7 @@ This is traffic coming from the left in a roundabout, and any traffic when leavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">destination_nodes</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">condition</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">RoadNetworkGrid</span><span class="o">.&lt;</span><span class="k">lambda</span><span class="o">&gt;&gt;</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>:</span></span>
+        <span class="name">destination_nodes</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">condition</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">RoadNetworkGrid</span><span class="o">.&lt;</span><span class="k">lambda</span><span class="o">&gt;&gt;</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.destination_nodes-view-source"><span>View Source</span></label>
 
@@ -2231,7 +2231,7 @@ This is traffic coming from the left in a roundabout, and any traffic when leavi
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">roads_from</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">source</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">condition</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">RoadNetworkGrid</span><span class="o">.&lt;</span><span class="k">lambda</span><span class="o">&gt;&gt;</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>:</span></span>
+        <span class="name">roads_from</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">source</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>,</span><span class="param">	<span class="n">condition</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">RoadNetworkGrid</span><span class="o">.&lt;</span><span class="k">lambda</span><span class="o">&gt;&gt;</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.roads_from-view-source"><span>View Source</span></label>
 
@@ -2277,7 +2277,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">roads_to</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">sink</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">condition</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">RoadNetworkGrid</span><span class="o">.&lt;</span><span class="k">lambda</span><span class="o">&gt;&gt;</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>:</span></span>
+        <span class="name">roads_to</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">sink</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>,</span><span class="param">	<span class="n">condition</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">RoadNetworkGrid</span><span class="o">.&lt;</span><span class="k">lambda</span><span class="o">&gt;&gt;</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.roads_to-view-source"><span>View Source</span></label>
 
@@ -2323,7 +2323,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_destination</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">is_destination</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.is_destination-view-source"><span>View Source</span></label>
 
@@ -2365,7 +2365,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_charging_point</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">is_charging_point</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.is_charging_point-view-source"><span>View Source</span></label>
 
@@ -2407,7 +2407,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">edge_direction</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">source</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>, </span><span class="param"><span class="n">sink</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+        <span class="name">edge_direction</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">source</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">sink</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.edge_direction-view-source"><span>View Source</span></label>
 
@@ -2451,7 +2451,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">shortest_path</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">source</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">target</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>:</span></span>
+        <span class="name">shortest_path</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">source</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">target</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.shortest_path-view-source"><span>View Source</span></label>
 
@@ -2496,7 +2496,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">path_to_nearest</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">source</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">targets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>:</span></span>
+        <span class="name">path_to_nearest</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">source</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">targets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.path_to_nearest-view-source"><span>View Source</span></label>
 
@@ -2542,7 +2542,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">has_road_to</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">source</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>, </span><span class="param"><span class="n">direction</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">has_road_to</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">source</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">direction</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.has_road_to-view-source"><span>View Source</span></label>
 
@@ -2566,7 +2566,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_road</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">node1</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">node2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">is_road</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node1</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>, </span><span class="param"><span class="n">node2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.is_road-view-source"><span>View Source</span></label>
 
@@ -2590,7 +2590,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">place_agent</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">agent</span><span class="p">:</span> <span class="n"><a href="core.html#Agent">core.Agent</a></span>, </span><span class="param"><span class="n">node_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">place_agent</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">agent</span><span class="p">:</span> <span class="n"><a href="core.html#Agent">core.Agent</a></span>, </span><span class="param"><span class="n">node_id</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.place_agent-view-source"><span>View Source</span></label>
 
@@ -2613,7 +2613,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_neighborhood</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">node_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">include_center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>,</span><span class="param">	<span class="n">radius</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>:</span></span>
+        <span class="name">get_neighborhood</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">node_id</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>,</span><span class="param">	<span class="n">include_center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>,</span><span class="param">	<span class="n">radius</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.get_neighborhood-view-source"><span>View Source</span></label>
 
@@ -2644,7 +2644,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_neighbors</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">node_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>,</span><span class="param">	<span class="n">include_center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="core.html#Agent">core.Agent</a></span><span class="p">]</span>:</span></span>
+        <span class="name">get_neighbors</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">node_id</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span>,</span><span class="param">	<span class="n">include_center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="core.html#Agent">core.Agent</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.get_neighbors-view-source"><span>View Source</span></label>
 
@@ -2667,7 +2667,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">move_agent</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">agent</span><span class="p">:</span> <span class="n"><a href="core.html#Agent">core.Agent</a></span>, </span><span class="param"><span class="n">node_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+        <span class="name">move_agent</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">agent</span><span class="p">:</span> <span class="n"><a href="core.html#Agent">core.Agent</a></span>, </span><span class="param"><span class="n">node_id</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.move_agent-view-source"><span>View Source</span></label>
 
@@ -2716,7 +2716,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_cell_empty</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
+        <span class="name">is_cell_empty</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">node_id</span><span class="p">:</span> <span class="n"><a href="#Node">space.Node</a></span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.is_cell_empty-view-source"><span>View Source</span></label>
 
@@ -2738,7 +2738,7 @@ If a condition function is provided, only nodes fulfilling that condition are re
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_cell_list_contents</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">cell_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="core.html#Agent">core.Agent</a></span><span class="p">]</span>:</span></span>
+        <span class="name">get_cell_list_contents</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">cell_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Node">space.Node</a></span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="core.html#Agent">core.Agent</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="RoadNetworkGrid.get_cell_list_contents-view-source"><span>View Source</span></label>
 

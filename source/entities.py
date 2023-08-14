@@ -1,19 +1,19 @@
 """
 Provides concrete agents and other entities.
 """
-from typing import Optional
+from typing import Annotated, Optional
 
 import capabilities
-from configuration import Configuration, configurable, Param
+from configuration import Configuration, configurable
 import core 
 from space import Node
 
 @configurable
 class Vehicle(core.Agent):
     # Define configuration parameters relevant to this class
-    max_load:            Param(int)   = 3     # maximum load of a vehicle
-    max_energy:          Param(int)   = 100   # maximum energy of a vehicle
-    charging_speed:      Param(int)   = 10    # the charging speed of a vehicle
+    max_load:       Annotated[int, "Param", "maximum load of a vehicle"]       = 3 
+    max_energy:     Annotated[int, "Param", "maximum energy of a vehicle"]     = 100 
+    charging_speed: Annotated[int, "Param", "the charging speed of a vehicle"] = 10 
 
     def __init__(self, model: "model.TransportSystem", configuration: Configuration):
         """
@@ -168,7 +168,7 @@ class Cargo(core.Entity):
     A cargo is an entity which can be transported by vehicles.
     It has a weight, a position, a destination, and a carrier.
     """
-    max_cargo_weight: Param(int) = 3  # The maximum weight of a cargo.
+    max_cargo_weight: Annotated[int, "Param", "The maximum weight of a cargo"] = 3
 
     def __init__(self, model: "model.TransportSystem", configuration: Configuration):
         """

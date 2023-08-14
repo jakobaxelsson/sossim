@@ -305,7 +305,7 @@ core    </h1>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">        Args:</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">            unique_id (int): the unique id of the agent.</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">            model (core.Model): the model in which the agent is situated.</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">            model (Model): the model in which the agent is situated.</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
@@ -367,7 +367,7 @@ core    </h1>
 </span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
 </span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>
 </span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">        Args:</span>
-</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a><span class="sd">            agent (core.Agent): the agent who should have this capability.</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a><span class="sd">            agent (Agent): the agent who should have this capability.</span>
 </span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
 </span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>
@@ -1273,7 +1273,7 @@ Default behavior is to just update the views.</p>
 </span><span id="Agent-114"><a href="#Agent-114"><span class="linenos">114</span></a>
 </span><span id="Agent-115"><a href="#Agent-115"><span class="linenos">115</span></a><span class="sd">        Args:</span>
 </span><span id="Agent-116"><a href="#Agent-116"><span class="linenos">116</span></a><span class="sd">            unique_id (int): the unique id of the agent.</span>
-</span><span id="Agent-117"><a href="#Agent-117"><span class="linenos">117</span></a><span class="sd">            model (core.Model): the model in which the agent is situated.</span>
+</span><span id="Agent-117"><a href="#Agent-117"><span class="linenos">117</span></a><span class="sd">            model (Model): the model in which the agent is situated.</span>
 </span><span id="Agent-118"><a href="#Agent-118"><span class="linenos">118</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Agent-119"><a href="#Agent-119"><span class="linenos">119</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </span><span id="Agent-120"><a href="#Agent-120"><span class="linenos">120</span></a>
@@ -1348,7 +1348,7 @@ This means also that they can be placed on the map, and have a unique id, which 
 </span><span id="Agent.__init__-114"><a href="#Agent.__init__-114"><span class="linenos">114</span></a>
 </span><span id="Agent.__init__-115"><a href="#Agent.__init__-115"><span class="linenos">115</span></a><span class="sd">        Args:</span>
 </span><span id="Agent.__init__-116"><a href="#Agent.__init__-116"><span class="linenos">116</span></a><span class="sd">            unique_id (int): the unique id of the agent.</span>
-</span><span id="Agent.__init__-117"><a href="#Agent.__init__-117"><span class="linenos">117</span></a><span class="sd">            model (core.Model): the model in which the agent is situated.</span>
+</span><span id="Agent.__init__-117"><a href="#Agent.__init__-117"><span class="linenos">117</span></a><span class="sd">            model (Model): the model in which the agent is situated.</span>
 </span><span id="Agent.__init__-118"><a href="#Agent.__init__-118"><span class="linenos">118</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Agent.__init__-119"><a href="#Agent.__init__-119"><span class="linenos">119</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </span><span id="Agent.__init__-120"><a href="#Agent.__init__-120"><span class="linenos">120</span></a>
@@ -1363,7 +1363,7 @@ This means also that they can be placed on the map, and have a unique id, which 
 
 <ul>
 <li><strong>unique_id (int):</strong>  the unique id of the agent.</li>
-<li><strong>model (<a href="#Model">core.Model</a>):</strong>  the model in which the agent is situated.</li>
+<li><strong>model (Model):</strong>  the model in which the agent is situated.</li>
 </ul>
 </div>
 
@@ -1565,7 +1565,7 @@ Then, any further actions specified in the superclass are carried out.</p>
 </span><span id="Capability-176"><a href="#Capability-176"><span class="linenos">176</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
 </span><span id="Capability-177"><a href="#Capability-177"><span class="linenos">177</span></a>
 </span><span id="Capability-178"><a href="#Capability-178"><span class="linenos">178</span></a><span class="sd">        Args:</span>
-</span><span id="Capability-179"><a href="#Capability-179"><span class="linenos">179</span></a><span class="sd">            agent (core.Agent): the agent who should have this capability.</span>
+</span><span id="Capability-179"><a href="#Capability-179"><span class="linenos">179</span></a><span class="sd">            agent (Agent): the agent who should have this capability.</span>
 </span><span id="Capability-180"><a href="#Capability-180"><span class="linenos">180</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Capability-181"><a href="#Capability-181"><span class="linenos">181</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
 </span><span id="Capability-182"><a href="#Capability-182"><span class="linenos">182</span></a>
@@ -1625,7 +1625,7 @@ Then, any further actions specified in the superclass are carried out.</p>
 </span><span id="Capability.__init__-176"><a href="#Capability.__init__-176"><span class="linenos">176</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
 </span><span id="Capability.__init__-177"><a href="#Capability.__init__-177"><span class="linenos">177</span></a>
 </span><span id="Capability.__init__-178"><a href="#Capability.__init__-178"><span class="linenos">178</span></a><span class="sd">        Args:</span>
-</span><span id="Capability.__init__-179"><a href="#Capability.__init__-179"><span class="linenos">179</span></a><span class="sd">            agent (core.Agent): the agent who should have this capability.</span>
+</span><span id="Capability.__init__-179"><a href="#Capability.__init__-179"><span class="linenos">179</span></a><span class="sd">            agent (Agent): the agent who should have this capability.</span>
 </span><span id="Capability.__init__-180"><a href="#Capability.__init__-180"><span class="linenos">180</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Capability.__init__-181"><a href="#Capability.__init__-181"><span class="linenos">181</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
 </span></pre></div>
@@ -1637,7 +1637,7 @@ Subclasses can add parameters for how to use a certain capability.</p>
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>agent (<a href="#Agent">core.Agent</a>):</strong>  the agent who should have this capability.</li>
+<li><strong>agent (Agent):</strong>  the agent who should have this capability.</li>
 </ul>
 </div>
 

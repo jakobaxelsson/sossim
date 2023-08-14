@@ -5,11 +5,11 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.
 """
 import itertools
 import math
-from typing import Any, Callable, Iterator, NewType, Optional
+from typing import Annotated, Any, Callable, Iterator, NewType, Optional
 
 import networkx as nx
 
-from configuration import Configuration, configurable, Param
+from configuration import Configuration, configurable
 import core
 
 # Type abbreviations for nodes, edges and directions.
@@ -167,11 +167,11 @@ class RoadNetworkGrid(core.Space):
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
     Some nodes in the road networks can be destinations, where places of interest can be placed.
     """
-    width:                  Param(int)   = 10   #  number of grid cells in x dimension
-    height:                 Param(int)   = 10   #  number of grid cells in y dimension
-    road_density:           Param(float) = 0.3  #  the proportion of the grid to be covered by roads") = 0.3
-    destination_density:    Param(float) = 0.3  #  probability of generating a destination in a position where it is possible
-    charging_point_density: Param(float) = 0.3  #  probability of a destination having a charging point
+    width:                  Annotated[int,   "Param", "number of grid cells in x dimension"]   = 10  
+    height:                 Annotated[int,   "Param", "number of grid cells in y dimension"]   = 10   
+    road_density:           Annotated[float, "Param", "the proportion of the grid to be covered by roads"] = 0.3
+    destination_density:    Annotated[float, "Param", "probability of generating a destination in a position where it is possible"] = 0.3 
+    charging_point_density: Annotated[float, "Param", "probability of a destination having a charging point"] = 0.3
 
     def __init__(self, configuration: Configuration, model: core.Model):
         """
