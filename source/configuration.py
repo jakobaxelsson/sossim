@@ -9,7 +9,7 @@ A typical usage is as follows:
 
     @configurable
     class C:
-        param: Param(int, flag = "-p") = 3   # some help string
+        param: Param(int) = 3   # some help string
 
         def __init__(self, configuration: Configuration):
             configuration.initialize(self)
@@ -21,8 +21,7 @@ A typical usage is as follows:
 
 Here, the @configurable decorater informs that this is a class that can take configuration parameters.
 The Param type declaration adds param as a configuration parameter for the class C, with a default value of 3.
-It is given a command line argument --param by default. 
-In addition, the optional flag -p is added for a shorter command line flag.
+It is given a command line argument --param <value>. 
 The help string in the comment is shown when printing the help information for the command line.
 It can also be used as tooltips in a user interface.
 """
@@ -38,29 +37,23 @@ class Param(Generic[T]):
     Param is a class holding the information provided when declaring a configuration parameter using type hints.
     If this is used in a class which is not decorated as configurable, an error is raised.
     """
-    def __init__(self, type: type[T], flag: str = "", help: str = ""):
+    def __init__(self, type: type[T]):
         try:
             self.type = type
-            self.flag = flag
-            if help:
-                self.help = help
-            else:
-                # Fetch the help message from a comment at the end of the line where the Param was created.
-                # Get the caller's frame
-                frame = inspect.currentframe().f_back # type: ignore
-                # Get the file line number where the call to Param occured
-                code_line = frame.f_lineno # type: ignore
-                # Get the source code of the class and the line in the file where the class definition starts
-                source_code, start_line = inspect.getsourcelines(frame) # type: ignore
-                # Get the relevant source line
-                source_line = source_code[code_line - start_line]
-                # Extract the comment at the end of the line
-                try:
-                    comment = source_line.split("#")[1].strip()
-                except:
-                    comment = ""
-                if comment:
-                    self.help = comment
+            # Fetch the help message from a comment at the end of the line where the Param was created.
+            # Get the caller's frame
+            frame = inspect.currentframe().f_back # type: ignore
+            # Get the file line number where the call to Param occured
+            code_line = frame.f_lineno # type: ignore
+            # Get the source code of the class and the line in the file where the class definition starts
+            source_code, start_line = inspect.getsourcelines(frame) # type: ignore
+            # Get the relevant source line
+            source_line = source_code[code_line - start_line]
+            # Extract the comment at the end of the line
+            try:
+                self.help = source_line.split("#")[1].strip()
+            except:
+                self.help = ""
         except:
             print("Error in Param. Param can only be used in classes decorated as @configurable.")
 
@@ -70,7 +63,7 @@ def configurable(cls: type) -> type:
     """
     for a, t in get_type_hints(cls).items():
         if isinstance(t, Param):
-            Configuration.add_param(class_name = cls.__name__, name = a, default = getattr(cls, a), type = t.type, flag = t.flag, help = t.help) # type: ignore
+            Configuration.add_param(class_name = cls.__name__, name = a, default = getattr(cls, a), type = t.type, help = t.help) # type: ignore
             delattr(cls, a)
     return cls
 
@@ -84,7 +77,7 @@ class Configuration:
 
     # Params are stored in a three level dictionary which is defined on the class.
     # The first level is class names, the second is parameter names, and the third is parameter information.
-    # The parameter information is type, default, flag (for command line arguments), and help string.
+    # The parameter information is type, default, and help string.
     params: dict[str, dict[str, dict[str, Any]]] = dict()
 
     # Create a command line parser for the parameters.
@@ -104,9 +97,9 @@ class Configuration:
                 self.set_param_value(c, p, d["default"])
 
     @classmethod
-    def add_param(cls, class_name: str, name: str, type: Any, default: Any, flag: str, help: str) -> None: 
+    def add_param(cls, class_name: str, name: str, type: Any, default: Any, help: str) -> None: 
         """
-        Adds a parameter to a class, with a type, default value, a command line argument flag, and a help string.
+        Adds a parameter to a class, with a type, default value, and a help string.
         The current value is set to the default value.
         Typically, this method is called in conjunction with the definition of the class to which it applies.
 
@@ -115,7 +108,6 @@ class Configuration:
             name (str): the name of the parameter.
             type (Any): the type of the parameter.
             default (Any): the default value of the parameter.
-            flag (str): a command line argument flag.
             help (str): a help string.
         """
         # Create the subdictionaries
@@ -126,14 +118,10 @@ class Configuration:
         # Add the parameter information
         p["type"] = type
         p["default"] = default
-        p["flag"] = flag
         p["help"] = help
         
         # Update the command line arguments parser.
-        if flag:
-            cls.parser.add_argument(flag, "--" + name, type = type, default = default, help = help)
-        else:
-            cls.parser.add_argument("--" + name, type = type, default = default, help = help)
+        cls.parser.add_argument("--" + name, type = type, default = default, help = help)
 
     def set_param_value(self, cls: str, name: str, value: Any) -> None:
         """

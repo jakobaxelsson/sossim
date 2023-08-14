@@ -14,9 +14,9 @@ from view import viewable
 @viewable
 class TransportSystem(core.Model):
     # Define configuration parameters relevant to this class
-    num_vehicles: Param(int, flag = "-N") = 10   # number of vehicles
+    num_vehicles: Param(int) = 10   # number of vehicles
     num_cargos:   Param(int) = 10                # number of cargos
-    random_seed:  Param(int, flag = "-r") = -1   # seed for random number generator (use -1 to initialize from system time)
+    random_seed:  Param(int) = -1   # seed for random number generator (use -1 to initialize from system time)
 
     def __init__(self, configuration: Configuration):
         """

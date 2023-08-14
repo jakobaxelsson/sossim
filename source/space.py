@@ -167,11 +167,11 @@ class RoadNetworkGrid(core.Space):
     The road network is a networkx graph, where node names are tuples (x, y) referring to grid positions.
     Some nodes in the road networks can be destinations, where places of interest can be placed.
     """
-    width:                  Param(int, flag = "-x") = 10   #  number of grid cells in x dimension
-    height:                 Param(int, flag = "-y") = 10   #  number of grid cells in y dimension
-    road_density:           Param(float)            = 0.3  #  the proportion of the grid to be covered by roads") = 0.3
-    destination_density:    Param(float)            = 0.3  #  probability of generating a destination in a position where it is possible
-    charging_point_density: Param(float)            = 0.3  #  probability of a destination having a charging point
+    width:                  Param(int)   = 10   #  number of grid cells in x dimension
+    height:                 Param(int)   = 10   #  number of grid cells in y dimension
+    road_density:           Param(float) = 0.3  #  the proportion of the grid to be covered by roads") = 0.3
+    destination_density:    Param(float) = 0.3  #  probability of generating a destination in a position where it is possible
+    charging_point_density: Param(float) = 0.3  #  probability of a destination having a charging point
 
     def __init__(self, configuration: Configuration, model: core.Model):
         """

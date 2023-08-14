@@ -128,8 +128,9 @@ class RoadNetworkGridView(View):
                      stroke_width = 0.8, stroke_linecap = "round")
 
             # Visualize destinations and charging points.
-            for (x, y) in space.road_nodes(space.is_destination):
-                if space.is_charging_point((x, y)):
+            for node in space.road_nodes(space.is_destination):
+                (x, y) = node
+                if space.is_charging_point(node):
                     with g(cls = "charging_point", transform = f"translate({x}, {y})"):
                         circle(cx =  0.5, cy = 0.5, r = 0.25)
                         polygon(points = "0.52,0.30 0.35,0.55 0.48,0.55 0.48,0.70 0.65,0.45 0.52,0.45 0.52,0.30")

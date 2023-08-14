@@ -36,8 +36,10 @@ class JSDomElement(Protocol):
     """
     Specifies the interface of Javascript DOM elements, for typechecking.
     """
+    children: list[Self]
     firstChild: Self
     innerHTML: str
+    style: Any
 
     def addEventListener(self, event: str, listener: Callable[[Event], Any]): ...
     def appendChild(self, child: Self): ...

@@ -113,7 +113,7 @@ class Agent(Entity):
 
         Args:
             unique_id (int): the unique id of the agent.
-            model (core.Model): the model in which the agent is situated.
+            model (Model): the model in which the agent is situated.
         """
         super().__init__(model)
 
@@ -175,7 +175,7 @@ class Capability:
         Subclasses can add parameters for how to use a certain capability.
 
         Args:
-            agent (core.Agent): the agent who should have this capability.
+            agent (Agent): the agent who should have this capability.
         """
         self.agent = agent
 

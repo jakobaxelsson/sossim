@@ -24,9 +24,16 @@ def batch_mode(configuration: Configuration) -> None:
     """
     # Parse command line arguments.
     import argparse
+
     # Add a few extra arguments to the configuration parser.
     configuration.parser.add_argument("-t", "--iterations", type = int, default = 3, help = "number of iterations of the simulation")
     configuration.parser.add_argument("-i", "--interactive", default = False, action = argparse.BooleanOptionalAction, help = "start server for running in interactive mode")
+
+    # Add shorthands for some configuration parameters.
+    configuration.parser.add_argument("-N", dest = "num_vehicles", type = int)
+    configuration.parser.add_argument("-r", dest = "random_seed", type = int)
+    configuration.parser.add_argument("-x", dest = "width", type = int)
+    configuration.parser.add_argument("-y", dest = "height", type = int)
     args = configuration.parse_args()
 
     if args.interactive:
