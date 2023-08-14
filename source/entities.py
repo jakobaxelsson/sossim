@@ -1,12 +1,15 @@
 """
 Provides concrete agents and other entities.
 """
-from typing import Annotated, Optional
+from typing import Annotated, Optional, TYPE_CHECKING
 
 import capabilities
 from configuration import Configuration, configurable
 import core 
 from space import Node
+
+if TYPE_CHECKING:
+    import model
 
 @configurable
 class Vehicle(core.Agent):

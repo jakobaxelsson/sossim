@@ -4,10 +4,9 @@ Provides abstract classes representing the core concepts of systems-of-systems.
 from typing import Self
 
 import mesa
-from view import viewable
+from view import Viewable
 
-@viewable
-class Model(mesa.Model):
+class Model(mesa.Model, Viewable):
     """
     A comman base class for SoS models.
     """
@@ -24,7 +23,8 @@ class Model(mesa.Model):
         Returns:
             list[Agent]: the agents
         """
-        return self.schedule.agents
+        # We only create core.Agent, and not other mesa.Agent, so safe to ignore type error
+        return self.schedule.agents # type: ignore
     
     def time(self) -> float:
         """
@@ -33,30 +33,30 @@ class Model(mesa.Model):
         Returns:
             Float: the time.
         """
-        return self.schedule.time
+        # Since we know there must be a scheduler, it is safe to ignore type warning.
+        return self.schedule.time # type: ignore
 
-@viewable
-class Space:
+class Space(Viewable):
     """
     A comman base class for SoS spaces.
     """
 
-@viewable
-class Entity(mesa.Agent): 
+class Entity(mesa.Agent, Viewable): 
     """
     A common abstract baseclass for entities within a SoS.
     All entities are treated as agents, but not all of them have behavior.
     This means also that they can be placed on the map, and have a unique id, which is automatically generated.
     """
-    id_counter = 0 # Counter for generating unique id.
-
     def __init__(self, model: Model):
-        # Generate unique id based on counter.
-        super().__init__(Entity.id_counter, model)
-        Entity.id_counter += 1
+        # Create agent, with a unique id.
+        super().__init__(model.next_id(), model)
 
         # Add agent to the scheduler
-        model.schedule.add(self)
+        # Since we know there must be a scheduler, it is safe to ignore type warning
+        model.schedule.add(self) # type: ignore
+
+        # Add type information, for type checking
+        self.pos: tuple[int, int]
 
     def __repr__(self) -> str:
         """

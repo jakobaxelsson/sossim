@@ -15,9 +15,9 @@ class View(Protocol):
             viewable (Any): the viewable on which the update should be based.
         """
 
-def viewable(cls):
+class Viewable:
     """
-    A mixin decorator for objects to which a view can be attached. 
+    A mixin class for objects to which a view can be attached. 
     It adds the methods for handling views attached to the viewable, unless such a method already exists.
     """
     def add_view(self, view: View):
@@ -57,9 +57,3 @@ def viewable(cls):
         Removes all views.
         """
         self._views = []
-
-    setattr(cls, "add_view", add_view)
-    setattr(cls, "get_views", get_views)
-    setattr(cls, "update_views", update_views)
-    setattr(cls, "clear_views", clear_views)
-    return cls

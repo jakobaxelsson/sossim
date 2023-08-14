@@ -529,7 +529,7 @@ class RoadNetworkGrid(core.Space):
         """Remove the agent from the network and set its pos attribute to None."""
         node_id = agent.pos
         self.road_network.nodes[node_id]["agent"].remove(agent)
-        agent.pos = None
+        agent.pos = Node((-1, -1))
 
     def is_cell_empty(self, node_id: Node) -> bool:
         """Returns a bool of the contents of a cell."""

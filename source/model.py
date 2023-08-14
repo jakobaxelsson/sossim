@@ -9,10 +9,8 @@ from entities import Cargo, Vehicle
 from configuration import Configuration, configurable
 import core
 import space
-from view import viewable
 
 @configurable
-@viewable
 class TransportSystem(core.Model):
     # Define configuration parameters relevant to this class
     num_vehicles: Annotated[int, "Param", "number of vehicles"] = 10 
