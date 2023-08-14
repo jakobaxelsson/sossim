@@ -5,7 +5,7 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.
 """
 import itertools
 import math
-from typing import Any, Callable, Iterator, NewType, Optional, Tuple
+from typing import Any, Callable, Iterator, NewType, Optional
 
 import networkx as nx
 
@@ -13,8 +13,8 @@ from configuration import Configuration, configurable, Param
 import core
 
 # Type abbreviations for nodes, edges and directions.
-Node = Tuple[int, int]
-Edge = NewType("Edge", Tuple[Node, Node])
+Node = NewType("Node", tuple[int, int])
+Edge = NewType("Edge", tuple[Node, Node])
 Direction = int
 
 class RoadGridGraph(nx.DiGraph):
@@ -158,7 +158,7 @@ def subnode(node: Node, i: int, j: int) -> Node:
     """
     Returns the detailed network subnode (i, j) of a coarse network node.
     """
-    return (node[0] * 4 + i, node[1] * 4 + j)
+    return Node((node[0] * 4 + i, node[1] * 4 + j))
 
 @configurable
 class RoadNetworkGrid(core.Space):

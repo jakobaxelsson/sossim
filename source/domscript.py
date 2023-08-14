@@ -36,8 +36,8 @@ class JSDomElement(Protocol):
     """
     Specifies the interface of Javascript DOM elements, for typechecking.
     """
-    firstChild: Self = ...
-    innerHTML: str = ...
+    firstChild: Self
+    innerHTML: str
 
     def addEventListener(self, event: str, listener: Callable[[Event], Any]): ...
     def appendChild(self, child: Self): ...
@@ -60,7 +60,7 @@ if sys.platform == "emscripten":
 else:
     # Specifies the interface of the Pyodide entities js and create_proxy, for typechecking.
     class js(Protocol):
-        document: JSDocument = ...
+        document: JSDocument
 
     def create_proxy(f: Any) -> Any: ...
 
@@ -234,32 +234,212 @@ def create_tag(tag_name: str, namespace: Optional[str] = None) -> Callable[..., 
         return DomWrapper(tag_name, content, namespace, **attrs)
     return f
 
-# Concrete HTML and SVG tag names
-html_tags = "a abbr acronym address applet area article aside audio b base basefont bdi bdo big blockquote body " \
-    "br button canvas caption center cite code col colgroup data datalist dd del details dfn dialog dir div dl " \
-    "dt em embed fieldset figcaption figure font footer form frame frameset h1 h2 h3 h4 h5 h6 head header hr " \
-    "html i iframe img ins kbd label legend li link main map mark meta meter nav noframes noscript object " \
-    "ol optgroup option output p param picture pre progress q rp rt ruby s samp script section select small " \
-    "source span strike strong style sub summary sup svg table tbody td template textarea tfoot th thead time " \
-    "title tr track tt u ul var video wbr"
+# Concrete HTML tags
+# Tag names that are reserved words in Python have an underscore appended.
+# I.e., del becomes del_, input becomes input_, and set becomes set_.
 
-svg_tags = "altGlyph altGlyphDef altGlyphItem animate animateColor animateMotion animateTransform circle " \
-    "clipPath color-profile cursor defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite " \
-    "feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feFlood feFuncA feFuncB feFuncG " \
-    "feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting " \
-    "feSpotLight feTile feTurbulence filter font font-face font-face-format font-face-name font-face-src " \
-    "font-face-uri foreignObject g glyph glyphRef hkern image line linearGradient marker mask metadata " \
-    "missing-glyph mpath path pattern polygon polyline radialGradient rect solidColor stop style svg " \
-    "switch symbol text textPath title tref tspan use view vkern"
-
-# Create the HTML tag and bind them in the global namespace.
-for t in html_tags.split(" "):
-    globals()[t] = create_tag(t)
-
-# Create the SVG tag and bind them in the global namespace.
-for t in svg_tags.split(" "):
-    globals()[t] = create_tag(t, "http://www.w3.org/2000/svg")
-
-# Special treatment for some tags whose name collide with Python symbols
+a = create_tag("a")
+abbr = create_tag("abbr")
+acronym = create_tag("acronym")
+address = create_tag("address")
+applet = create_tag("applet")
+area = create_tag("area")
+article = create_tag("article")
+aside = create_tag("aside")
+audio = create_tag("audio")
+b = create_tag("b")
+base = create_tag("base")
+basefont = create_tag("basefont")
+bdi = create_tag("bdi")
+bdo = create_tag("bdo")
+big = create_tag("big")
+blockquote = create_tag("blockquote")
+body = create_tag("body")
+br = create_tag("br")
+button = create_tag("button")
+canvas = create_tag("canvas")
+caption = create_tag("caption")
+center = create_tag("center")
+cite = create_tag("cite")
+code = create_tag("code")
+col = create_tag("col")
+colgroup = create_tag("colgroup")
+data = create_tag("data")
+datalist = create_tag("datalist")
+dd = create_tag("dd")
+del_ = create_tag("del")
+details = create_tag("details")
+dfn = create_tag("dfn")
+dialog = create_tag("dialog")
+dir = create_tag("dir")
+div = create_tag("div")
+dl = create_tag("dl")
+dt = create_tag("dt")
+em = create_tag("em")
+embed = create_tag("embed")
+fieldset = create_tag("fieldset")
+figcaption = create_tag("figcaption")
+figure = create_tag("figure")
+font = create_tag("font")
+footer = create_tag("footer")
+form = create_tag("form")
+frame = create_tag("frame")
+frameset = create_tag("frameset")
+h1 = create_tag("h1")
+h2 = create_tag("h2")
+h3 = create_tag("h3")
+h4 = create_tag("h4")
+h5 = create_tag("h5")
+h6 = create_tag("h6")
+head = create_tag("head")
+header = create_tag("header")
+hr = create_tag("hr")
+html = create_tag("html")
+i = create_tag("i")
+iframe = create_tag("iframe")
+img = create_tag("img")
 input_ = create_tag("input")
+ins = create_tag("ins")
+kbd = create_tag("kbd")
+label = create_tag("label")
+legend = create_tag("legend")
+li = create_tag("li")
+link = create_tag("link")
+main = create_tag("main")
+map = create_tag("map")
+mark = create_tag("mark")
+meta = create_tag("meta")
+meter = create_tag("meter")
+nav = create_tag("nav")
+noframes = create_tag("noframes")
+noscript = create_tag("noscript")
+object = create_tag("object")
+ol = create_tag("ol")
+optgroup = create_tag("optgroup")
+option = create_tag("option")
+output = create_tag("output")
+p = create_tag("p")
+param = create_tag("param")
+picture = create_tag("picture")
+pre = create_tag("pre")
+progress = create_tag("progress")
+q = create_tag("q")
+rp = create_tag("rp")
+rt = create_tag("rt")
+ruby = create_tag("ruby")
+s = create_tag("s")
+samp = create_tag("samp")
+script = create_tag("script")
+section = create_tag("section")
+select = create_tag("select")
 set_ = create_tag("set")
+small = create_tag("small")
+source = create_tag("source")
+span = create_tag("span")
+strike = create_tag("strike")
+strong = create_tag("strong")
+style = create_tag("style")
+sub = create_tag("sub")
+summary = create_tag("summary")
+sup = create_tag("sup")
+svg = create_tag("svg")
+table = create_tag("table")
+tbody = create_tag("tbody")
+td = create_tag("td")
+template = create_tag("template")
+textarea = create_tag("textarea")
+tfoot = create_tag("tfoot")
+th = create_tag("th")
+thead = create_tag("thead")
+time = create_tag("time")
+title = create_tag("title")
+tr = create_tag("tr")
+track = create_tag("track")
+tt = create_tag("tt")
+u = create_tag("u")
+ul = create_tag("ul")
+var = create_tag("var")
+video = create_tag("video")
+wbr = create_tag("wbr")
+
+# Concrete SVG tags
+# Hyphens in the tag names are replaced by underscore in the Python variable name.
+
+altGlyph = create_tag("altGlyph", "http://www.w3.org/2000/svg")
+altGlyphDef = create_tag("altGlyphDef", "http://www.w3.org/2000/svg")
+altGlyphItem = create_tag("altGlyphItem", "http://www.w3.org/2000/svg")
+animate = create_tag("animate", "http://www.w3.org/2000/svg")
+animateColor = create_tag("animateColor", "http://www.w3.org/2000/svg")
+animateMotion = create_tag("animateMotion", "http://www.w3.org/2000/svg")
+animateTransform = create_tag("animateTransform", "http://www.w3.org/2000/svg")
+circle = create_tag("circle", "http://www.w3.org/2000/svg")
+clipPath = create_tag("clipPath", "http://www.w3.org/2000/svg")
+color_profile = create_tag("color-profile", "http://www.w3.org/2000/svg")
+cursor = create_tag("cursor", "http://www.w3.org/2000/svg")
+defs = create_tag("defs", "http://www.w3.org/2000/svg")
+desc = create_tag("desc", "http://www.w3.org/2000/svg")
+ellipse = create_tag("ellipse", "http://www.w3.org/2000/svg")
+feBlend = create_tag("feBlend", "http://www.w3.org/2000/svg")
+feColorMatrix = create_tag("feColorMatrix", "http://www.w3.org/2000/svg")
+feComponentTransfer = create_tag("feComponentTransfer", "http://www.w3.org/2000/svg")
+feComposite = create_tag("feComposite", "http://www.w3.org/2000/svg")
+feConvolveMatrix = create_tag("feConvolveMatrix", "http://www.w3.org/2000/svg")
+feDiffuseLighting = create_tag("feDiffuseLighting", "http://www.w3.org/2000/svg")
+feDisplacementMap = create_tag("feDisplacementMap", "http://www.w3.org/2000/svg")
+feDistantLight = create_tag("feDistantLight", "http://www.w3.org/2000/svg")
+feFlood = create_tag("feFlood", "http://www.w3.org/2000/svg")
+feFuncA = create_tag("feFuncA", "http://www.w3.org/2000/svg")
+feFuncB = create_tag("feFuncB", "http://www.w3.org/2000/svg")
+feFuncG = create_tag("feFuncG", "http://www.w3.org/2000/svg")
+feFuncR = create_tag("feFuncR", "http://www.w3.org/2000/svg")
+feGaussianBlur = create_tag("feGaussianBlur", "http://www.w3.org/2000/svg")
+feImage = create_tag("feImage", "http://www.w3.org/2000/svg")
+feMerge = create_tag("feMerge", "http://www.w3.org/2000/svg")
+feMergeNode = create_tag("feMergeNode", "http://www.w3.org/2000/svg")
+feMorphology = create_tag("feMorphology", "http://www.w3.org/2000/svg")
+feOffset = create_tag("feOffset", "http://www.w3.org/2000/svg")
+fePointLight = create_tag("fePointLight", "http://www.w3.org/2000/svg")
+feSpecularLighting = create_tag("feSpecularLighting", "http://www.w3.org/2000/svg")
+feSpotLight = create_tag("feSpotLight", "http://www.w3.org/2000/svg")
+feTile = create_tag("feTile", "http://www.w3.org/2000/svg")
+feTurbulence = create_tag("feTurbulence", "http://www.w3.org/2000/svg")
+filter = create_tag("filter", "http://www.w3.org/2000/svg")
+font = create_tag("font", "http://www.w3.org/2000/svg")
+font_face = create_tag("font-face", "http://www.w3.org/2000/svg")
+font_face_format = create_tag("font-face-format", "http://www.w3.org/2000/svg")
+font_face_name = create_tag("font-face-name", "http://www.w3.org/2000/svg")
+font_face_src = create_tag("font-face-src", "http://www.w3.org/2000/svg")
+font_face_uri = create_tag("font-face-uri", "http://www.w3.org/2000/svg")
+foreignObject = create_tag("foreignObject", "http://www.w3.org/2000/svg")
+g = create_tag("g", "http://www.w3.org/2000/svg")
+glyph = create_tag("glyph", "http://www.w3.org/2000/svg")
+glyphRef = create_tag("glyphRef", "http://www.w3.org/2000/svg")
+hkern = create_tag("hkern", "http://www.w3.org/2000/svg")
+image = create_tag("image", "http://www.w3.org/2000/svg")
+line = create_tag("line", "http://www.w3.org/2000/svg")
+linearGradient = create_tag("linearGradient", "http://www.w3.org/2000/svg")
+marker = create_tag("marker", "http://www.w3.org/2000/svg")
+mask = create_tag("mask", "http://www.w3.org/2000/svg")
+metadata = create_tag("metadata", "http://www.w3.org/2000/svg")
+missing_glyph = create_tag("missing-glyph", "http://www.w3.org/2000/svg")
+mpath = create_tag("mpath", "http://www.w3.org/2000/svg")
+path = create_tag("path", "http://www.w3.org/2000/svg")
+pattern = create_tag("pattern", "http://www.w3.org/2000/svg")
+polygon = create_tag("polygon", "http://www.w3.org/2000/svg")
+polyline = create_tag("polyline", "http://www.w3.org/2000/svg")
+radialGradient = create_tag("radialGradient", "http://www.w3.org/2000/svg")
+rect = create_tag("rect", "http://www.w3.org/2000/svg")
+solidColor = create_tag("solidColor", "http://www.w3.org/2000/svg")
+stop = create_tag("stop", "http://www.w3.org/2000/svg")
+style = create_tag("style", "http://www.w3.org/2000/svg")
+svg = create_tag("svg", "http://www.w3.org/2000/svg")
+switch = create_tag("switch", "http://www.w3.org/2000/svg")
+symbol = create_tag("symbol", "http://www.w3.org/2000/svg")
+text = create_tag("text", "http://www.w3.org/2000/svg")
+textPath = create_tag("textPath", "http://www.w3.org/2000/svg")
+title = create_tag("title", "http://www.w3.org/2000/svg")
+tref = create_tag("tref", "http://www.w3.org/2000/svg")
+tspan = create_tag("tspan", "http://www.w3.org/2000/svg")
+use = create_tag("use", "http://www.w3.org/2000/svg")
+view = create_tag("view", "http://www.w3.org/2000/svg")
+vkern = create_tag("vkern", "http://www.w3.org/2000/svg")
