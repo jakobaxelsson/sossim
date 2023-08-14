@@ -185,8 +185,8 @@ class RoadNetworkGrid(core.Space):
         super().__init__()
         configuration.initialize(self)
         self.model = model
-        self.coarse_network = None
-        self.road_network = None
+        self.coarse_network = RoadGridGraph(self.width, self.height)
+        self.road_network = RoadGridGraph(self.width * 4, self.height * 4)
 
         # Generate roads and destinations
         self.generate_roads()
@@ -383,9 +383,9 @@ class RoadNetworkGrid(core.Space):
         Returns:
             list[Node]: the nodes connected by roads.
         """
-        return [(n1, n2) for (n1, n2) in self.road_network.edges if self.is_road(n1, n2)]
+        return [Edge((n1, n2)) for (n1, n2) in self.road_network.edges if self.is_road(n1, n2)]
 
-    def roads_from(self, source: Node, condition: Optional[Callable[[Node], bool]] = lambda _ : True) -> list[Node]:
+    def roads_from(self, source: Node, condition: Callable[[Node], bool] = lambda _ : True) -> list[Node]:
         """
         Returns a list of all nodes that can be reached by road from a given source node.
         If a condition function is provided, only nodes fulfilling that condition are returned.
@@ -399,7 +399,7 @@ class RoadNetworkGrid(core.Space):
         """
         return [sink for _, sink, has_road in self.road_network.out_edges(source, data = "road") if has_road and condition(sink)]
 
-    def roads_to(self, sink: Node, condition: Optional[Callable[[Node], bool]] = lambda _ : True) -> list[Node]:
+    def roads_to(self, sink: Node, condition: Callable[[Node], bool] = lambda _ : True) -> list[Node]:
         """
         Returns a list of all nodes that can reach the given sink node by road.
         If a condition function is provided, only nodes fulfilling that condition are returned.
@@ -485,7 +485,7 @@ class RoadNetworkGrid(core.Space):
         """
         Calls the method with the same name on self.road_network.
         """
-        return self.road_network.has_road(source, direction)
+        return self.road_network.has_road_to(source, direction)
 
     def is_road(self, node1: Node, node2: Optional[Node] = None) -> bool:
         """
@@ -543,9 +543,9 @@ class RoadNetworkGrid(core.Space):
 
     def get_all_cell_contents(self) -> list[core.Agent]:
         """Returns a list of all the agents in the network."""
-        return self.get_cell_list_contents(self.road_network)
+        return self.get_cell_list_contents(self.road_network.nodes)
 
-    def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[core.Agent]:
+    def iter_cell_list_contents(self, cell_list: list[Node]) -> Iterator[core.Agent]:
         """Returns an iterator of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """
