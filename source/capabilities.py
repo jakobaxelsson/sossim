@@ -1,14 +1,14 @@
 """
 Classes that define capabilities of agents.
 """
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
 import core
 from space import Node
 
 class Move(core.Capability):
     
-    def __init__(self, agent: core.Agent, route: List[Node]):
+    def __init__(self, agent: core.Agent, route: list[Node]):
         """
         Defines the capability of an agent to move to a new position along a route of nodes.
         The capability can be given to an agent which has a pos attribute and has a model with a space containing a road network.

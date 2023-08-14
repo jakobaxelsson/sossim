@@ -1,7 +1,7 @@
 """
 Provides concrete agents and other entities.
 """
-from typing import List, Optional
+from typing import Optional
 
 import capabilities
 from configuration import Configuration, configurable, Param
@@ -28,7 +28,7 @@ class Vehicle(core.Agent):
 
         # Add a load capacity of the vehicle and a list of cargos
         self.capacity = self.model.random.choice(range(self.max_load)) + 1
-        self.cargos: List["Cargo"] = []
+        self.cargos: list["Cargo"] = []
 
         # Add an energy level and initialize it to a random value
         self.energy_level = self.model.random.choice(range(round(0.2 * self.max_energy), self.max_energy + 1))
@@ -54,12 +54,12 @@ class Vehicle(core.Agent):
         """
         return not isinstance(other, Vehicle)
 
-    def available_cargo(self, node: Node) -> List["Cargo"]:
+    def available_cargo(self, node: Node) -> list["Cargo"]:
         """
         Returns the list of available cargos in a destination node that the vehicle can carry.
         
         Returns:
-            List[Cargo]: the list of cargo.
+            list[Cargo]: the list of cargo.
         """
         space = self.model.space
         if space.is_destination(node):

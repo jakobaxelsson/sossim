@@ -29,7 +29,7 @@ It can also be used as tooltips in a user interface.
 import argparse
 import inspect
 import json
-from typing import get_type_hints, Any, Dict, Generic, Type, TypeVar
+from typing import get_type_hints, Any, Generic, TypeVar
 
 T = TypeVar("T")
 
@@ -38,7 +38,7 @@ class Param(Generic[T]):
     Param is a class holding the information provided when declaring a configuration parameter using type hints.
     If this is used in a class which is not decorated as configurable, an error is raised.
     """
-    def __init__(self, type: Type[T], flag: str = "", help: str = ""):
+    def __init__(self, type: type[T], flag: str = "", help: str = ""):
         try:
             self.type = type
             self.flag = flag
@@ -85,7 +85,7 @@ class Configuration:
     # Params are stored in a three level dictionary which is defined on the class.
     # The first level is class names, the second is parameter names, and the third is parameter information.
     # The parameter information is type, default, flag (for command line arguments), and help string.
-    params: Dict[str, Dict[str, Dict[str, Any]]] = dict()
+    params: dict[str, dict[str, dict[str, Any]]] = dict()
 
     # Create a command line parser for the parameters.
     parser = argparse.ArgumentParser()
@@ -183,7 +183,7 @@ class Configuration:
         Returns:
             str: a JSON representation of the configuration.
         """
-        output: Dict[str, Dict[str, Any]] = dict()
+        output: dict[str, dict[str, Any]] = dict()
         # Convert type objects to str, to be able to serialize.
         for cls, param in self.data.items():
             output[cls] = dict()

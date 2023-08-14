@@ -193,7 +193,7 @@ core    </h1>
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd">Provides abstract classes representing the core concepts of systems-of-systems.</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Self</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Self</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">import</span> <span class="nn">mesa</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span> <span class="nn">view</span> <span class="kn">import</span> <span class="n">viewable</span>
@@ -209,12 +209,12 @@ core    </h1>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>        <span class="c1"># Create time and space, using a staged activation scheduler based on the OODA loop</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span> <span class="o">=</span> <span class="n">mesa</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">StagedActivation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;observe&quot;</span><span class="p">,</span> <span class="s2">&quot;orient&quot;</span><span class="p">,</span> <span class="s2">&quot;decide&quot;</span><span class="p">,</span> <span class="s2">&quot;act&quot;</span><span class="p">])</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="k">def</span> <span class="nf">agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Agent&quot;</span><span class="p">]:</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="k">def</span> <span class="nf">agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;Agent&quot;</span><span class="p">]:</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="sd">        Returns the agents in the model.</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">        Returns:</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="sd">            List[Agent]: the agents</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="sd">            list[Agent]: the agents</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>    
@@ -310,7 +310,7 @@ core    </h1>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
 </span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
 </span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="k">def</span> <span class="nf">update_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -431,12 +431,12 @@ core    </h1>
 </span><span id="Model-18"><a href="#Model-18"><span class="linenos">18</span></a>        <span class="c1"># Create time and space, using a staged activation scheduler based on the OODA loop</span>
 </span><span id="Model-19"><a href="#Model-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span> <span class="o">=</span> <span class="n">mesa</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">StagedActivation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;observe&quot;</span><span class="p">,</span> <span class="s2">&quot;orient&quot;</span><span class="p">,</span> <span class="s2">&quot;decide&quot;</span><span class="p">,</span> <span class="s2">&quot;act&quot;</span><span class="p">])</span>
 </span><span id="Model-20"><a href="#Model-20"><span class="linenos">20</span></a>
-</span><span id="Model-21"><a href="#Model-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="nf">agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Agent&quot;</span><span class="p">]:</span>
+</span><span id="Model-21"><a href="#Model-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="nf">agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;Agent&quot;</span><span class="p">]:</span>
 </span><span id="Model-22"><a href="#Model-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Model-23"><a href="#Model-23"><span class="linenos">23</span></a><span class="sd">        Returns the agents in the model.</span>
 </span><span id="Model-24"><a href="#Model-24"><span class="linenos">24</span></a>
 </span><span id="Model-25"><a href="#Model-25"><span class="linenos">25</span></a><span class="sd">        Returns:</span>
-</span><span id="Model-26"><a href="#Model-26"><span class="linenos">26</span></a><span class="sd">            List[Agent]: the agents</span>
+</span><span id="Model-26"><a href="#Model-26"><span class="linenos">26</span></a><span class="sd">            list[Agent]: the agents</span>
 </span><span id="Model-27"><a href="#Model-27"><span class="linenos">27</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Model-28"><a href="#Model-28"><span class="linenos">28</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span>
 </span><span id="Model-29"><a href="#Model-29"><span class="linenos">29</span></a>    
@@ -495,18 +495,18 @@ core    </h1>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">agents</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n"><a href="#Agent">core.Agent</a></span><span class="p">]</span>:</span></span>
+        <span class="name">agents</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="#Agent">core.Agent</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="Model.agents-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#Model.agents"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Model.agents-21"><a href="#Model.agents-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="nf">agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Agent&quot;</span><span class="p">]:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Model.agents-21"><a href="#Model.agents-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="nf">agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;Agent&quot;</span><span class="p">]:</span>
 </span><span id="Model.agents-22"><a href="#Model.agents-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Model.agents-23"><a href="#Model.agents-23"><span class="linenos">23</span></a><span class="sd">        Returns the agents in the model.</span>
 </span><span id="Model.agents-24"><a href="#Model.agents-24"><span class="linenos">24</span></a>
 </span><span id="Model.agents-25"><a href="#Model.agents-25"><span class="linenos">25</span></a><span class="sd">        Returns:</span>
-</span><span id="Model.agents-26"><a href="#Model.agents-26"><span class="linenos">26</span></a><span class="sd">            List[Agent]: the agents</span>
+</span><span id="Model.agents-26"><a href="#Model.agents-26"><span class="linenos">26</span></a><span class="sd">            list[Agent]: the agents</span>
 </span><span id="Model.agents-27"><a href="#Model.agents-27"><span class="linenos">27</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Model.agents-28"><a href="#Model.agents-28"><span class="linenos">28</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span>
 </span></pre></div>
@@ -517,7 +517,7 @@ core    </h1>
 <h6 id="returns">Returns:</h6>
 
 <blockquote>
-  <p>List[Agent]: the agents</p>
+  <p>list[Agent]: the agents</p>
 </blockquote>
 </div>
 
@@ -597,18 +597,18 @@ core    </h1>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n"><a href="view.html#View">view.View</a></span><span class="p">]</span>:</span></span>
+        <span class="name">get_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="view.html#View">view.View</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="Model.get_views-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#Model.get_views"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Model.get_views-36"><a href="#Model.get_views-36"><span class="linenos">36</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Model.get_views-36"><a href="#Model.get_views-36"><span class="linenos">36</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
 </span><span id="Model.get_views-37"><a href="#Model.get_views-37"><span class="linenos">37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Model.get_views-38"><a href="#Model.get_views-38"><span class="linenos">38</span></a><span class="sd">        Returns the list of views attached to the viewable object.</span>
 </span><span id="Model.get_views-39"><a href="#Model.get_views-39"><span class="linenos">39</span></a>
 </span><span id="Model.get_views-40"><a href="#Model.get_views-40"><span class="linenos">40</span></a><span class="sd">        Returns:</span>
-</span><span id="Model.get_views-41"><a href="#Model.get_views-41"><span class="linenos">41</span></a><span class="sd">            List[View]: the views.</span>
+</span><span id="Model.get_views-41"><a href="#Model.get_views-41"><span class="linenos">41</span></a><span class="sd">            list[View]: the views.</span>
 </span><span id="Model.get_views-42"><a href="#Model.get_views-42"><span class="linenos">42</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Model.get_views-43"><a href="#Model.get_views-43"><span class="linenos">43</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
 </span><span id="Model.get_views-44"><a href="#Model.get_views-44"><span class="linenos">44</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
@@ -621,7 +621,7 @@ core    </h1>
 <h6 id="returns">Returns:</h6>
 
 <blockquote>
-  <p>List[View]: the views.</p>
+  <p>list[View]: the views.</p>
 </blockquote>
 </div>
 
@@ -759,18 +759,18 @@ core    </h1>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n"><a href="view.html#View">view.View</a></span><span class="p">]</span>:</span></span>
+        <span class="name">get_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="view.html#View">view.View</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="Space.get_views-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#Space.get_views"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Space.get_views-36"><a href="#Space.get_views-36"><span class="linenos">36</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Space.get_views-36"><a href="#Space.get_views-36"><span class="linenos">36</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
 </span><span id="Space.get_views-37"><a href="#Space.get_views-37"><span class="linenos">37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Space.get_views-38"><a href="#Space.get_views-38"><span class="linenos">38</span></a><span class="sd">        Returns the list of views attached to the viewable object.</span>
 </span><span id="Space.get_views-39"><a href="#Space.get_views-39"><span class="linenos">39</span></a>
 </span><span id="Space.get_views-40"><a href="#Space.get_views-40"><span class="linenos">40</span></a><span class="sd">        Returns:</span>
-</span><span id="Space.get_views-41"><a href="#Space.get_views-41"><span class="linenos">41</span></a><span class="sd">            List[View]: the views.</span>
+</span><span id="Space.get_views-41"><a href="#Space.get_views-41"><span class="linenos">41</span></a><span class="sd">            list[View]: the views.</span>
 </span><span id="Space.get_views-42"><a href="#Space.get_views-42"><span class="linenos">42</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Space.get_views-43"><a href="#Space.get_views-43"><span class="linenos">43</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
 </span><span id="Space.get_views-44"><a href="#Space.get_views-44"><span class="linenos">44</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
@@ -783,7 +783,7 @@ core    </h1>
 <h6 id="returns">Returns:</h6>
 
 <blockquote>
-  <p>List[View]: the views.</p>
+  <p>list[View]: the views.</p>
 </blockquote>
 </div>
 
@@ -1158,18 +1158,18 @@ Default behavior is to just update the views.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n"><a href="view.html#View">view.View</a></span><span class="p">]</span>:</span></span>
+        <span class="name">get_views</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n"><a href="view.html#View">view.View</a></span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="Entity.get_views-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#Entity.get_views"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Entity.get_views-36"><a href="#Entity.get_views-36"><span class="linenos">36</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Entity.get_views-36"><a href="#Entity.get_views-36"><span class="linenos">36</span></a>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">View</span><span class="p">]:</span>
 </span><span id="Entity.get_views-37"><a href="#Entity.get_views-37"><span class="linenos">37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Entity.get_views-38"><a href="#Entity.get_views-38"><span class="linenos">38</span></a><span class="sd">        Returns the list of views attached to the viewable object.</span>
 </span><span id="Entity.get_views-39"><a href="#Entity.get_views-39"><span class="linenos">39</span></a>
 </span><span id="Entity.get_views-40"><a href="#Entity.get_views-40"><span class="linenos">40</span></a><span class="sd">        Returns:</span>
-</span><span id="Entity.get_views-41"><a href="#Entity.get_views-41"><span class="linenos">41</span></a><span class="sd">            List[View]: the views.</span>
+</span><span id="Entity.get_views-41"><a href="#Entity.get_views-41"><span class="linenos">41</span></a><span class="sd">            list[View]: the views.</span>
 </span><span id="Entity.get_views-42"><a href="#Entity.get_views-42"><span class="linenos">42</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Entity.get_views-43"><a href="#Entity.get_views-43"><span class="linenos">43</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_views&quot;</span><span class="p">):</span>
 </span><span id="Entity.get_views-44"><a href="#Entity.get_views-44"><span class="linenos">44</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1182,7 +1182,7 @@ Default behavior is to just update the views.</p>
 <h6 id="returns">Returns:</h6>
 
 <blockquote>
-  <p>List[View]: the views.</p>
+  <p>list[View]: the views.</p>
 </blockquote>
 </div>
 
@@ -1278,7 +1278,7 @@ Default behavior is to just update the views.</p>
 </span><span id="Agent-119"><a href="#Agent-119"><span class="linenos">119</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </span><span id="Agent-120"><a href="#Agent-120"><span class="linenos">120</span></a>
 </span><span id="Agent-121"><a href="#Agent-121"><span class="linenos">121</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
-</span><span id="Agent-122"><a href="#Agent-122"><span class="linenos">122</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="Agent-122"><a href="#Agent-122"><span class="linenos">122</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="Agent-123"><a href="#Agent-123"><span class="linenos">123</span></a>
 </span><span id="Agent-124"><a href="#Agent-124"><span class="linenos">124</span></a>    <span class="k">def</span> <span class="nf">update_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Agent-125"><a href="#Agent-125"><span class="linenos">125</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1353,7 +1353,7 @@ This means also that they can be placed on the map, and have a unique id, which 
 </span><span id="Agent.__init__-119"><a href="#Agent.__init__-119"><span class="linenos">119</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </span><span id="Agent.__init__-120"><a href="#Agent.__init__-120"><span class="linenos">120</span></a>
 </span><span id="Agent.__init__-121"><a href="#Agent.__init__-121"><span class="linenos">121</span></a>        <span class="c1"># Add a plan, which is a list of capability instances.</span>
-</span><span id="Agent.__init__-122"><a href="#Agent.__init__-122"><span class="linenos">122</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="Agent.__init__-122"><a href="#Agent.__init__-122"><span class="linenos">122</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;Capability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span></pre></div>
 
 
@@ -1371,7 +1371,7 @@ This means also that they can be placed on the map, and have a unique id, which 
                             </div>
                             <div id="Agent.plan" class="classattr">
                                 <div class="attr variable">
-            <span class="name">plan</span><span class="annotation">: List[<a href="#Capability">core.Capability</a>]</span>
+            <span class="name">plan</span><span class="annotation">: list[<a href="#Capability">core.Capability</a>]</span>
 
         
     </div>

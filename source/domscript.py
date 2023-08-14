@@ -28,7 +28,7 @@ TODO:
   It should set the property "display" to "initial" or "none. self.dom_element.style.setProperty("display", "initial")
 """
 import sys
-from typing import Any, Callable, ClassVar, List, Optional, Protocol, Self
+from typing import Any, Callable, ClassVar, Optional, Protocol, Self
 
 Event = Any
 
@@ -70,7 +70,7 @@ class DomWrapper:
     """
 
     # Keep av stack of surrounding contexts.
-    stack: ClassVar[List[Self]] = []
+    stack: ClassVar[list[Self]] = []
 
     def __init__(self, tag_name: str, content: Optional[str | Self] = None, namespace: Optional[str] = None, **attrs: Any):
         """

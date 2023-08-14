@@ -5,7 +5,7 @@ Attributes can be set on nodes and edges to represent roads, destinations, etc.
 """
 import itertools
 import math
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
+from typing import Any, Callable, Iterator, NewType, Optional, Tuple
 
 import networkx as nx
 
@@ -14,7 +14,7 @@ import core
 
 # Type abbreviations for nodes, edges and directions.
 Node = Tuple[int, int]
-Edge = Tuple[Node, Node]
+Edge = NewType("Edge", Tuple[Node, Node])
 Direction = int
 
 class RoadGridGraph(nx.DiGraph):
@@ -25,7 +25,7 @@ class RoadGridGraph(nx.DiGraph):
     Some destinations can also have charging points.
     """
 
-    def __init__(self, width: int, height: int, node_attrs: Dict[str, Any] = dict(), edge_attrs: Dict[str, Any] = dict()):
+    def __init__(self, width: int, height: int, node_attrs: dict[str, Any] = dict(), edge_attrs: dict[str, Any] = dict()):
         """
         Creates the grid graph.
         Two dictionaries are provided that give optional default attributes to nodes and edges.
@@ -33,8 +33,8 @@ class RoadGridGraph(nx.DiGraph):
         Args:
             width (int): the width of the grid.
             height (int): the height of the grid.
-            node_attrs (Dict[str, Any]): attributes and values to be added to each node. Defaults to an empty dictionary.
-            edge_attrs (Dict[str, Any]): attributes and values to be added to each edge. Defaults to an empty dictionary.
+            node_attrs (dict[str, Any]): attributes and values to be added to each node. Defaults to an empty dictionary.
+            edge_attrs (dict[str, Any]): attributes and values to be added to each edge. Defaults to an empty dictionary.
 
         Returns:
             nx.DiGraph: the resulting graph.
@@ -83,13 +83,13 @@ class RoadGridGraph(nx.DiGraph):
         if bidirectional:
             self[sink][source]["road"] = True
 
-    def add_roads(self, node: Node, directions: List[Direction]):
+    def add_roads(self, node: Node, directions: list[Direction]):
         """
         Adds a sequence of roads to the network, starting in the provided node and going in the provided directions.
 
         Args:
             node (Node): the start node.
-            directions (List[Direction]): a list containing directions in degrees.
+            directions (list[Direction]): a list containing directions in degrees.
         """
         for d in directions:
             next_node = next(n for n in self.neighbors(node) if self[node][n]["direction"] == d)
@@ -322,7 +322,7 @@ class RoadNetworkGrid(core.Space):
         # Prefer adding edges away from the center and adding new nodes (a small epsilon is added to ensure that weights > 0)
         return 50 * norm_dist / (nb_source_edges ** 2 + nb_sink_edges + 0.00001)
         
-    def priority_nodes(self, from_node: Node, to_node: Node) -> List[Node]:
+    def priority_nodes(self, from_node: Node, to_node: Node) -> list[Node]:
         """
         Returns the nodes from which traffic has priority over from_node when going into to_node.
         This is traffic coming from the left in a roundabout, and any traffic when leaving a parking.
@@ -332,7 +332,7 @@ class RoadNetworkGrid(core.Space):
             to_node (Node): the node to be checked for priority.
 
         Returns:
-            List[Node]: a list of nodes from which vehicles have priority.
+            list[Node]: a list of nodes from which vehicles have priority.
         """
         rnw = self.road_network
         # Determine which node has priority entering to_node.
@@ -352,7 +352,7 @@ class RoadNetworkGrid(core.Space):
         else:
             return []
 
-    def road_nodes(self, condition: Callable[[Node], bool] = lambda _: True) -> List[Node]:
+    def road_nodes(self, condition: Callable[[Node], bool] = lambda _: True) -> list[Node]:
         """
         Returns a list of all nodes which are connected by roads.
 
@@ -360,11 +360,11 @@ class RoadNetworkGrid(core.Space):
             condition: a condition that the nodes must satisfy. Defaults to always True.
 
         Returns:
-            List[Node]: the nodes connected by roads.
+            list[Node]: the nodes connected by roads.
         """
         return [n for n in self.road_network.nodes if self.road_network.is_road(n) and condition(n)]
 
-    def destination_nodes(self, condition: Callable[[Node], bool] = lambda _: True) -> List[Node]:
+    def destination_nodes(self, condition: Callable[[Node], bool] = lambda _: True) -> list[Node]:
         """
         Returns a list of all nodes which are destinations.
 
@@ -372,20 +372,20 @@ class RoadNetworkGrid(core.Space):
             condition: a condition that the nodes must satisfy. Defaults to always True.
 
         Returns:
-            List[Node]: the destinations.
+            list[Node]: the destinations.
         """
         return [n for n in self.road_network.nodes if self.is_destination(n) and condition(n)]
 
-    def road_edges(self) -> List[Edge]:
+    def road_edges(self) -> list[Edge]:
         """
         Returns a list of all edges that are roads.
 
         Returns:
-            List[Node]: the nodes connected by roads.
+            list[Node]: the nodes connected by roads.
         """
         return [(n1, n2) for (n1, n2) in self.road_network.edges if self.is_road(n1, n2)]
 
-    def roads_from(self, source: Node, condition: Optional[Callable[[Node], bool]] = lambda _ : True) -> List[Node]:
+    def roads_from(self, source: Node, condition: Optional[Callable[[Node], bool]] = lambda _ : True) -> list[Node]:
         """
         Returns a list of all nodes that can be reached by road from a given source node.
         If a condition function is provided, only nodes fulfilling that condition are returned.
@@ -395,11 +395,11 @@ class RoadNetworkGrid(core.Space):
             condition (Callable[[Node], bool], optional): a condition on the nodes. Defaults to always True.
             
         Returns:
-            List[Node]: a list of nodes reachable by road.
+            list[Node]: a list of nodes reachable by road.
         """
         return [sink for _, sink, has_road in self.road_network.out_edges(source, data = "road") if has_road and condition(sink)]
 
-    def roads_to(self, sink: Node, condition: Optional[Callable[[Node], bool]] = lambda _ : True) -> List[Node]:
+    def roads_to(self, sink: Node, condition: Optional[Callable[[Node], bool]] = lambda _ : True) -> list[Node]:
         """
         Returns a list of all nodes that can reach the given sink node by road.
         If a condition function is provided, only nodes fulfilling that condition are returned.
@@ -409,7 +409,7 @@ class RoadNetworkGrid(core.Space):
             condition (Callable[[Node], bool], optional): a condition on the nodes. Defaults to always True.
 
         Returns:
-            List[Node]: a list of nodes from which the sink node can be reached by road.
+            list[Node]: a list of nodes from which the sink node can be reached by road.
         """
         return [source for source, _, has_road in self.road_network.in_edges(sink, data = "road") if has_road and condition(source)]
 
@@ -450,7 +450,7 @@ class RoadNetworkGrid(core.Space):
         """
         return self.road_network[source][sink]["direction"]
 
-    def shortest_path(self, source: Node, target: Node) -> List[Node]:
+    def shortest_path(self, source: Node, target: Node) -> list[Node]:
         """
         Returns the shortest path from source to sink as a list of nodes.
 
@@ -459,21 +459,21 @@ class RoadNetworkGrid(core.Space):
             target (Node): the target node.
 
         Returns:
-            List[Node]: the path.
+            list[Node]: the path.
         """
         return nx.shortest_path(self.road_network, source = source, target = target,
                                 weight = lambda n1, n2, attributes: 1 if attributes["road"] else 10000000)
 
-    def path_to_nearest(self, source: Node, targets: List[Node]) -> List[Node]:
+    def path_to_nearest(self, source: Node, targets: list[Node]) -> list[Node]:
         """
         Given a source node and a list of target nodes, return the path to the nearest of the targets.
 
         Args:
             source (Node): the source node.
-            targets (List[Node]): the list of target nodes.
+            targets (list[Node]): the list of target nodes.
 
         Returns:
-            List[Node]: the path to the nearest target node.
+            list[Node]: the path to the nearest target node.
         """
         shortest_paths = [self.shortest_path(source, target) for target in targets]
         shortest_paths.sort(key = len)

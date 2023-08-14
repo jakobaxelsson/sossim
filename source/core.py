@@ -1,7 +1,7 @@
 """
 Provides abstract classes representing the core concepts of systems-of-systems.
 """
-from typing import List, Self
+from typing import Self
 
 import mesa
 from view import viewable
@@ -17,12 +17,12 @@ class Model(mesa.Model):
         # Create time and space, using a staged activation scheduler based on the OODA loop
         self.schedule = mesa.time.StagedActivation(self, ["observe", "orient", "decide", "act"])
 
-    def agents(self) -> List["Agent"]:
+    def agents(self) -> list["Agent"]:
         """
         Returns the agents in the model.
 
         Returns:
-            List[Agent]: the agents
+            list[Agent]: the agents
         """
         return self.schedule.agents
     
@@ -118,7 +118,7 @@ class Agent(Entity):
         super().__init__(model)
 
         # Add a plan, which is a list of capability instances.
-        self.plan: List["Capability"] = []
+        self.plan: list["Capability"] = []
 
     def update_plan(self):
         """

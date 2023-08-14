@@ -1,7 +1,7 @@
 """
 Module containing functionality for attaching views to model classes.    
 """
-from typing import Any, List, Protocol
+from typing import Any, Protocol
 
 class View(Protocol):
     """
@@ -32,12 +32,12 @@ def viewable(cls):
         self._views += [view]
         self.update_views()
 
-    def get_views(self) -> List[View]:
+    def get_views(self) -> list[View]:
         """
         Returns the list of views attached to the viewable object.
 
         Returns:
-            List[View]: the views.
+            list[View]: the views.
         """
         if not hasattr(self, "_views"):
             self._views = []
