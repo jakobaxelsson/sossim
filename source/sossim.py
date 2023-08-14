@@ -28,6 +28,7 @@ def batch_mode(configuration: Configuration) -> None:
     # Add a few extra arguments to the configuration parser.
     configuration.parser.add_argument("-t", "--iterations", type = int, default = 3, help = "number of iterations of the simulation")
     configuration.parser.add_argument("-i", "--interactive", default = False, action = argparse.BooleanOptionalAction, help = "start server for running in interactive mode")
+    configuration.parser.add_argument("-p", "--profile", default = False, action = argparse.BooleanOptionalAction, help = "run in batch mode with profiling")
 
     # Add shorthands for some configuration parameters.
     configuration.parser.add_argument("-N", dest = "num_vehicles", type = int)
@@ -42,6 +43,17 @@ def batch_mode(configuration: Configuration) -> None:
         from http.server import HTTPServer, SimpleHTTPRequestHandler
         print("Server for interactive simulation started. Go to http://127.0.0.1:8000/source/sossim.html to open simulation.")
         HTTPServer(("", 8000), SimpleHTTPRequestHandler).serve_forever()
+    elif args.profile:
+        import cProfile, pstats
+        with cProfile.Profile() as pr:
+            print("Running batch mode simulation with profiling")
+            mod = model.TransportSystem(configuration)
+            for i in range(args.iterations):
+                mod.step()
+            stats = pstats.Stats(pr)
+            stats.strip_dirs()
+            stats.sort_stats("tottime")
+            stats.print_stats()
     else:
         # Create the model using the supplied command line arguments, and run it.
         print("Running batch mode simulation")

@@ -190,13 +190,6 @@ class RoadNetworkGrid(core.Space):
 
         # Generate roads and destinations
         self.generate_roads()
-        # import cProfile, pstats
-        # with cProfile.Profile() as pr:
-        #     self.generate_roads()
-        #     stats = pstats.Stats(pr)
-        #     stats.strip_dirs()
-        #     stats.sort_stats("cumtime")
-        #     stats.print_stats()
 
     def generate_roads(self):
         """
