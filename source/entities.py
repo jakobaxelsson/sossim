@@ -11,6 +11,25 @@ from space import Node
 if TYPE_CHECKING:
     import model
 
+class VehicleWorldModel(core.WorldModel):
+    """
+    The world model of a vehicle.
+    """
+    def __init__(self, model: "model.TransportSystem"):
+        """
+        Initializes a vehicle world model.
+        """
+        super().__init__(model)
+
+    def perceive(self):
+        """
+        Updates the perception of the world as represented in this world model.
+        This is done by setting space to a subgraph of the model's space, that only contain neighboring nodes.
+        """
+        # TODO: Create a subgraph of the model's space whose nodes are only the grid neighbors of the current node.
+        # For now, just set it to the ordinary space
+        self.space = self.agent.model.space
+
 @configurable
 class Vehicle(core.Agent):
     # Define configuration parameters relevant to this class
@@ -26,7 +45,7 @@ class Vehicle(core.Agent):
             model (model.TransportSystem): the model in which the agent is situated.
             configuration (Configuration): the configuration parameters.
         """
-        super().__init__(model)
+        super().__init__(model, VehicleWorldModel(self))
         configuration.initialize(self)
 
         # Add a load capacity of the vehicle and a list of cargos
@@ -64,7 +83,7 @@ class Vehicle(core.Agent):
         Returns:
             list[Cargo]: the list of cargo.
         """
-        space = self.model.space
+        space = self.world_model.space
         if space.is_destination(node):
             return [e for e in space.get_cell_list_contents([node]) if isinstance(e, Cargo) and e.weight <= self.load_capacity()]
         else:
@@ -84,29 +103,29 @@ class Vehicle(core.Agent):
                 - Otherwise, search for a cargo to transport by randomly moving around.
         - If it is low on energy, first search for a charging point.
         """
-        space = self.model.space
-        if not self.plan:
+        space = self.world_model.space
+        if not self.world_model.plan:
             if self.cargos:
                 # Go to the destination of the cargo, and when arriving, unload it
-                self.plan = [capabilities.FindDestination(self, condition = None, final = self.cargos[0].destination), 
-                             capabilities.UnloadCargo(self, self.cargos[0])]
+                self.world_model.plan = [capabilities.FindDestination(self, condition = None, final = self.cargos[0].destination), 
+                                         capabilities.UnloadCargo(self, self.cargos[0])]
                 # To avoid that the vehicle directly picks up the cargo again, move away after unloading
                 node1 = space.roads_from(self.cargos[0].destination)[0]
                 node2 = space.roads_from(node1, lambda node: not space.is_destination(node))[0]
-                self.plan += [capabilities.Move(self, [node1, node2])]
+                self.world_model.plan += [capabilities.Move(self, [node1, node2])]
             elif cargos := self.available_cargo(self.pos):
                 # There is a suitable cargo in the current position, so load it.
-                self.plan = [capabilities.LoadCargo(self, cargos[0])]
+                self.world_model.plan = [capabilities.LoadCargo(self, cargos[0])]
             else:
                 # Randomly search for a destination where there is a cargo 
-                self.plan = [capabilities.FindDestination(self, condition = self.available_cargo)]
+                self.world_model.plan = [capabilities.FindDestination(self, condition = self.available_cargo)]
 
         # If low on energy, make sure that there is a plan to recharge.
-        if self.energy_level < 30 and not any(isinstance(c, capabilities.ChargeEnergy) for c in self.plan):
+        if self.energy_level < 30 and not any(isinstance(c, capabilities.ChargeEnergy) for c in self.world_model.plan):
             # Go to the nearest charging point and charge energy there before proceeding with the plan.
             charging_points = space.destination_nodes(space.is_charging_point)
-            self.plan = [capabilities.Move(self, space.path_to_nearest(self.pos, charging_points)),
-                         capabilities.ChargeEnergy(self)]
+            self.world_model.plan = [capabilities.Move(self, space.path_to_nearest(self.pos, charging_points)),
+                                     capabilities.ChargeEnergy(self)]
 
         # If the vehicle wants to enter a destination that is already occupied, move on instead to avoid deadlock
         # - The vehicle has a plan
@@ -114,13 +133,13 @@ class Vehicle(core.Agent):
         # - There is a route to move along
         # - The first step of the route is a destination
         # - There are other agents in that destination with which the vehicle cannot coexist
-        if self.plan[0] and \
-            isinstance(self.plan[0], capabilities.Move) and \
-            self.plan[0].route and \
-            space.is_destination(self.plan[0].route[0]) and \
-            not all(self.can_coexist(other) for other in space.get_cell_list_contents([self.plan[0].route[0]])):
+        if self.world_model.plan[0] and \
+            isinstance(self.world_model.plan[0], capabilities.Move) and \
+            self.world_model.plan[0].route and \
+            space.is_destination(self.world_model.plan[0].route[0]) and \
+            not all(self.can_coexist(other) for other in space.get_cell_list_contents([self.world_model.plan[0].route[0]])):
             route = [self.model.random.choice(space.roads_from(self.pos, lambda node: not space.is_destination(node)))]
-            self.plan = [capabilities.Move(self, route)]
+            self.world_model.plan = [capabilities.Move(self, route)]
 
     def move(self, target: Node):
         """

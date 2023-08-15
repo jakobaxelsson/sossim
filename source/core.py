@@ -41,6 +41,32 @@ class Space(Viewable):
     A comman base class for SoS spaces.
     """
 
+class WorldModel:
+    """
+    A common base class for SoS world models.
+    The world model is an internal, cognitive representation of information about the world.
+    It is updated by the agent's perception, and used for reasoning about e.g. planned actions.
+    """
+    def __init__(self, agent: "Agent"):
+        """
+        Creates a world model.
+
+        Args:
+            model (Model): the simulation's representation of the real world.
+        """
+        self.agent = agent
+        self.space = Space()
+
+        # Add a plan, which is a list of capability instances.
+        self.plan: list["Capability"] = []
+
+    def perceive(self):
+        """
+        Updates the perception of the world as represented in this world model.
+        Redefined in subclasses.
+        """
+        pass
+
 class Entity(mesa.Agent, Viewable): 
     """
     A common abstract baseclass for entities within a SoS.
@@ -107,18 +133,17 @@ class Entity(mesa.Agent, Viewable):
 
 class Agent(Entity):
 
-    def __init__(self, model: Model):
+    def __init__(self, model: Model, world_model: WorldModel):
         """
         Creates a SoS agent in a simulation model.
 
         Args:
             unique_id (int): the unique id of the agent.
             model (Model): the model in which the agent is situated.
+            world_model (WorldModel): the world model of the agent.
         """
         super().__init__(model)
-
-        # Add a plan, which is a list of capability instances.
-        self.plan: list["Capability"] = []
+        self.world_model = world_model
 
     def update_plan(self):
         """
@@ -129,11 +154,14 @@ class Agent(Entity):
     def observe(self):
         """
         Observe stage of the OODA loop used by the simulation scheduler.
+        It updates the world model through perception.
         If the agent has a plan, and the first step in that plan is completed, it skips to the next step.
         """
-        # TODO: This should update the world model by observing the real world.
-        if self.plan and self.plan[0].postcondition():
-            self.plan = self.plan[1:]
+        # Updates the world model through perception.
+        self.world_model.perceive()
+
+        if self.world_model.plan and self.world_model.plan[0].postcondition():
+            self.world_model.plan = self.world_model.plan[1:]
 
     def orient(self):
         """
@@ -151,8 +179,8 @@ class Agent(Entity):
         """
         # TODO: This should select the best action to take given the value of the alternative plans, based solely on the world model.
         # Check if the first step of the plan can be carried out.
-        if self.plan:
-            self.ready_to_act = self.plan[0].precondition()
+        if self.world_model.plan:
+            self.ready_to_act = self.world_model.plan[0].precondition()
 
     def act(self):
         """
@@ -160,8 +188,8 @@ class Agent(Entity):
         If the precondition of the first action in the current plan was fullfilled, that action is now carried out.
         Then, any further actions specified in the superclass are carried out.
         """
-        if self.plan and self.ready_to_act:
-            self.plan[0].act()
+        if self.world_model.plan and self.ready_to_act:
+            self.world_model.plan[0].act()
         super().act()
 
 class Capability:
