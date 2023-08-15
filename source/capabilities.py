@@ -115,7 +115,7 @@ class FindDestination(Move):
             return
         # A final node is provided, so find the shortest path to it and use that as the route
         if self.final:
-            self.route = space.shortest_path(self.agent.pos, self.final)[1:]
+            self.route = self.agent.navigator.shortest_path(self.agent.pos, self.final)[1:]
             return
 
         # Find all adjacent nodes that are destinations.

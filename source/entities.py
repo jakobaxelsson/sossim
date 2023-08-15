@@ -6,20 +6,59 @@ from typing import Annotated, Optional, TYPE_CHECKING
 import capabilities
 from configuration import Configuration, configurable
 import core 
-from space import Node
+from space import Node, RoadNetworkGrid
 
 if TYPE_CHECKING:
     import model
+
+class Navigator:
+    """
+    A navigation system that can be used to find routes between destinations.
+    """
+    def __init__(self, space: RoadNetworkGrid):
+        """
+        Initializes the navigator based on the space it navigates in.
+
+        Args:
+            space (RoadNetworkGrid): the space to navigate in.
+        """
+        self.space = space
+
+    def shortest_path(self, source: Node, target: Node) -> list[Node]:
+        """
+        Returns the shortest path from source to sink as a list of nodes.
+
+        Args:
+            source (Node): the source node.
+            target (Node): the target node.
+
+        Returns:
+            list[Node]: the path.
+        """
+        return self.space.shortest_path(source, target)
+
+    def path_to_nearest(self, source: Node, targets: list[Node]) -> list[Node]:
+        """
+        Given a source node and a list of target nodes, return the path to the nearest of the targets.
+
+        Args:
+            source (Node): the source node.
+            targets (list[Node]): the list of target nodes.
+
+        Returns:
+            list[Node]: the path to the nearest target node.
+        """
+        return self.space.path_to_nearest(source, targets)
 
 class VehicleWorldModel(core.WorldModel):
     """
     The world model of a vehicle.
     """
-    def __init__(self, model: "model.TransportSystem"):
+    def __init__(self, agent: "Vehicle"):
         """
         Initializes a vehicle world model.
         """
-        super().__init__(model)
+        super().__init__(agent)
 
     def perceive(self):
         """
@@ -47,6 +86,9 @@ class Vehicle(core.Agent):
         """
         super().__init__(model, VehicleWorldModel(self))
         configuration.initialize(self)
+
+        # Add a navigator
+        self.navigator = Navigator(self.model.space)
 
         # Add a load capacity of the vehicle and a list of cargos
         self.capacity = self.model.random.choice(range(self.max_load)) + 1
@@ -124,7 +166,7 @@ class Vehicle(core.Agent):
         if self.energy_level < 30 and not any(isinstance(c, capabilities.ChargeEnergy) for c in self.world_model.plan):
             # Go to the nearest charging point and charge energy there before proceeding with the plan.
             charging_points = space.destination_nodes(space.is_charging_point)
-            self.world_model.plan = [capabilities.Move(self, space.path_to_nearest(self.pos, charging_points)),
+            self.world_model.plan = [capabilities.Move(self, self.navigator.path_to_nearest(self.pos, charging_points)),
                                      capabilities.ChargeEnergy(self)]
 
         # If the vehicle wants to enter a destination that is already occupied, move on instead to avoid deadlock
