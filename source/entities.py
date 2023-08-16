@@ -50,6 +50,19 @@ class Navigator:
         """
         return self.space.path_to_nearest(source, targets)
 
+    def path_to_nearest_charging_point(self, source: Node) -> list[Node]:
+        """
+        Returns the path to the nearest charging point from a source node.
+
+        Args:
+            source (Node): the starting point.
+
+        Returns:
+            list[Node]: the path to the nearest charging point.
+        """
+        charging_points = self.space.destination_nodes(self.space.is_charging_point)
+        return self.space.path_to_nearest(source, charging_points)
+
 class VehicleWorldModel(core.WorldModel):
     """
     The world model of a vehicle.
@@ -65,16 +78,16 @@ class VehicleWorldModel(core.WorldModel):
         Updates the perception of the world as represented in this world model.
         This is done by setting space to a subgraph of the model's space, that only contain neighboring nodes.
         """
-        # TODO: Create a subgraph of the model's space whose nodes are only the grid neighbors of the current node.
-        # For now, just set it to the ordinary space
-        self.space = self.agent.model.space
+        neighbors = self.agent.model.space.grid_neighbors(self.agent.pos, diagonal = True, dist = self.agent.perception_range)
+        self.space = self.agent.model.space.subgraph([self.agent.pos] + neighbors)
 
 @configurable
 class Vehicle(core.Agent):
     # Define configuration parameters relevant to this class
-    max_load:       Annotated[int, "Param", "maximum load of a vehicle"]       = 3 
-    max_energy:     Annotated[int, "Param", "maximum energy of a vehicle"]     = 100 
-    charging_speed: Annotated[int, "Param", "the charging speed of a vehicle"] = 10 
+    max_load:         Annotated[int, "Param", "maximum load of a vehicle"]           = 3 
+    max_energy:       Annotated[int, "Param", "maximum energy of a vehicle"]         = 100 
+    charging_speed:   Annotated[int, "Param", "the charging speed of a vehicle"]     = 10 
+    perception_range: Annotated[int, "Param", "the perception range of the vehicle"] = 1
 
     def __init__(self, model: "model.TransportSystem", configuration: Configuration):
         """
@@ -105,6 +118,9 @@ class Vehicle(core.Agent):
         # Set the initial heading of the vehicle to that of the heading of one of the roads leading into the current position.
         self.heading = space.edge_direction(space.roads_to(self.pos)[0], self.pos)
 
+        # Initialize the perceived state of the world.
+        self.world_model.perceive()
+
     def can_coexist(self, other: core.Entity) -> bool:
         """
         Returns True if this entity can coexist in the same cell with the other entity.
@@ -116,7 +132,7 @@ class Vehicle(core.Agent):
         Returns:
             bool: True if coexistance is possible.
         """
-        return not isinstance(other, Vehicle)
+        return other == self or not isinstance(other, Vehicle)
 
     def available_cargo(self, node: Node) -> list["Cargo"]:
         """
@@ -145,43 +161,43 @@ class Vehicle(core.Agent):
                 - Otherwise, search for a cargo to transport by randomly moving around.
         - If it is low on energy, first search for a charging point.
         """
-        space = self.world_model.space
-        if not self.world_model.plan:
+        wm = self.world_model
+        if not wm.plan:
             if self.cargos:
                 # Go to the destination of the cargo, and when arriving, unload it
-                self.world_model.plan = [capabilities.FindDestination(self, condition = None, final = self.cargos[0].destination), 
-                                         capabilities.UnloadCargo(self, self.cargos[0])]
-                # To avoid that the vehicle directly picks up the cargo again, move away after unloading
-                node1 = space.roads_from(self.cargos[0].destination)[0]
-                node2 = space.roads_from(node1, lambda node: not space.is_destination(node))[0]
-                self.world_model.plan += [capabilities.Move(self, [node1, node2])]
+                wm.plan = [capabilities.FollowRoute(self, route_planner = lambda: self.navigator.shortest_path(self.pos, self.cargos[0].destination)), 
+                           capabilities.UnloadCargo(self, self.cargos[0])]
+                # To avoid that the vehicle directly picks up the cargo again, move away from the destination after unloading
+                not_destination = lambda node: not self.model.space.is_destination(node)
+                wm.plan += [capabilities.Move(self, not_destination), capabilities.Move(self, not_destination)]
             elif cargos := self.available_cargo(self.pos):
                 # There is a suitable cargo in the current position, so load it.
-                self.world_model.plan = [capabilities.LoadCargo(self, cargos[0])]
+                wm.plan = [capabilities.LoadCargo(self, cargos[0])]
+            elif any(self.available_cargo(node) for node in wm.space.roads_from(self.pos)):
+                # There is an available cargo in an adjacent node, so move to that one
+                wm.plan = [capabilities.Move(self, condition = self.available_cargo)]
             else:
-                # Randomly search for a destination where there is a cargo 
-                self.world_model.plan = [capabilities.FindDestination(self, condition = self.available_cargo)]
+                # Move along the rode to look for cargos elsewhere
+                wm.plan = [capabilities.Move(self, condition = lambda node: not self.model.space.is_destination(node))]
 
         # If low on energy, make sure that there is a plan to recharge.
         if self.energy_level < 30 and not any(isinstance(c, capabilities.ChargeEnergy) for c in self.world_model.plan):
             # Go to the nearest charging point and charge energy there before proceeding with the plan.
-            charging_points = space.destination_nodes(space.is_charging_point)
-            self.world_model.plan = [capabilities.Move(self, self.navigator.path_to_nearest(self.pos, charging_points)),
-                                     capabilities.ChargeEnergy(self)]
+            wm.plan = [capabilities.FollowRoute(self, route_planner = lambda: self.navigator.path_to_nearest_charging_point(self.pos)), 
+                       capabilities.ChargeEnergy(self)]
 
-        # If the vehicle wants to enter a destination that is already occupied, move on instead to avoid deadlock
+        # If the vehicle wants to enter a destination that is already occupied, move on instead to avoid deadlock. Conditions:
         # - The vehicle has a plan
         # - The first step of the plan is to make a move
         # - There is a route to move along
         # - The first step of the route is a destination
         # - There are other agents in that destination with which the vehicle cannot coexist
-        if self.world_model.plan[0] and \
-            isinstance(self.world_model.plan[0], capabilities.Move) and \
-            self.world_model.plan[0].route and \
-            space.is_destination(self.world_model.plan[0].route[0]) and \
-            not all(self.can_coexist(other) for other in space.get_cell_list_contents([self.world_model.plan[0].route[0]])):
-            route = [self.model.random.choice(space.roads_from(self.pos, lambda node: not space.is_destination(node)))]
-            self.world_model.plan = [capabilities.Move(self, route)]
+        if wm.plan[0] and \
+            hasattr(wm.plan[0], "route") and \
+            wm.plan[0].route and \
+            wm.space.is_destination(wm.plan[0].route[0]) and \
+            not all(self.can_coexist(other) for other in wm.space.get_cell_list_contents([wm.plan[0].route[0]])):
+            self.world_model.plan = [capabilities.Move(self, lambda node: not wm.space.is_destination(node))]
 
     def move(self, target: Node):
         """

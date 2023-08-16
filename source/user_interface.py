@@ -44,6 +44,7 @@ class VehicleView(View):
             with g(id = f"vehicle_{agent.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"): 
                 height = (agent.capacity + 1) / (agent.max_load + 1) * 0.8
                 rect(x = -0.2, y = -height / 2, width = 0.4, height = height, fill = self.color)
+                g(id = "route")
                 # When a vehicle is clicked, print some data about it to the console.
                 event_listener("click", lambda _: self.select_vehicle())
 
@@ -71,9 +72,25 @@ class VehicleView(View):
         if agent.unique_id == VehicleView.selected_vehicle_id:
             with document.query("#agent_information").clear():
                 h3("Agent information")
-                attributes = ["unique_id", "pos", "energy_level", "plan", "cargos"]
+                attributes = ["unique_id", "pos", "energy_level", "world_model", "cargos"]
                 for a in attributes:
                     p(f"{a}: {getattr(agent, a)}")
+
+            # Draw its planned route if it has one
+            if VehicleView.selected_vehicle_id:
+                wm = agent.world_model
+                if wm.plan and hasattr(wm.plan[0], "route"):
+                    route_nodes = wm.plan[0].route
+                    with document.query("#route").clear():
+                        for (x1, y1), (x2, y2) in zip(route_nodes[0: -1], route_nodes[1:]):
+                            line(cls = "route", x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5)
+                            
+            # Show its world view space if it has one
+            with document.query("#world_model").clear():
+                nodes = agent.model.space.grid_neighbors(agent.pos, diagonal = True, dist = self.agent.perception_range)
+                print(agent.pos, nodes)
+                for (x, y) in nodes:
+                    rect(cls = "world_model_space", x = x, y = y, width = 1, height = 1)                        
 
 class CargoView(View):
     """
@@ -124,8 +141,10 @@ class RoadNetworkGridView(View):
         with document.query("#road_network").clear():
             # Visualize roads
             for (x1, y1), (x2, y2) in space.road_edges():
-                line(cls = "road", x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5, 
-                     stroke_width = 0.8, stroke_linecap = "round")
+                line(cls = "road", x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5)
+
+            # Placeholder for vehicle route information
+            g(id = "route")
 
             # Visualize destinations and charging points.
             for node in space.road_nodes(space.is_destination):
@@ -420,6 +439,7 @@ class UserInterface:
                         with svg(cls = "map", id = "map", width = "100%", height = "90vh"):
                             with g(id = "map_content"):
                                 g(id = "road_network")
+                                g(id = "world_model")
                                 g(id = "vehicles")
                                 g(id = "cargos")
                         self.simulation_controller = SimulationController(self)

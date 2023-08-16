@@ -8,20 +8,27 @@ from space import Node
 
 class Move(core.Capability):
     
-    def __init__(self, agent: core.Agent, route: list[Node]):
+    def __init__(self, agent: core.Agent, condition: Callable[[Node], bool] = lambda _: True):
         """
-        Defines the capability of an agent to move to a new position along a route of nodes.
+        Defines the capability of an agent to move to a new position.
+        It randomly choose any of the neighboring nodes which fulfils a given condition, which defaults to any node.
         The capability can be given to an agent which has a pos attribute and has a model with a space containing a road network.
 
         Args:
             agent (core.Agent): the agent who should be given this capability.
-            route (Position): the route to be traversed in space.
+            condition (Callable[[Node], bool], optional): a condition, specifying which neighboring nodes to choose from. Defaults to any node.
         """
         super().__init__(agent)
-        self.route = route
-        # If the route starts in the current position, remove it
-        if self.route and self.route[0] == agent.pos:
-            self.route = self.route[1:]
+        self.condition = condition
+        self.route: list[Node] = []
+
+    def start(self):
+        """
+        Selects the route based on the current position of the agent.
+        """
+        if not self.started:
+            super().start()
+            self.route = [self.agent.model.random.choice(self.agent.world_model.space.roads_from(self.agent.pos, self.condition))]
 
     def precondition(self) -> bool:
         """
@@ -34,31 +41,112 @@ class Move(core.Capability):
         Returns:
             bool: True if and only if the move is possible.
         """
-        if not self.route:
+        if not super().precondition():
             return False
-        
-        space = self.agent.model.space
-        target = self.route[0]
+
+        wm = self.agent.world_model
 
         # There is no road to the next node from the current node.
-        if target not in space.roads_from(self.agent.pos):
+        if self.route[0] not in wm.space.roads_from(self.agent.pos):
             return False
 
         # If there is another entity in the node with which the agent cannot exist, it must be assumed that it might stay.
-        if not all(self.agent.can_coexist(other) for other in space.get_cell_list_contents([target])):
+        if not all(self.agent.can_coexist(other) for other in wm.space.get_cell_list_contents([self.route[0]])):
             return False
         
         # Priority rules prevent a move.
         if not all(self.agent.can_coexist(other)
-                   for priority_pos in space.priority_nodes(self.agent.pos, target)
-                   for other in space.get_cell_list_contents([priority_pos])):
+                   for priority_pos in wm.space.priority_nodes(self.agent.pos, self.route[0])
+                   for other in wm.space.get_cell_list_contents([priority_pos])):
             return False
 
         # The agent has insufficient energy.
         if self.agent.energy_level == 0:
             return False
 
-        return super().precondition()
+        return True
+    
+    def act(self):
+        """
+        Performs a move to the next node in the route, and remove that node from the route.
+        """
+        self.agent.move(self.route[0])
+
+    def postcondition(self) -> bool:
+        """
+        The postcondition of a move is that the route is empty.
+
+        Returns:
+            bool: True if and only if the final position of the route has been reached, meaning that the route is empty.
+        """
+        return self.route[0] == self.agent.pos
+
+class FollowRoute(core.Capability):
+    
+    def __init__(self, agent: core.Agent, route_planner: Callable[[], list[Node]]):
+        """
+        Defines the capability of an agent to move to a new position along a route of nodes.
+        The capability can be given to an agent which has a pos attribute and has a model with a space containing a road network.
+        It is provided with a route_planner function, which when invoked generates a route starting from the current position.
+
+        Args:
+            agent (core.Agent): the agent who should be given this capability.
+            route_planner (Callable[[], list[Node]]): a function that generates the route to be traversed in space.
+        """
+        super().__init__(agent)
+        self.route_planner = route_planner
+        self.route: list[Node] = []
+
+    def start(self):
+        """
+        Generates a route to be followed, from the agent's current position.
+        """
+        if not self.started:
+            super().start()
+            self.route = self.route_planner()
+            # If the current node of the agent is included at the start of the route, remove it
+            if self.route[0] == self.agent.pos:
+                self.route = self.route[1:]
+
+    def precondition(self) -> bool:
+        """
+        Defines the preconditions to follow a route:
+        - There is a non-empty route.
+        - There is a road to the next node from the current node.
+        - There is no conflicting traffic.
+        - The agent has sufficient energy.
+
+        Returns:
+            bool: True if and only if the move is possible.
+        """
+        if not super().precondition():
+            return False
+
+        if not self.route:
+            return False
+        
+        wm = self.agent.world_model
+        target = self.route[0]
+
+        # There is no road to the next node from the current node.
+        if target not in wm.space.roads_from(self.agent.pos):
+            return False
+
+        # If there is another entity in the node with which the agent cannot exist, it must be assumed that it might stay.
+        if not all(self.agent.can_coexist(other) for other in wm.space.get_cell_list_contents([target])):
+            return False
+        
+        # Priority rules prevent a move.
+        if not all(self.agent.can_coexist(other)
+                   for priority_pos in wm.space.priority_nodes(self.agent.pos, target)
+                   for other in wm.space.get_cell_list_contents([priority_pos])):
+            return False
+
+        # The agent has insufficient energy.
+        if self.agent.energy_level == 0:
+            return False
+
+        return True
     
     def act(self):
         """
@@ -75,90 +163,6 @@ class Move(core.Capability):
             bool: True if and only if the final position of the route has been reached, meaning that the route is empty.
         """
         return self.route == []
-
-class FindDestination(Move):
-    """
-    Defines the capability of an agent to find an available destination that fulfils a certain condition.
-    The capability can be given to any agent that can move in a space containing a road network.
-    It can take an optional condition specifying what types of destinations are acceptable.
-    """
-
-    def __init__(self, agent: core.Agent, condition: Optional[Callable[[Node], bool]] = None, final: Optional[Node] = None):
-        """
-        Defines the capability of an agent to move to a new position.
-        The capability can be given to an agent which has a pos attribute and has a model with a space containing a road network.
-        If a condition is provided, that must be fulfilled by the destination node.
-        If a final node is provided, only that node is accepted as a the final destination.
-
-        Args:
-            agent (core.Agent): the agent who should be given this capability.
-            condition (Callable[Position, bool], optional): a condition to be fulfilled by the destination. Defaults to always True.
-            final (Node, optional): a final node to be achieved. Defaults to None.
-        """
-        super().__init__(agent, [])
-        self.condition = condition
-        self.final = final
-        self.select_route()
-
-    def select_route(self):
-        """
-        Selects the route to move.
-        If there is already a route, do nothing.
-        If a final node has been provided, calculate the shortest route to it.
-        If there is an adjacent destination that fulfils the condition, set that as the target.
-        Otherwise, randomly move one step.
-        """
-        space = self.agent.model.space
-
-        # There is already a route, so no need to change it.
-        if self.route:
-            return
-        # A final node is provided, so find the shortest path to it and use that as the route
-        if self.final:
-            self.route = self.agent.navigator.shortest_path(self.agent.pos, self.final)[1:]
-            return
-
-        # Find all adjacent nodes that are destinations.
-        destinations = space.roads_from(self.agent.pos, space.is_destination)
-        if destinations and self.check_condition(destinations[0]) and all(self.agent.can_coexist(other) for other in space.get_cell_list_contents(destinations)):
-            # If there is an adjacent destination which meets the provided condition, and which is possible to enter for this agent, set that destination as the route. 
-            self.route = [destinations[0]]
-        else:
-            # Otherwise, randomly choose one of the neighboring non-destination nodes as the next node.
-            self.route = [self.agent.model.random.choice(space.roads_from(self.agent.pos, lambda node: not space.is_destination(node)))]
-
-    def check_condition(self, node: Node) -> bool:
-        """
-        Check if the condition is fulfilled in the node. For the result to be True, the following must be fulfilled:
-        If a final destination was provided, the node must be equal to that destination.
-        If the condition was provided, the value of that function must be True.
-        If neither was provided, the condition is True.
-
-        Args:
-            node (Node): the node.
-
-        Returns:
-            bool: True if the node fulfils the condition.
-        """
-        return (not self.final or self.final == node) and (not self.condition or self.condition(node))
-    
-    def act(self):
-        """
-        Performs the move and selects a new route.
-        """
-        super().act()
-
-        # Select a new route
-        self.select_route()
-
-    def postcondition(self) -> bool:
-        """
-        The postcondition of a find destination capability is that the position is a destination which fulfils the specified condition.
-
-        Returns:
-            bool: True if and only if the current position is a destination which fulfils the specified condition.
-        """
-        return self.agent.model.space.is_destination(self.agent.pos) and self.check_condition(self.agent.pos)
 
 class LoadCargo(core.Capability):
     
@@ -242,7 +246,7 @@ class UnloadCargo(core.Capability):
             return False
 
         # The current position is not a destination.
-        if not self.agent.model.space.is_destination(self.agent.pos):
+        if not self.agent.world_model.space.is_destination(self.agent.pos):
             return False
 
         return super().precondition()
@@ -278,7 +282,7 @@ class ChargeEnergy(core.Capability):
         Returns:
             bool: True if the capability can be used, False otherwise
         """
-        return self.agent.model.space.is_charging_point(self.agent.pos)
+        return self.agent.world_model.space.is_charging_point(self.agent.pos)
     
     def act(self):
         """

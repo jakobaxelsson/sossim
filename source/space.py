@@ -3,9 +3,10 @@ Provides spaces for the SoSSim system-of-systems simulator.
 The space is a grid rendered as a bidirectional graph, with nodes being grid cells and with edges between all adjacent grid cells.
 Attributes can be set on nodes and edges to represent roads, destinations, etc.
 """
+import copy
 import itertools
 import math
-from typing import Annotated, Any, Callable, Iterator, NewType, Optional
+from typing import Annotated, Any, Callable, Iterator, NewType, Optional, Self
 
 import networkx as nx
 
@@ -25,48 +26,71 @@ class RoadGridGraph(nx.DiGraph):
     Some destinations can also have charging points.
     """
 
-    def __init__(self, width: int, height: int, node_attrs: dict[str, Any] = dict(), edge_attrs: dict[str, Any] = dict()):
+    def __init__(self, width: int = 0, height: int = 0, node_attrs: dict[str, Any] = dict(), edge_attrs: dict[str, Any] = dict()):
         """
         Creates the grid graph.
         Two dictionaries are provided that give optional default attributes to nodes and edges.
         
         Args:
-            width (int): the width of the grid.
-            height (int): the height of the grid.
+            width (int, optional): the width of the grid. Defaults to 0.
+            height (int, optional): the height of the grid. Defaults to 0.
             node_attrs (dict[str, Any]): attributes and values to be added to each node. Defaults to an empty dictionary.
             edge_attrs (dict[str, Any]): attributes and values to be added to each edge. Defaults to an empty dictionary.
 
         Returns:
             nx.DiGraph: the resulting graph.
         """
-        # Create the graph and fill it by adding bidirectional edges going down and to the right of each node.
-        super().__init__()
-        for x in range(width):
-            for y in range(height):
-                if x != width - 1: # Do not add edge to the right if in last column
-                    self.add_edge((x, y), (x + 1, y))
-                    self.add_edge((x + 1, y), (x, y))
-                if y != height - 1: # Do not add edge downwards if in last row
-                    self.add_edge((x, y), (x, y + 1))
-                    self.add_edge((x, y  + 1), (x, y))
+        self.width = width
+        self.height = height
+        if width > 0 and height > 0:
+            # Create the graph and fill it by adding bidirectional edges going down and to the right of each node.
+            super().__init__()
+            for x in range(width):
+                for y in range(height):
+                    if x != width - 1: # Do not add edge to the right if in last column
+                        self.add_edge((x, y), (x + 1, y))
+                        self.add_edge((x + 1, y), (x, y))
+                    if y != height - 1: # Do not add edge downwards if in last row
+                        self.add_edge((x, y), (x, y + 1))
+                        self.add_edge((x, y  + 1), (x, y))
 
-        # Set default attribute values for nodes and edges
-        for node in self.nodes:
-            self.nodes[node]["road"] = False
-            self.nodes[node]["destination"] = False
-            self.nodes[node]["charging_point"] = False
-            self.nodes[node]["agent"] = []
-            for (attr, value) in node_attrs.items():
-                self.nodes[node][attr] = value
-        for (source, sink) in self.edges:
-            self[source][sink]["road"] = False
-            for (attr, value) in edge_attrs.items():
-                self[source][sink][attr] = value
+            # Set default attribute values for nodes and edges
+            for node in self.nodes:
+                self.nodes[node]["road"] = False
+                self.nodes[node]["destination"] = False
+                self.nodes[node]["charging_point"] = False
+                self.nodes[node]["agent"] = []
+                for (attr, value) in node_attrs.items():
+                    self.nodes[node][attr] = value
+            for (source, sink) in self.edges:
+                self[source][sink]["road"] = False
+                for (attr, value) in edge_attrs.items():
+                    self[source][sink][attr] = value
 
-        # Set the direction attribute for edges
-        for (source, sink) in self.edges:
-            ((x1, y1), (x2, y2)) = (source, sink)
-            self[source][sink]["direction"] = int(math.degrees(math.atan2(y2 - y1, x2 - x1))) + 90
+            # Set the direction attribute for edges
+            for (source, sink) in self.edges:
+                ((x1, y1), (x2, y2)) = (source, sink)
+                self[source][sink]["direction"] = int(math.degrees(math.atan2(y2 - y1, x2 - x1))) + 90
+
+    def grid_neighbors(self, node: Node, diagonal: bool = False, dist: int = 1) -> list[Node]:
+        """
+        Returns a list of all grid neighbors of a node. If diagonal is False, diagonal neighbors are not included.
+
+        Args:
+            node (Node): the node.
+            diagonal (bool, optional): if True, diagonal neighbors are included. Defaults to False.
+            dist (int, optional): if different from 1, include all nodes at this distance. Defaults to 1.
+
+        Returns:
+            list[Node]: a list of grid neighbors.
+        """
+        (ax, ay) = node
+        result = []
+        for x in range(max(ax - dist, 0), min(ax + dist + 1, self.width)):
+            for y in range(max(ay - dist, 0), min(ay + dist + 1, self.height)):
+                if diagonal or x != y:
+                    result.append(Node((x, y)))
+        return result
 
     def add_road(self, source: Node, sink: Node, bidirectional: bool = False):
         """
@@ -190,6 +214,21 @@ class RoadNetworkGrid(core.Space):
 
         # Generate roads and destinations
         self.generate_roads()
+
+    def subgraph(self, nodes: list[Node]) -> Self:
+        """
+        Creates a copy of the space, where the road network is a subgraph of the complete network, only containing the given nodes.
+
+        Args:
+            nodes (list[Node]): the nodes to be included in the subgraph.
+
+        Returns:
+            Self: the subgraph space.
+        """
+        result = copy.copy(self)
+#        result.road_network = self.road_network.subgraph(nodes)
+        result.road_network = nx.subgraph_view(self.road_network, filter_node = lambda node: node in nodes)
+        return result
 
     def generate_roads(self):
         """
@@ -337,11 +376,11 @@ class RoadNetworkGrid(core.Space):
         # In a roundabout, a vehicle going S yields to one going W, E to S, N to E, and W to N.
         priority_rule = { 180 : 270, 90 : 180, 0 : 90, 270 : 0 }
         priority_direction = priority_rule[rnw[from_node][to_node]["direction"]]
-        priority_node = next(n for n, _, d in rnw.in_edges(to_node, data = "direction") if d == priority_direction)
+        priority_nodes = [n for n, _, d in rnw.in_edges(to_node, data = "direction") if d == priority_direction]
 
         # If the priority node can reach to_node, return it, otherwise return nothing.
-        if self.is_road(priority_node, to_node) and not self.is_destination(priority_node):
-            return [priority_node]
+        if priority_nodes and self.is_road(priority_nodes[0], to_node) and not self.is_destination(priority_nodes[0]):
+            return priority_nodes[0:1]
         else:
             return []
 
@@ -486,12 +525,23 @@ class RoadNetworkGrid(core.Space):
         """
         return self.road_network.is_road(node1, node2)
 
+
+    def grid_neighbors(self, node: Node, diagonal: bool = False, dist: int = 1) -> list[Node]:
+        """
+        Calls the method with the same name on self.road_network.
+        """
+        return self.road_network.grid_neighbors(node, diagonal, dist)
+
     # Mesa space API (adapted from mesa.space.NetworkGrid)
 
     def place_agent(self, agent: core.Agent, node_id: Node) -> None:
         """Place an agent in a node."""
         self.road_network.nodes[node_id]["agent"].append(agent)
         agent.pos = node_id
+        # If there are other agents in the node with which the agent cannot co-exist, raise an exception
+        for other in self.road_network.nodes[node_id]["agent"]:
+            if not agent.can_coexist(other):
+                raise Exception(f"Error in {node_id}: Agents cannot coexist: {agent}, {other}")
 
     def get_neighborhood(self, node_id: Node, include_center: bool = False, radius: int = 1) -> list[Node]:
         """Get all adjacent nodes within a certain radius"""

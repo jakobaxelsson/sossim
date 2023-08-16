@@ -11,10 +11,15 @@ Style sheet for the SoSSim systems-of-systems simulator.
     --map-background: lightgreen;
     --map-border: 0.5px solid black;
     --road-color: lightslategray;
+    --road-width: 0.8;
     --destination-background: darkgray;
     --charging-point-background: orange;
     --charging-point-foreground: black;
     --cargo-color: red;
+    --route-color: dimgray;
+    --route-width: var(--road-width);
+    --world-model-space-color: yellow;
+    --world-model-space-opacity: 0.4;
 
     /* Navbar */
     --navbar-color: #e8e8e8;
@@ -35,7 +40,11 @@ Style sheet for the SoSSim systems-of-systems simulator.
     border: var(--map-border); 
     background: var(--map-background);
 
-    & .road { stroke: var(--road-color); }
+    & .road { 
+        stroke: var(--road-color); 
+        stroke-width: var(--road-width);
+        stroke-linecap: round;
+    }
 
     & .destination { fill: var(--destination-background); }
 
@@ -46,6 +55,17 @@ Style sheet for the SoSSim systems-of-systems simulator.
 
     & .cargo {
         & circle { fill: var(--cargo-color); }
+    }
+
+    & .route {
+        stroke: var(--route-color); 
+        stroke-width: var(--route-width);
+        stroke-linecap: round;
+    }
+
+    & .world_model_space {
+        fill: var(--world-model-space-color); 
+        opacity: var(--world-model-space-opacity); 
     }
 }
 

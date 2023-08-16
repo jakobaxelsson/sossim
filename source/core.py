@@ -60,6 +60,12 @@ class WorldModel:
         # Add a plan, which is a list of capability instances.
         self.plan: list["Capability"] = []
 
+    def __repr__(self) -> str:
+        """
+        Returns a string representation of the world model.        
+        """
+        return f"plan = {self.plan}"
+
     def perceive(self):
         """
         Updates the perception of the world as represented in this world model.
@@ -160,6 +166,7 @@ class Agent(Entity):
         # Updates the world model through perception.
         self.world_model.perceive()
 
+        # If the postcondition of the first step in the plan is fulfilled, advance to the next step.
         if self.world_model.plan and self.world_model.plan[0].postcondition():
             self.world_model.plan = self.world_model.plan[1:]
 
@@ -171,6 +178,9 @@ class Agent(Entity):
         # TODO: This should generate a list of alternative plans, based solely on the world model.
         # Update the plan based on the current status of the world.
         self.update_plan()
+        # Start the first activity of the plan, if the plan is not empty.
+        if self.world_model.plan:
+            self.world_model.plan[0].start()
 
     def decide(self):
         """
@@ -206,6 +216,7 @@ class Capability:
             agent (Agent): the agent who should have this capability.
         """
         self.agent = agent
+        self.started = False
 
     def __repr__(self) -> str:
         """
@@ -214,8 +225,16 @@ class Capability:
         # Get the capability name
         name = self.__class__.__name__
         # Get all data attributes 
-        data = ", ".join(var + " = " + str(val) for var, val in self.__dict__.items() if var not in ["agent"] and not callable(val))
+        excluded = ["agent", "started"]
+        data = ", ".join(var + " = " + str(val) for var, val in self.__dict__.items() if var not in excluded and not callable(val))
         return f"{name}({data})"
+    
+    def start(self):
+        """
+        Starts the application of the capability.
+        This is useful for capabilities that may be started from a different state than when they were put into a plan.
+        """
+        self.started = True
 
     def precondition(self) -> bool:
         """
