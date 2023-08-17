@@ -475,9 +475,25 @@ class MenuBar:
             event (Any): the event (not used).
         """
         try:
+            # Extract the CSS style information from the document
+            style_information = "\n".join([rule.cssText for sheet in js.document.styleSheets for rule in sheet.cssRules])
             with document.query("#map") as m:
-                content = js.XMLSerializer.new().serializeToString(m.dom_element)
-                await save_file_as(content)
+                # Create a clone of the map and add a defs section with a style node inside
+                clone = m.dom_element.cloneNode(True)
+                defs_node = js.document.createElement("defs")
+                style_node = js.document.createElement("style")
+                style_node.setAttribute("type", "text/css")
+                defs_node.appendChild(style_node)
+                clone.prepend(defs_node)
+                # Add a placeholder textnode as a child of the style element
+                style_node.appendChild(js.document.createTextNode("*** PLACEHOLDER ***"))
+                # Serialize the clone tree as a string in XML format
+                content = js.XMLSerializer.new().serializeToString(clone)
+                # Replace the placeholder with the style information, properly wrapped as CDATA.
+                content = content.replace("*** PLACEHOLDER ***", f"<![CDATA[{style_information}]]>")
+                # Let the user select a file, and save the content prepende with the doctype
+                doctype = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+                await save_file_as(doctype + content)
         except:
             pass
 
