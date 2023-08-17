@@ -26,6 +26,19 @@ class Model(mesa.Model, Viewable):
         # We only create core.Agent, and not other mesa.Agent, so safe to ignore type error
         return self.schedule.agents # type: ignore
     
+    def agent(self, id: int) -> "Agent":
+        """
+        Returns the agent with the given id. 
+        If the agent with that id does not exist, a KeyError exception is raised.
+
+        Args:
+            id (int): the agent of the requested agent.
+
+        Returns:
+            Agent: the requested agent.
+        """
+        return self.schedule._agents[id]
+
     def time(self) -> float:
         """
         Returns the current time of the simulation.

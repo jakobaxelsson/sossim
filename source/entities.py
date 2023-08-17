@@ -87,7 +87,7 @@ class Vehicle(core.Agent):
     max_load:         Annotated[int, "Param", "maximum load of a vehicle"]           = 3 
     max_energy:       Annotated[int, "Param", "maximum energy of a vehicle"]         = 100 
     charging_speed:   Annotated[int, "Param", "the charging speed of a vehicle"]     = 10 
-    perception_range: Annotated[int, "Param", "the perception range of the vehicle"] = 1
+    perception_range: Annotated[int, "Param", "the perception range of the vehicle"] = 2
 
     def __init__(self, model: "model.TransportSystem", configuration: Configuration):
         """
