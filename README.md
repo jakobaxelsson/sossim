@@ -56,6 +56,11 @@ The interface components are created by manipulating the DOM elements of a web p
 The DOM manipulation is done using the `domscript.py` module, which provides a Pythonic approach inspired by the [Dominate](https://github.com/Knio/dominate) library.
 However, `domscript.py` works directly on the DOM elements since it executes in the browser, whereas Dominate generates HTML as text and is intended for server side usage.
 
+For development purposes, there is also a Python REPL accessible in the user interface, through the View menu.
+Through this, it is possible to access the user interface object using the variable `ui`.
+This in turn gives access to all parts of the system.
+As an example, to get the list of all agents, evaluate the expression `ui.model.agents()`.
+
 ### Configurations
 
 The models and simulation have a large number of different configuration parameters.

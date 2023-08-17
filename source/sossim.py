@@ -12,11 +12,14 @@ def interactive_mode(configuration: Configuration) -> None:
     """
     Runs the simulator in interactive mode in the browser.
     """
-    import user_interface as ui
+    import user_interface
+
+    # Define a global variable ui, which can be used to access all information about the executing system from the Python REPL in the browser.
+    global ui
 
     # Create the model and the user interface.
     mod = model.TransportSystem(configuration)
-    ui.UserInterface(mod, configuration)
+    ui = user_interface.UserInterface(mod, configuration)
 
 def batch_mode(configuration: Configuration) -> None:
     """

@@ -10,7 +10,7 @@ import js # type: ignore
 from pyodide.ffi import create_proxy # type: ignore
 
 from configuration import Configuration
-from domscript import event_listener, br, button, circle, details, document, div, g, h3, input_, label, li, line, main, nav, p, polygon, rect, span, summary, svg, ul
+from domscript import create_tag, event_listener, br, button, circle, details, document, div, g, h3, input_, label, li, line, main, nav, p, polygon, rect, span, summary, svg, ul
 from entities import Cargo, Vehicle
 from model import TransportSystem
 from space import RoadNetworkGrid
@@ -433,6 +433,8 @@ class MenuBar:
                             event_listener("click", lambda _: self.ui.select_content("#agent_information"))
                         with li("View settings"):
                             event_listener("click", lambda _: self.ui.select_content("#view_settings"))
+                        with li("Python REPL"):
+                            event_listener("click", lambda _: self.ui.select_content("#py-repl"))
                 with li("About"):
                     # Open the project README file on Github in a separate tab.
                     about_page = "https://github.com/jakobaxelsson/sossim/blob/master/README.md"
@@ -523,6 +525,7 @@ class UserInterface:
                             p("Select an agent to display information about it")
                         with div(id = "view_settings", style = "display: none;"):
                             self.view_controller = ViewController(self)
+                        create_tag("py-repl")(id = "py-repl", style = "display: none;")
         model.add_view(TransportSystemView(self))
 
     def select_content(self, id: str):
