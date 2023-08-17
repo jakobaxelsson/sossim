@@ -104,16 +104,16 @@ class Vehicle(core.Agent):
         self.navigator = Navigator(self.model.space)
 
         # Add a load capacity of the vehicle and a list of cargos
-        self.capacity = self.model.random.choice(range(self.max_load)) + 1
+        self.capacity = self.random.choice(range(self.max_load)) + 1
         self.cargos: list["Cargo"] = []
 
         # Add an energy level and initialize it to a random value
-        self.energy_level = self.model.random.choice(range(round(0.2 * self.max_energy), self.max_energy + 1))
+        self.energy_level = self.random.choice(range(round(0.2 * self.max_energy), self.max_energy + 1))
 
         # Randomly select a starting position which is not yet occupied by some other vehicle.
         space = self.model.space
         available_positions = space.road_nodes(space.is_cell_empty)
-        space.place_agent(self, self.model.random.choice(available_positions))
+        space.place_agent(self, self.random.choice(available_positions))
 
         # Set the initial heading of the vehicle to that of the heading of one of the roads leading into the current position.
         self.heading = space.edge_direction(space.roads_to(self.pos)[0], self.pos)
@@ -269,9 +269,9 @@ class Cargo(core.Entity):
 
         space = self.model.space
         available_positions = space.road_nodes(space.is_destination)
-        space.place_agent(self, self.model.random.choice(available_positions))
+        space.place_agent(self, self.random.choice(available_positions))
 
-        self.weight = self.model.random.choice(range(self.max_cargo_weight)) + 1
+        self.weight = self.random.choice(range(self.max_cargo_weight)) + 1
         self.select_destination()
         self.carrier: Vehicle | None = None
 
@@ -286,7 +286,7 @@ class Cargo(core.Entity):
             self.destination = destination
         else:
             space = self.model.space
-            self.destination = self.model.random.choice(space.road_nodes(lambda n: space.is_destination(n) and not space.is_charging_point(n)))
+            self.destination = self.random.choice(space.road_nodes(lambda n: space.is_destination(n) and not space.is_charging_point(n)))
 
     def load_onto(self, carrier: Vehicle):
         """

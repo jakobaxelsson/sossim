@@ -236,7 +236,7 @@ class RoadNetworkGrid(core.Space):
         remaining_nodes = self.width * self.height * self.road_density
         while remaining_nodes > 0:
             # Pick an edge to add, removing it from the candidates and adding it to the graph
-            (source, sink) = self.model.random.choices(list(edge_candidates.keys()), weights = [w for _, w in edge_candidates.items()])[0]
+            (source, sink) = self.random.choices(list(edge_candidates.keys()), weights = [w for _, w in edge_candidates.items()])[0]
 
             # If the sink of the new edge is new in the graph, add edges to its neighbors as new edge candidates
             if not cnw.is_road(sink):
@@ -308,8 +308,8 @@ class RoadNetworkGrid(core.Space):
             if rnw.is_road(node) and not self.is_destination(node):
                 for destination in rnw.grid_neighbors(node): 
                     if not rnw.is_road(destination):
-                        if self.model.random.random() < self.destination_density:
-                            charging_point = self.model.random.random() < self.charging_point_density
+                        if self.random.random() < self.destination_density:
+                            charging_point = self.random.random() < self.charging_point_density
                             rnw.add_destination(node, destination, charging_point = charging_point)
                             break
 

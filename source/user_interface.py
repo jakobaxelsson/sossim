@@ -38,7 +38,7 @@ class VehicleView(View):
         self.agent = agent
 
         # Draw the vehicle in a random color to make it easy to distinguish them.
-        self.color = "#" + "".join([agent.model.random.choice(list("0123456789abcdef")) for i in range(6)])
+        self.color = "#" + "".join([agent.random.choice(list("0123456789abcdef")) for i in range(6)])
         (x, y) = agent.pos
         with document.query("#vehicles"):
             with g(id = f"vehicle_{agent.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"): 

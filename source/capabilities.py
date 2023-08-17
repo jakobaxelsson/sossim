@@ -28,7 +28,7 @@ class Move(core.Capability):
         """
         if not self.started:
             super().start()
-            self.route = [self.agent.model.random.choice(self.agent.world_model.space.roads_from(self.agent.pos, self.condition))]
+            self.route = [self.random.choice(self.agent.world_model.space.roads_from(self.agent.pos, self.condition))]
 
     def precondition(self) -> bool:
         """
