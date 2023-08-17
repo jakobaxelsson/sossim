@@ -10,7 +10,7 @@ import js # type: ignore
 from pyodide.ffi import create_proxy # type: ignore
 
 from configuration import Configuration
-from domscript import create_tag, event_listener, br, button, circle, details, document, div, g, h3, input_, label, li, line, main, nav, p, polygon, rect, span, summary, svg, ul
+from domscript import create_tag, event_listener, br, button, circle, details, document, div, g, h3, input_, label, li, line, main, nav, p, path, polygon, rect, span, summary, svg, ul
 from entities import Cargo, Vehicle
 from model import TransportSystem
 from space import RoadNetworkGrid
@@ -86,9 +86,12 @@ class VehicleView(View):
                             
             # Show its world view space if it has one
             with document.query("#world_model").clear():
-                nodes = agent.model.space.grid_neighbors(agent.pos, diagonal = True, center = True, dist = self.agent.perception_range)
-                for (x, y) in nodes:
-                    rect(cls = "world_model_space", x = x, y = y, width = 1, height = 1)                        
+                width = 4 * agent.model.space.width
+                height = 4 * agent.model.space.height                      
+                (x, y) = agent.pos
+                dist = self.agent.perception_range
+                path(cls = "world_model_space", fill_rule = "evenodd", 
+                     d = f"M0,0 h{width} v{height} h-{width} z M{x - dist},{y - dist} v{2 * dist + 1} h{2 * dist + 1} v-{2 * dist + 1} z")
 
 class CargoView(View):
     """

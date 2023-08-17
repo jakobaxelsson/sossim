@@ -29,8 +29,8 @@ Style sheet for the SoSSim systems-of-systems simulator.
     --route-color: dimgray;
     --route-width: var(--road-width);
 
-    --world-model-space-color: yellow;
-    --world-model-space-opacity: 0.4;
+    --world-model-space-color: white;
+    --world-model-space-opacity: 0.5;
 
     /* Navbar */
     --navbar-color: #e8e8e8;
