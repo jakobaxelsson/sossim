@@ -1,9 +1,9 @@
 """
 Provides concrete agents and other entities.
 """
-from typing import Annotated, Optional, TYPE_CHECKING
+from typing import Annotated, Callable, Optional, TYPE_CHECKING
 
-import capabilities
+from capabilities import ChargeEnergy, FollowRoute, LoadCargo, UnloadCargo
 from configuration import Configuration, configurable
 import core 
 from space import Node, RoadNetworkGrid
@@ -147,6 +147,18 @@ class Vehicle(core.Agent):
         else:
             return []
 
+    def random_route(self, condition: Callable[[Node], bool] = lambda _: True) -> list[Node]:
+        """
+        Randomly choose any of the neighboring nodes which fulfils a given condition, which defaults to any node.
+
+        Args:
+            condition (Callable[[Node], bool], optional): a condition, specifying which neighboring nodes to choose from. Defaults to any node.
+
+        Returns:
+            Node: a list containing the chosen node.
+        """
+        return [self.random.choice(self.world_model.space.roads_from(self.pos, condition))]
+
     def update_plan(self):
         """
         The vehicle creates a plan, which consists of randomly moving to one the neighbours in the road network.
@@ -162,48 +174,36 @@ class Vehicle(core.Agent):
         - If it is low on energy, first search for a charging point.
         """
         wm = self.world_model
+        not_destination = lambda node: not wm.space.is_destination(node)
         if not wm.plan:
             if self.cargos:
                 # Go to the destination of the cargo, and when arriving, unload it
-                wm.plan = [capabilities.FollowRoute(self, route_planner = lambda: self.navigator.shortest_path(self.pos, self.cargos[0].destination)), 
-                           capabilities.UnloadCargo(self, self.cargos[0])]
+                wm.plan = [FollowRoute(self, lambda: self.navigator.shortest_path(self.pos, self.cargos[0].destination)), 
+                           UnloadCargo(self, self.cargos[0])]
                 # To avoid that the vehicle directly picks up the cargo again, move away from the destination after unloading
-                not_destination = lambda node: not self.model.space.is_destination(node)
-                wm.plan += [capabilities.Move(self, not_destination), capabilities.Move(self, not_destination)]
+                wm.plan += [FollowRoute(self, lambda: self.random_route(not_destination)), 
+                            FollowRoute(self, lambda: self.random_route(not_destination))]
             elif cargos := self.available_cargo(self.pos):
                 # There is a suitable cargo in the current position, so load it.
-                wm.plan = [capabilities.LoadCargo(self, cargos[0])]
+                wm.plan = [LoadCargo(self, cargos[0])]
             elif any(self.available_cargo(node) for node in wm.space.roads_from(self.pos)):
                 # There is an available cargo in an adjacent node, so move to that one
-                wm.plan = [capabilities.Move(self, condition = self.available_cargo)]
+                wm.plan = [FollowRoute(self, lambda: self.random_route(self.available_cargo))]
             else:
                 # Move along the rode to look for cargos elsewhere
-                wm.plan = [capabilities.Move(self, condition = lambda node: not self.model.space.is_destination(node))]
+                wm.plan = [FollowRoute(self, lambda: self.random_route(not_destination))]
 
         # If low on energy, make sure that there is a plan to recharge.
-        if self.energy_level < 30 and not any(isinstance(c, capabilities.ChargeEnergy) for c in self.world_model.plan):
+        if self.energy_level < 30 and not any(isinstance(c, ChargeEnergy) for c in self.world_model.plan):
             # Go to the nearest charging point and charge energy there before proceeding with the plan.
-            wm.plan = [capabilities.FollowRoute(self, route_planner = lambda: self.navigator.path_to_nearest_charging_point(self.pos)), 
-                       capabilities.ChargeEnergy(self)]
+            wm.plan = [FollowRoute(self, lambda: self.navigator.path_to_nearest_charging_point(self.pos)), 
+                       ChargeEnergy(self)]
 
-        # If the vehicle wants to enter a destination that is already occupied, move on instead to avoid deadlock. Conditions:
-        # - The vehicle has a plan
-        # - The first step of the plan is to make a move
-        # - There is a route to move along
-        # - The first step of the route is a destination
-        # - There are other agents in that destination with which the vehicle cannot coexist
-        # if wm.plan and \
-        #     hasattr(wm.plan[0], "route") and \
-        #     wm.plan[0].route and \
-        #     wm.space.is_destination(wm.plan[0].route[0]) and \
-        #     not all(self.can_coexist(other) for other in wm.space.get_cell_list_contents([wm.plan[0].route[0]])):
-        #     # Abandon current plan, and move to one of the other neighbors which is not a destination node
-        #     self.world_model.plan = [capabilities.Move(self, lambda node: not wm.space.is_destination(node))]
+        # The vehicle wants to enter a destination that is already occupied, move on instead to avoid deadlock
         if wm.space.is_destination(self.next_pos()) and \
-            not all(self.can_coexist(other) for other in wm.space.get_cell_list_contents([self.next_pos()])):
+           not all(self.can_coexist(other) for other in wm.space.get_cell_list_contents([self.next_pos()])):
             # Abandon current plan, and move to one of the other neighbors which is not a destination node
-            self.world_model.plan = [capabilities.Move(self, lambda node: not wm.space.is_destination(node))]
-
+            self.world_model.plan = [FollowRoute(self, lambda: self.random_route(not_destination))]
 
     def move(self, target: Node):
         """

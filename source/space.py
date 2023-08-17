@@ -102,7 +102,7 @@ class RoadGridGraph(nx.DiGraph):
         """
         for d in directions:
             (x, y) = node
-            dirs = { 0 : (x, y - 1), 90 : (x + 1, y), 180 : (x, y + 1), 270 : (x - 1, y) }
+            dirs = { 0 : Node((x, y - 1)), 90 : Node((x + 1, y)), 180 : Node((x, y + 1)), 270 : Node((x - 1, y)) }
             next_node = dirs[d]
             self.add_road(node, next_node)
             node = next_node

@@ -37,7 +37,7 @@ class Model(mesa.Model, Viewable):
         Returns:
             Agent: the requested agent.
         """
-        return self.schedule._agents[id]
+        return self.schedule._agents[id] # type: ignore
 
     def time(self) -> float:
         """
@@ -94,9 +94,6 @@ class Entity(mesa.Agent, Viewable):
     All entities are treated as agents, but not all of them have behavior.
     This means also that they can be placed on the map, and have a unique id, which is automatically generated.
     """
-    # Lift the random attribute of the model to this class for less verbose access
-    random = property(lambda self: self.model.random)
-
     def __init__(self, model: Model):
         # Create agent, with a unique id.
         super().__init__(model.next_id(), model)
