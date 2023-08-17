@@ -128,6 +128,9 @@
                         <li>
                                 <a class="function" href="#Agent.act">act</a>
                         </li>
+                        <li>
+                                <a class="function" href="#Agent.next_pos">next_pos</a>
+                        </li>
                 </ul>
 
             </li>
@@ -154,6 +157,9 @@
                         </li>
                         <li>
                                 <a class="function" href="#Capability.postcondition">postcondition</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Capability.next_pos">next_pos</a>
                         </li>
                 </ul>
 
@@ -385,63 +391,89 @@ core    </h1>
 </span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">world_model</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">act</span><span class="p">()</span>
 </span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">act</span><span class="p">()</span>
 </span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>
-</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="k">class</span> <span class="nc">Capability</span><span class="p">:</span>
-</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="sd">    A generic capability, serving as a base class for specific capabilities.</span>
-</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>
-</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">):</span>
-</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a><span class="sd">        Creates the capability for a certain agent.</span>
-</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
-</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>
-</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a><span class="sd">        Args:</span>
-</span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a><span class="sd">            agent (Agent): the agent who should have this capability.</span>
-</span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
-</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>
-</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a><span class="sd">        Returns a string representation of the capability.        </span>
-</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>        <span class="c1"># Get the capability name</span>
-</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>        <span class="c1"># Get all data attributes </span>
-</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>        <span class="n">excluded</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">,</span> <span class="s2">&quot;started&quot;</span><span class="p">]</span>
-</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">var</span> <span class="o">+</span> <span class="s2">&quot; = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
-</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">)&quot;</span>
-</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>    
-</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a><span class="sd">        Starts the application of the capability.</span>
-</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a><span class="sd">        This is useful for capabilities that may be started from a different state than when they were put into a plan.</span>
-</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>
-</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
-</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a>
-</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a><span class="sd">        Returns:</span>
-</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
-</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>    
-</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="sd">        Carries out the capability during one time step.</span>
-</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>        <span class="k">pass</span>
-</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>
-</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
-</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>
-</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="sd">        Returns:</span>
-</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
-</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>    <span class="k">def</span> <span class="nf">next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="sd">        Returns the intended next position of the agent, based on its plan. </span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a><span class="sd">        If the agent has a plan, the intended next position of the first capability of the plan is returned.</span>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a><span class="sd">        If there is no plan, None is returned.</span>
+</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>
+</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a><span class="sd">        Returns:</span>
+</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a><span class="sd">            Tuple[int, int] | None: _description_</span>
+</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_model</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span>
+</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_model</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">next_pos</span><span class="p">()</span>
+</span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a>            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a>
+</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a><span class="k">class</span> <span class="nc">Capability</span><span class="p">:</span>
+</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a><span class="sd">    A generic capability, serving as a base class for specific capabilities.</span>
+</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>
+</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">):</span>
+</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a><span class="sd">        Creates the capability for a certain agent.</span>
+</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
+</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>
+</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a><span class="sd">        Args:</span>
+</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a><span class="sd">            agent (Agent): the agent who should have this capability.</span>
+</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
+</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>
+</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a><span class="sd">        Returns a string representation of the capability.        </span>
+</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>        <span class="c1"># Get the capability name</span>
+</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a>        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>        <span class="c1"># Get all data attributes </span>
+</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a>        <span class="n">excluded</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">,</span> <span class="s2">&quot;started&quot;</span><span class="p">]</span>
+</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">var</span> <span class="o">+</span> <span class="s2">&quot; = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">)&quot;</span>
+</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>    
+</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="sd">        Starts the application of the capability.</span>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="sd">        This is useful for capabilities that may be started from a different state than when they were put into a plan.</span>
+</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>
+</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
+</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a>
+</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a><span class="sd">        Returns:</span>
+</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
+</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a>    
+</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a>    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a><span class="sd">        Carries out the capability during one time step.</span>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a>        <span class="k">pass</span>
+</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="sd">        Returns:</span>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a>    
+</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>    <span class="k">def</span> <span class="nf">next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a><span class="sd">        Returns the intended next position of the agent, if this capability were to be activated.</span>
+</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a><span class="sd">        Note that this is not necessarily the position in the next time step, since preconditions may inhibit the move.</span>
+</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a><span class="sd">        In case of an inhibited move, next_pos may change in the next time step, if replanning occurs.</span>
+</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a><span class="sd">        Default behavior is to return the current agent position, i.e. the capability does not move the agent.</span>
+</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a>
+</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="sd">        Returns:</span>
+</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="sd">            tuple[int, int]: the intended next position.</span>
+</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">pos</span>
 </span></pre></div>
 
 
@@ -1174,6 +1206,20 @@ Default behavior is to just update the views.</p>
 </span><span id="Agent-202"><a href="#Agent-202"><span class="linenos">202</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_model</span><span class="o">.</span><span class="n">plan</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready_to_act</span><span class="p">:</span>
 </span><span id="Agent-203"><a href="#Agent-203"><span class="linenos">203</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">world_model</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">act</span><span class="p">()</span>
 </span><span id="Agent-204"><a href="#Agent-204"><span class="linenos">204</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">act</span><span class="p">()</span>
+</span><span id="Agent-205"><a href="#Agent-205"><span class="linenos">205</span></a>
+</span><span id="Agent-206"><a href="#Agent-206"><span class="linenos">206</span></a>    <span class="k">def</span> <span class="nf">next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Agent-207"><a href="#Agent-207"><span class="linenos">207</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Agent-208"><a href="#Agent-208"><span class="linenos">208</span></a><span class="sd">        Returns the intended next position of the agent, based on its plan. </span>
+</span><span id="Agent-209"><a href="#Agent-209"><span class="linenos">209</span></a><span class="sd">        If the agent has a plan, the intended next position of the first capability of the plan is returned.</span>
+</span><span id="Agent-210"><a href="#Agent-210"><span class="linenos">210</span></a><span class="sd">        If there is no plan, None is returned.</span>
+</span><span id="Agent-211"><a href="#Agent-211"><span class="linenos">211</span></a>
+</span><span id="Agent-212"><a href="#Agent-212"><span class="linenos">212</span></a><span class="sd">        Returns:</span>
+</span><span id="Agent-213"><a href="#Agent-213"><span class="linenos">213</span></a><span class="sd">            Tuple[int, int] | None: _description_</span>
+</span><span id="Agent-214"><a href="#Agent-214"><span class="linenos">214</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Agent-215"><a href="#Agent-215"><span class="linenos">215</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_model</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span>
+</span><span id="Agent-216"><a href="#Agent-216"><span class="linenos">216</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_model</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">next_pos</span><span class="p">()</span>
+</span><span id="Agent-217"><a href="#Agent-217"><span class="linenos">217</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="Agent-218"><a href="#Agent-218"><span class="linenos">218</span></a>            <span class="k">return</span> <span class="kc">None</span>
 </span></pre></div>
 
 
@@ -1378,6 +1424,46 @@ Then, any further actions specified in the superclass are carried out.</p>
 
 
                             </div>
+                            <div id="Agent.next_pos" class="classattr">
+                                        <input id="Agent.next_pos-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">next_pos</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>:</span></span>
+
+                <label class="view-source-button" for="Agent.next_pos-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Agent.next_pos"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Agent.next_pos-206"><a href="#Agent.next_pos-206"><span class="linenos">206</span></a>    <span class="k">def</span> <span class="nf">next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Agent.next_pos-207"><a href="#Agent.next_pos-207"><span class="linenos">207</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Agent.next_pos-208"><a href="#Agent.next_pos-208"><span class="linenos">208</span></a><span class="sd">        Returns the intended next position of the agent, based on its plan. </span>
+</span><span id="Agent.next_pos-209"><a href="#Agent.next_pos-209"><span class="linenos">209</span></a><span class="sd">        If the agent has a plan, the intended next position of the first capability of the plan is returned.</span>
+</span><span id="Agent.next_pos-210"><a href="#Agent.next_pos-210"><span class="linenos">210</span></a><span class="sd">        If there is no plan, None is returned.</span>
+</span><span id="Agent.next_pos-211"><a href="#Agent.next_pos-211"><span class="linenos">211</span></a>
+</span><span id="Agent.next_pos-212"><a href="#Agent.next_pos-212"><span class="linenos">212</span></a><span class="sd">        Returns:</span>
+</span><span id="Agent.next_pos-213"><a href="#Agent.next_pos-213"><span class="linenos">213</span></a><span class="sd">            Tuple[int, int] | None: _description_</span>
+</span><span id="Agent.next_pos-214"><a href="#Agent.next_pos-214"><span class="linenos">214</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Agent.next_pos-215"><a href="#Agent.next_pos-215"><span class="linenos">215</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_model</span><span class="o">.</span><span class="n">plan</span><span class="p">:</span>
+</span><span id="Agent.next_pos-216"><a href="#Agent.next_pos-216"><span class="linenos">216</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_model</span><span class="o">.</span><span class="n">plan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">next_pos</span><span class="p">()</span>
+</span><span id="Agent.next_pos-217"><a href="#Agent.next_pos-217"><span class="linenos">217</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="Agent.next_pos-218"><a href="#Agent.next_pos-218"><span class="linenos">218</span></a>            <span class="k">return</span> <span class="kc">None</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Returns the intended next position of the agent, based on its plan. 
+If the agent has a plan, the intended next position of the first capability of the plan is returned.
+If there is no plan, None is returned.</p>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>Tuple[int, int] | None: _description_</p>
+</blockquote>
+</div>
+
+
+                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -1415,63 +1501,75 @@ Then, any further actions specified in the superclass are carried out.</p>
 
     </div>
     <a class="headerlink" href="#Capability"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability-206"><a href="#Capability-206"><span class="linenos">206</span></a><span class="k">class</span> <span class="nc">Capability</span><span class="p">:</span>
-</span><span id="Capability-207"><a href="#Capability-207"><span class="linenos">207</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-208"><a href="#Capability-208"><span class="linenos">208</span></a><span class="sd">    A generic capability, serving as a base class for specific capabilities.</span>
-</span><span id="Capability-209"><a href="#Capability-209"><span class="linenos">209</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Capability-210"><a href="#Capability-210"><span class="linenos">210</span></a>
-</span><span id="Capability-211"><a href="#Capability-211"><span class="linenos">211</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">):</span>
-</span><span id="Capability-212"><a href="#Capability-212"><span class="linenos">212</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-213"><a href="#Capability-213"><span class="linenos">213</span></a><span class="sd">        Creates the capability for a certain agent.</span>
-</span><span id="Capability-214"><a href="#Capability-214"><span class="linenos">214</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
-</span><span id="Capability-215"><a href="#Capability-215"><span class="linenos">215</span></a>
-</span><span id="Capability-216"><a href="#Capability-216"><span class="linenos">216</span></a><span class="sd">        Args:</span>
-</span><span id="Capability-217"><a href="#Capability-217"><span class="linenos">217</span></a><span class="sd">            agent (Agent): the agent who should have this capability.</span>
-</span><span id="Capability-218"><a href="#Capability-218"><span class="linenos">218</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-219"><a href="#Capability-219"><span class="linenos">219</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
-</span><span id="Capability-220"><a href="#Capability-220"><span class="linenos">220</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="Capability-221"><a href="#Capability-221"><span class="linenos">221</span></a>
-</span><span id="Capability-222"><a href="#Capability-222"><span class="linenos">222</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="Capability-223"><a href="#Capability-223"><span class="linenos">223</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-224"><a href="#Capability-224"><span class="linenos">224</span></a><span class="sd">        Returns a string representation of the capability.        </span>
-</span><span id="Capability-225"><a href="#Capability-225"><span class="linenos">225</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-226"><a href="#Capability-226"><span class="linenos">226</span></a>        <span class="c1"># Get the capability name</span>
-</span><span id="Capability-227"><a href="#Capability-227"><span class="linenos">227</span></a>        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-</span><span id="Capability-228"><a href="#Capability-228"><span class="linenos">228</span></a>        <span class="c1"># Get all data attributes </span>
-</span><span id="Capability-229"><a href="#Capability-229"><span class="linenos">229</span></a>        <span class="n">excluded</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">,</span> <span class="s2">&quot;started&quot;</span><span class="p">]</span>
-</span><span id="Capability-230"><a href="#Capability-230"><span class="linenos">230</span></a>        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">var</span> <span class="o">+</span> <span class="s2">&quot; = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
-</span><span id="Capability-231"><a href="#Capability-231"><span class="linenos">231</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">)&quot;</span>
-</span><span id="Capability-232"><a href="#Capability-232"><span class="linenos">232</span></a>    
-</span><span id="Capability-233"><a href="#Capability-233"><span class="linenos">233</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Capability-234"><a href="#Capability-234"><span class="linenos">234</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-235"><a href="#Capability-235"><span class="linenos">235</span></a><span class="sd">        Starts the application of the capability.</span>
-</span><span id="Capability-236"><a href="#Capability-236"><span class="linenos">236</span></a><span class="sd">        This is useful for capabilities that may be started from a different state than when they were put into a plan.</span>
-</span><span id="Capability-237"><a href="#Capability-237"><span class="linenos">237</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-238"><a href="#Capability-238"><span class="linenos">238</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="Capability-239"><a href="#Capability-239"><span class="linenos">239</span></a>
-</span><span id="Capability-240"><a href="#Capability-240"><span class="linenos">240</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Capability-241"><a href="#Capability-241"><span class="linenos">241</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-242"><a href="#Capability-242"><span class="linenos">242</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
-</span><span id="Capability-243"><a href="#Capability-243"><span class="linenos">243</span></a>
-</span><span id="Capability-244"><a href="#Capability-244"><span class="linenos">244</span></a><span class="sd">        Returns:</span>
-</span><span id="Capability-245"><a href="#Capability-245"><span class="linenos">245</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
-</span><span id="Capability-246"><a href="#Capability-246"><span class="linenos">246</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-247"><a href="#Capability-247"><span class="linenos">247</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="Capability-248"><a href="#Capability-248"><span class="linenos">248</span></a>    
-</span><span id="Capability-249"><a href="#Capability-249"><span class="linenos">249</span></a>    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Capability-250"><a href="#Capability-250"><span class="linenos">250</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-251"><a href="#Capability-251"><span class="linenos">251</span></a><span class="sd">        Carries out the capability during one time step.</span>
-</span><span id="Capability-252"><a href="#Capability-252"><span class="linenos">252</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-253"><a href="#Capability-253"><span class="linenos">253</span></a>        <span class="k">pass</span>
-</span><span id="Capability-254"><a href="#Capability-254"><span class="linenos">254</span></a>
-</span><span id="Capability-255"><a href="#Capability-255"><span class="linenos">255</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Capability-256"><a href="#Capability-256"><span class="linenos">256</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability-257"><a href="#Capability-257"><span class="linenos">257</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
-</span><span id="Capability-258"><a href="#Capability-258"><span class="linenos">258</span></a>
-</span><span id="Capability-259"><a href="#Capability-259"><span class="linenos">259</span></a><span class="sd">        Returns:</span>
-</span><span id="Capability-260"><a href="#Capability-260"><span class="linenos">260</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
-</span><span id="Capability-261"><a href="#Capability-261"><span class="linenos">261</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability-262"><a href="#Capability-262"><span class="linenos">262</span></a>        <span class="k">return</span> <span class="kc">True</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability-220"><a href="#Capability-220"><span class="linenos">220</span></a><span class="k">class</span> <span class="nc">Capability</span><span class="p">:</span>
+</span><span id="Capability-221"><a href="#Capability-221"><span class="linenos">221</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-222"><a href="#Capability-222"><span class="linenos">222</span></a><span class="sd">    A generic capability, serving as a base class for specific capabilities.</span>
+</span><span id="Capability-223"><a href="#Capability-223"><span class="linenos">223</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Capability-224"><a href="#Capability-224"><span class="linenos">224</span></a>
+</span><span id="Capability-225"><a href="#Capability-225"><span class="linenos">225</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">):</span>
+</span><span id="Capability-226"><a href="#Capability-226"><span class="linenos">226</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-227"><a href="#Capability-227"><span class="linenos">227</span></a><span class="sd">        Creates the capability for a certain agent.</span>
+</span><span id="Capability-228"><a href="#Capability-228"><span class="linenos">228</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
+</span><span id="Capability-229"><a href="#Capability-229"><span class="linenos">229</span></a>
+</span><span id="Capability-230"><a href="#Capability-230"><span class="linenos">230</span></a><span class="sd">        Args:</span>
+</span><span id="Capability-231"><a href="#Capability-231"><span class="linenos">231</span></a><span class="sd">            agent (Agent): the agent who should have this capability.</span>
+</span><span id="Capability-232"><a href="#Capability-232"><span class="linenos">232</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-233"><a href="#Capability-233"><span class="linenos">233</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
+</span><span id="Capability-234"><a href="#Capability-234"><span class="linenos">234</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="Capability-235"><a href="#Capability-235"><span class="linenos">235</span></a>
+</span><span id="Capability-236"><a href="#Capability-236"><span class="linenos">236</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="Capability-237"><a href="#Capability-237"><span class="linenos">237</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-238"><a href="#Capability-238"><span class="linenos">238</span></a><span class="sd">        Returns a string representation of the capability.        </span>
+</span><span id="Capability-239"><a href="#Capability-239"><span class="linenos">239</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-240"><a href="#Capability-240"><span class="linenos">240</span></a>        <span class="c1"># Get the capability name</span>
+</span><span id="Capability-241"><a href="#Capability-241"><span class="linenos">241</span></a>        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+</span><span id="Capability-242"><a href="#Capability-242"><span class="linenos">242</span></a>        <span class="c1"># Get all data attributes </span>
+</span><span id="Capability-243"><a href="#Capability-243"><span class="linenos">243</span></a>        <span class="n">excluded</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">,</span> <span class="s2">&quot;started&quot;</span><span class="p">]</span>
+</span><span id="Capability-244"><a href="#Capability-244"><span class="linenos">244</span></a>        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">var</span> <span class="o">+</span> <span class="s2">&quot; = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+</span><span id="Capability-245"><a href="#Capability-245"><span class="linenos">245</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">)&quot;</span>
+</span><span id="Capability-246"><a href="#Capability-246"><span class="linenos">246</span></a>    
+</span><span id="Capability-247"><a href="#Capability-247"><span class="linenos">247</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Capability-248"><a href="#Capability-248"><span class="linenos">248</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-249"><a href="#Capability-249"><span class="linenos">249</span></a><span class="sd">        Starts the application of the capability.</span>
+</span><span id="Capability-250"><a href="#Capability-250"><span class="linenos">250</span></a><span class="sd">        This is useful for capabilities that may be started from a different state than when they were put into a plan.</span>
+</span><span id="Capability-251"><a href="#Capability-251"><span class="linenos">251</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-252"><a href="#Capability-252"><span class="linenos">252</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="Capability-253"><a href="#Capability-253"><span class="linenos">253</span></a>
+</span><span id="Capability-254"><a href="#Capability-254"><span class="linenos">254</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Capability-255"><a href="#Capability-255"><span class="linenos">255</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-256"><a href="#Capability-256"><span class="linenos">256</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
+</span><span id="Capability-257"><a href="#Capability-257"><span class="linenos">257</span></a>
+</span><span id="Capability-258"><a href="#Capability-258"><span class="linenos">258</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability-259"><a href="#Capability-259"><span class="linenos">259</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
+</span><span id="Capability-260"><a href="#Capability-260"><span class="linenos">260</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-261"><a href="#Capability-261"><span class="linenos">261</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="Capability-262"><a href="#Capability-262"><span class="linenos">262</span></a>    
+</span><span id="Capability-263"><a href="#Capability-263"><span class="linenos">263</span></a>    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Capability-264"><a href="#Capability-264"><span class="linenos">264</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-265"><a href="#Capability-265"><span class="linenos">265</span></a><span class="sd">        Carries out the capability during one time step.</span>
+</span><span id="Capability-266"><a href="#Capability-266"><span class="linenos">266</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-267"><a href="#Capability-267"><span class="linenos">267</span></a>        <span class="k">pass</span>
+</span><span id="Capability-268"><a href="#Capability-268"><span class="linenos">268</span></a>
+</span><span id="Capability-269"><a href="#Capability-269"><span class="linenos">269</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Capability-270"><a href="#Capability-270"><span class="linenos">270</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-271"><a href="#Capability-271"><span class="linenos">271</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
+</span><span id="Capability-272"><a href="#Capability-272"><span class="linenos">272</span></a>
+</span><span id="Capability-273"><a href="#Capability-273"><span class="linenos">273</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability-274"><a href="#Capability-274"><span class="linenos">274</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
+</span><span id="Capability-275"><a href="#Capability-275"><span class="linenos">275</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-276"><a href="#Capability-276"><span class="linenos">276</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="Capability-277"><a href="#Capability-277"><span class="linenos">277</span></a>    
+</span><span id="Capability-278"><a href="#Capability-278"><span class="linenos">278</span></a>    <span class="k">def</span> <span class="nf">next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+</span><span id="Capability-279"><a href="#Capability-279"><span class="linenos">279</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability-280"><a href="#Capability-280"><span class="linenos">280</span></a><span class="sd">        Returns the intended next position of the agent, if this capability were to be activated.</span>
+</span><span id="Capability-281"><a href="#Capability-281"><span class="linenos">281</span></a><span class="sd">        Note that this is not necessarily the position in the next time step, since preconditions may inhibit the move.</span>
+</span><span id="Capability-282"><a href="#Capability-282"><span class="linenos">282</span></a><span class="sd">        In case of an inhibited move, next_pos may change in the next time step, if replanning occurs.</span>
+</span><span id="Capability-283"><a href="#Capability-283"><span class="linenos">283</span></a><span class="sd">        Default behavior is to return the current agent position, i.e. the capability does not move the agent.</span>
+</span><span id="Capability-284"><a href="#Capability-284"><span class="linenos">284</span></a>
+</span><span id="Capability-285"><a href="#Capability-285"><span class="linenos">285</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability-286"><a href="#Capability-286"><span class="linenos">286</span></a><span class="sd">            tuple[int, int]: the intended next position.</span>
+</span><span id="Capability-287"><a href="#Capability-287"><span class="linenos">287</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability-288"><a href="#Capability-288"><span class="linenos">288</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">pos</span>
 </span></pre></div>
 
 
@@ -1489,16 +1587,16 @@ Then, any further actions specified in the superclass are carried out.</p>
 
     </div>
     <a class="headerlink" href="#Capability.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.__init__-211"><a href="#Capability.__init__-211"><span class="linenos">211</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">):</span>
-</span><span id="Capability.__init__-212"><a href="#Capability.__init__-212"><span class="linenos">212</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability.__init__-213"><a href="#Capability.__init__-213"><span class="linenos">213</span></a><span class="sd">        Creates the capability for a certain agent.</span>
-</span><span id="Capability.__init__-214"><a href="#Capability.__init__-214"><span class="linenos">214</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
-</span><span id="Capability.__init__-215"><a href="#Capability.__init__-215"><span class="linenos">215</span></a>
-</span><span id="Capability.__init__-216"><a href="#Capability.__init__-216"><span class="linenos">216</span></a><span class="sd">        Args:</span>
-</span><span id="Capability.__init__-217"><a href="#Capability.__init__-217"><span class="linenos">217</span></a><span class="sd">            agent (Agent): the agent who should have this capability.</span>
-</span><span id="Capability.__init__-218"><a href="#Capability.__init__-218"><span class="linenos">218</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability.__init__-219"><a href="#Capability.__init__-219"><span class="linenos">219</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
-</span><span id="Capability.__init__-220"><a href="#Capability.__init__-220"><span class="linenos">220</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">False</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.__init__-225"><a href="#Capability.__init__-225"><span class="linenos">225</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">):</span>
+</span><span id="Capability.__init__-226"><a href="#Capability.__init__-226"><span class="linenos">226</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.__init__-227"><a href="#Capability.__init__-227"><span class="linenos">227</span></a><span class="sd">        Creates the capability for a certain agent.</span>
+</span><span id="Capability.__init__-228"><a href="#Capability.__init__-228"><span class="linenos">228</span></a><span class="sd">        Subclasses can add parameters for how to use a certain capability.</span>
+</span><span id="Capability.__init__-229"><a href="#Capability.__init__-229"><span class="linenos">229</span></a>
+</span><span id="Capability.__init__-230"><a href="#Capability.__init__-230"><span class="linenos">230</span></a><span class="sd">        Args:</span>
+</span><span id="Capability.__init__-231"><a href="#Capability.__init__-231"><span class="linenos">231</span></a><span class="sd">            agent (Agent): the agent who should have this capability.</span>
+</span><span id="Capability.__init__-232"><a href="#Capability.__init__-232"><span class="linenos">232</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.__init__-233"><a href="#Capability.__init__-233"><span class="linenos">233</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
+</span><span id="Capability.__init__-234"><a href="#Capability.__init__-234"><span class="linenos">234</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">False</span>
 </span></pre></div>
 
 
@@ -1547,12 +1645,12 @@ Subclasses can add parameters for how to use a certain capability.</p>
 
     </div>
     <a class="headerlink" href="#Capability.start"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.start-233"><a href="#Capability.start-233"><span class="linenos">233</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Capability.start-234"><a href="#Capability.start-234"><span class="linenos">234</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability.start-235"><a href="#Capability.start-235"><span class="linenos">235</span></a><span class="sd">        Starts the application of the capability.</span>
-</span><span id="Capability.start-236"><a href="#Capability.start-236"><span class="linenos">236</span></a><span class="sd">        This is useful for capabilities that may be started from a different state than when they were put into a plan.</span>
-</span><span id="Capability.start-237"><a href="#Capability.start-237"><span class="linenos">237</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability.start-238"><a href="#Capability.start-238"><span class="linenos">238</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">True</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.start-247"><a href="#Capability.start-247"><span class="linenos">247</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Capability.start-248"><a href="#Capability.start-248"><span class="linenos">248</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.start-249"><a href="#Capability.start-249"><span class="linenos">249</span></a><span class="sd">        Starts the application of the capability.</span>
+</span><span id="Capability.start-250"><a href="#Capability.start-250"><span class="linenos">250</span></a><span class="sd">        This is useful for capabilities that may be started from a different state than when they were put into a plan.</span>
+</span><span id="Capability.start-251"><a href="#Capability.start-251"><span class="linenos">251</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.start-252"><a href="#Capability.start-252"><span class="linenos">252</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">started</span> <span class="o">=</span> <span class="kc">True</span>
 </span></pre></div>
 
 
@@ -1573,14 +1671,14 @@ This is useful for capabilities that may be started from a different state than 
 
     </div>
     <a class="headerlink" href="#Capability.precondition"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.precondition-240"><a href="#Capability.precondition-240"><span class="linenos">240</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Capability.precondition-241"><a href="#Capability.precondition-241"><span class="linenos">241</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability.precondition-242"><a href="#Capability.precondition-242"><span class="linenos">242</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
-</span><span id="Capability.precondition-243"><a href="#Capability.precondition-243"><span class="linenos">243</span></a>
-</span><span id="Capability.precondition-244"><a href="#Capability.precondition-244"><span class="linenos">244</span></a><span class="sd">        Returns:</span>
-</span><span id="Capability.precondition-245"><a href="#Capability.precondition-245"><span class="linenos">245</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
-</span><span id="Capability.precondition-246"><a href="#Capability.precondition-246"><span class="linenos">246</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability.precondition-247"><a href="#Capability.precondition-247"><span class="linenos">247</span></a>        <span class="k">return</span> <span class="kc">True</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.precondition-254"><a href="#Capability.precondition-254"><span class="linenos">254</span></a>    <span class="k">def</span> <span class="nf">precondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Capability.precondition-255"><a href="#Capability.precondition-255"><span class="linenos">255</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.precondition-256"><a href="#Capability.precondition-256"><span class="linenos">256</span></a><span class="sd">        Checks if the precondition for executing this capability is fulfilled.</span>
+</span><span id="Capability.precondition-257"><a href="#Capability.precondition-257"><span class="linenos">257</span></a>
+</span><span id="Capability.precondition-258"><a href="#Capability.precondition-258"><span class="linenos">258</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability.precondition-259"><a href="#Capability.precondition-259"><span class="linenos">259</span></a><span class="sd">            bool: True if the capability can be used, False otherwise</span>
+</span><span id="Capability.precondition-260"><a href="#Capability.precondition-260"><span class="linenos">260</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.precondition-261"><a href="#Capability.precondition-261"><span class="linenos">261</span></a>        <span class="k">return</span> <span class="kc">True</span>
 </span></pre></div>
 
 
@@ -1606,11 +1704,11 @@ This is useful for capabilities that may be started from a different state than 
 
     </div>
     <a class="headerlink" href="#Capability.act"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.act-249"><a href="#Capability.act-249"><span class="linenos">249</span></a>    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Capability.act-250"><a href="#Capability.act-250"><span class="linenos">250</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability.act-251"><a href="#Capability.act-251"><span class="linenos">251</span></a><span class="sd">        Carries out the capability during one time step.</span>
-</span><span id="Capability.act-252"><a href="#Capability.act-252"><span class="linenos">252</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability.act-253"><a href="#Capability.act-253"><span class="linenos">253</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.act-263"><a href="#Capability.act-263"><span class="linenos">263</span></a>    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Capability.act-264"><a href="#Capability.act-264"><span class="linenos">264</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.act-265"><a href="#Capability.act-265"><span class="linenos">265</span></a><span class="sd">        Carries out the capability during one time step.</span>
+</span><span id="Capability.act-266"><a href="#Capability.act-266"><span class="linenos">266</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.act-267"><a href="#Capability.act-267"><span class="linenos">267</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -1630,14 +1728,14 @@ This is useful for capabilities that may be started from a different state than 
 
     </div>
     <a class="headerlink" href="#Capability.postcondition"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.postcondition-255"><a href="#Capability.postcondition-255"><span class="linenos">255</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="Capability.postcondition-256"><a href="#Capability.postcondition-256"><span class="linenos">256</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Capability.postcondition-257"><a href="#Capability.postcondition-257"><span class="linenos">257</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
-</span><span id="Capability.postcondition-258"><a href="#Capability.postcondition-258"><span class="linenos">258</span></a>
-</span><span id="Capability.postcondition-259"><a href="#Capability.postcondition-259"><span class="linenos">259</span></a><span class="sd">        Returns:</span>
-</span><span id="Capability.postcondition-260"><a href="#Capability.postcondition-260"><span class="linenos">260</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
-</span><span id="Capability.postcondition-261"><a href="#Capability.postcondition-261"><span class="linenos">261</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Capability.postcondition-262"><a href="#Capability.postcondition-262"><span class="linenos">262</span></a>        <span class="k">return</span> <span class="kc">True</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.postcondition-269"><a href="#Capability.postcondition-269"><span class="linenos">269</span></a>    <span class="k">def</span> <span class="nf">postcondition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="Capability.postcondition-270"><a href="#Capability.postcondition-270"><span class="linenos">270</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.postcondition-271"><a href="#Capability.postcondition-271"><span class="linenos">271</span></a><span class="sd">        Checks if the postcondition for this capability is fulfilled.</span>
+</span><span id="Capability.postcondition-272"><a href="#Capability.postcondition-272"><span class="linenos">272</span></a>
+</span><span id="Capability.postcondition-273"><a href="#Capability.postcondition-273"><span class="linenos">273</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability.postcondition-274"><a href="#Capability.postcondition-274"><span class="linenos">274</span></a><span class="sd">            bool: True if the capability has been fulfilled, False otherwise</span>
+</span><span id="Capability.postcondition-275"><a href="#Capability.postcondition-275"><span class="linenos">275</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.postcondition-276"><a href="#Capability.postcondition-276"><span class="linenos">276</span></a>        <span class="k">return</span> <span class="kc">True</span>
 </span></pre></div>
 
 
@@ -1647,6 +1745,45 @@ This is useful for capabilities that may be started from a different state than 
 
 <blockquote>
   <p>bool: True if the capability has been fulfilled, False otherwise</p>
+</blockquote>
+</div>
+
+
+                            </div>
+                            <div id="Capability.next_pos" class="classattr">
+                                        <input id="Capability.next_pos-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">next_pos</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
+
+                <label class="view-source-button" for="Capability.next_pos-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Capability.next_pos"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Capability.next_pos-278"><a href="#Capability.next_pos-278"><span class="linenos">278</span></a>    <span class="k">def</span> <span class="nf">next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+</span><span id="Capability.next_pos-279"><a href="#Capability.next_pos-279"><span class="linenos">279</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Capability.next_pos-280"><a href="#Capability.next_pos-280"><span class="linenos">280</span></a><span class="sd">        Returns the intended next position of the agent, if this capability were to be activated.</span>
+</span><span id="Capability.next_pos-281"><a href="#Capability.next_pos-281"><span class="linenos">281</span></a><span class="sd">        Note that this is not necessarily the position in the next time step, since preconditions may inhibit the move.</span>
+</span><span id="Capability.next_pos-282"><a href="#Capability.next_pos-282"><span class="linenos">282</span></a><span class="sd">        In case of an inhibited move, next_pos may change in the next time step, if replanning occurs.</span>
+</span><span id="Capability.next_pos-283"><a href="#Capability.next_pos-283"><span class="linenos">283</span></a><span class="sd">        Default behavior is to return the current agent position, i.e. the capability does not move the agent.</span>
+</span><span id="Capability.next_pos-284"><a href="#Capability.next_pos-284"><span class="linenos">284</span></a>
+</span><span id="Capability.next_pos-285"><a href="#Capability.next_pos-285"><span class="linenos">285</span></a><span class="sd">        Returns:</span>
+</span><span id="Capability.next_pos-286"><a href="#Capability.next_pos-286"><span class="linenos">286</span></a><span class="sd">            tuple[int, int]: the intended next position.</span>
+</span><span id="Capability.next_pos-287"><a href="#Capability.next_pos-287"><span class="linenos">287</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Capability.next_pos-288"><a href="#Capability.next_pos-288"><span class="linenos">288</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">pos</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Returns the intended next position of the agent, if this capability were to be activated.
+Note that this is not necessarily the position in the next time step, since preconditions may inhibit the move.
+In case of an inhibited move, next_pos may change in the next time step, if replanning occurs.
+Default behavior is to return the current agent position, i.e. the capability does not move the agent.</p>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>tuple[int, int]: the intended next position.</p>
 </blockquote>
 </div>
 

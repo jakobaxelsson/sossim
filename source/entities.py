@@ -78,7 +78,7 @@ class VehicleWorldModel(core.WorldModel):
         Updates the perception of the world as represented in this world model.
         This is done by setting space to a subgraph of the model's space, that only contain neighboring nodes.
         """
-        neighbors = self.agent.model.space.grid_neighbors(self.agent.pos, diagonal = True, dist = self.agent.perception_range)
+        neighbors = self.agent.model.space.grid_neighbors(self.agent.pos, diagonal = True, center = True, dist = self.agent.perception_range)
         self.space = self.agent.model.space.subgraph([self.agent.pos] + neighbors)
 
 @configurable
@@ -192,12 +192,18 @@ class Vehicle(core.Agent):
         # - There is a route to move along
         # - The first step of the route is a destination
         # - There are other agents in that destination with which the vehicle cannot coexist
-        if wm.plan[0] and \
-            hasattr(wm.plan[0], "route") and \
-            wm.plan[0].route and \
-            wm.space.is_destination(wm.plan[0].route[0]) and \
-            not all(self.can_coexist(other) for other in wm.space.get_cell_list_contents([wm.plan[0].route[0]])):
+        # if wm.plan and \
+        #     hasattr(wm.plan[0], "route") and \
+        #     wm.plan[0].route and \
+        #     wm.space.is_destination(wm.plan[0].route[0]) and \
+        #     not all(self.can_coexist(other) for other in wm.space.get_cell_list_contents([wm.plan[0].route[0]])):
+        #     # Abandon current plan, and move to one of the other neighbors which is not a destination node
+        #     self.world_model.plan = [capabilities.Move(self, lambda node: not wm.space.is_destination(node))]
+        if wm.space.is_destination(self.next_pos()) and \
+            not all(self.can_coexist(other) for other in wm.space.get_cell_list_contents([self.next_pos()])):
+            # Abandon current plan, and move to one of the other neighbors which is not a destination node
             self.world_model.plan = [capabilities.Move(self, lambda node: not wm.space.is_destination(node))]
+
 
     def move(self, target: Node):
         """

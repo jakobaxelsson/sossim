@@ -202,6 +202,20 @@ class Agent(Entity):
             self.world_model.plan[0].act()
         super().act()
 
+    def next_pos(self) -> tuple[int, int] | None:
+        """
+        Returns the intended next position of the agent, based on its plan. 
+        If the agent has a plan, the intended next position of the first capability of the plan is returned.
+        If there is no plan, None is returned.
+
+        Returns:
+            Tuple[int, int] | None: _description_
+        """
+        if self.world_model.plan:
+            return self.world_model.plan[0].next_pos()
+        else:
+            return None
+
 class Capability:
     """
     A generic capability, serving as a base class for specific capabilities.
@@ -259,3 +273,15 @@ class Capability:
             bool: True if the capability has been fulfilled, False otherwise
         """
         return True
+    
+    def next_pos(self) -> tuple[int, int]:
+        """
+        Returns the intended next position of the agent, if this capability were to be activated.
+        Note that this is not necessarily the position in the next time step, since preconditions may inhibit the move.
+        In case of an inhibited move, next_pos may change in the next time step, if replanning occurs.
+        Default behavior is to return the current agent position, i.e. the capability does not move the agent.
+
+        Returns:
+            tuple[int, int]: the intended next position.
+        """
+        return self.agent.pos

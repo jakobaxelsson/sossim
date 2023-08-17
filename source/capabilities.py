@@ -47,16 +47,16 @@ class Move(core.Capability):
         wm = self.agent.world_model
 
         # There is no road to the next node from the current node.
-        if self.route[0] not in wm.space.roads_from(self.agent.pos):
+        if self.next_pos() not in wm.space.roads_from(self.agent.pos):
             return False
 
         # If there is another entity in the node with which the agent cannot exist, it must be assumed that it might stay.
-        if not all(self.agent.can_coexist(other) for other in wm.space.get_cell_list_contents([self.route[0]])):
+        if not all(self.agent.can_coexist(other) for other in wm.space.get_cell_list_contents([self.next_pos()])):
             return False
         
         # Priority rules prevent a move.
         if not all(self.agent.can_coexist(other)
-                   for priority_pos in wm.space.priority_nodes(self.agent.pos, self.route[0])
+                   for priority_pos in wm.space.priority_nodes(self.agent.pos, self.next_pos())
                    for other in wm.space.get_cell_list_contents([priority_pos])):
             return False
 
@@ -70,7 +70,7 @@ class Move(core.Capability):
         """
         Performs a move to the next node in the route, and remove that node from the route.
         """
-        self.agent.move(self.route[0])
+        self.agent.move(self.next_pos())
 
     def postcondition(self) -> bool:
         """
@@ -80,6 +80,18 @@ class Move(core.Capability):
             bool: True if and only if the final position of the route has been reached, meaning that the route is empty.
         """
         return self.route[0] == self.agent.pos
+
+    def next_pos(self) -> tuple[int, int]:
+        """
+        Returns the first position of the route, if there is a route, and otherwise the current agent position.
+
+        Returns:
+            tuple[int, int]: the intended next position.
+        """
+        if self.route:
+            return self.route[0]
+        else:
+            return self.agent.pos
 
 class FollowRoute(core.Capability):
     
@@ -105,7 +117,7 @@ class FollowRoute(core.Capability):
             super().start()
             self.route = self.route_planner()
             # If the current node of the agent is included at the start of the route, remove it
-            if self.route[0] == self.agent.pos:
+            if self.next_pos() == self.agent.pos:
                 self.route = self.route[1:]
 
     def precondition(self) -> bool:
@@ -126,7 +138,7 @@ class FollowRoute(core.Capability):
             return False
         
         wm = self.agent.world_model
-        target = self.route[0]
+        target = self.next_pos()
 
         # There is no road to the next node from the current node.
         if target not in wm.space.roads_from(self.agent.pos):
@@ -152,7 +164,7 @@ class FollowRoute(core.Capability):
         """
         Performs a move to the next node in the route, and remove that node from the route.
         """
-        self.agent.move(self.route[0])
+        self.agent.move(self.next_pos())
         self.route = self.route[1:]
 
     def postcondition(self) -> bool:
@@ -163,6 +175,18 @@ class FollowRoute(core.Capability):
             bool: True if and only if the final position of the route has been reached, meaning that the route is empty.
         """
         return self.route == []
+
+    def next_pos(self) -> tuple[int, int]:
+        """
+        Returns the first position of the route, if there is a route, and otherwise the current agent position.
+
+        Returns:
+            tuple[int, int]: the intended next position.
+        """
+        if self.route:
+            return self.route[0]
+        else:
+            return self.agent.pos
 
 class LoadCargo(core.Capability):
     

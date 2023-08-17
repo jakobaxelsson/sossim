@@ -13,7 +13,7 @@ import space
 @configurable
 class TransportSystem(core.Model):
     # Define configuration parameters relevant to this class
-    num_vehicles: Annotated[int, "Param", "number of vehicles"] = 10 
+    num_vehicles: Annotated[int, "Param", "number of vehicles"] = 10
     num_cargos:   Annotated[int, "Param", "number of cargos"] = 10
     random_seed:  Annotated[int, "Param", "seed for random number generator (use -1 to initialize from system time)"] = -1
 

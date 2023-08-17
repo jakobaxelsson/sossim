@@ -26,59 +26,29 @@ class RoadGridGraph(nx.DiGraph):
     Some destinations can also have charging points.
     """
 
-    def __init__(self, width: int = 0, height: int = 0, node_attrs: dict[str, Any] = dict(), edge_attrs: dict[str, Any] = dict()):
+    def __init__(self, width: int = 0, height: int = 0):
         """
         Creates the grid graph.
-        Two dictionaries are provided that give optional default attributes to nodes and edges.
         
         Args:
             width (int, optional): the width of the grid. Defaults to 0.
             height (int, optional): the height of the grid. Defaults to 0.
-            node_attrs (dict[str, Any]): attributes and values to be added to each node. Defaults to an empty dictionary.
-            edge_attrs (dict[str, Any]): attributes and values to be added to each edge. Defaults to an empty dictionary.
 
         Returns:
             nx.DiGraph: the resulting graph.
         """
+        super().__init__()
         self.width = width
         self.height = height
-        if width > 0 and height > 0:
-            # Create the graph and fill it by adding bidirectional edges going down and to the right of each node.
-            super().__init__()
-            for x in range(width):
-                for y in range(height):
-                    if x != width - 1: # Do not add edge to the right if in last column
-                        self.add_edge((x, y), (x + 1, y))
-                        self.add_edge((x + 1, y), (x, y))
-                    if y != height - 1: # Do not add edge downwards if in last row
-                        self.add_edge((x, y), (x, y + 1))
-                        self.add_edge((x, y  + 1), (x, y))
 
-            # Set default attribute values for nodes and edges
-            for node in self.nodes:
-                self.nodes[node]["road"] = False
-                self.nodes[node]["destination"] = False
-                self.nodes[node]["charging_point"] = False
-                self.nodes[node]["agent"] = []
-                for (attr, value) in node_attrs.items():
-                    self.nodes[node][attr] = value
-            for (source, sink) in self.edges:
-                self[source][sink]["road"] = False
-                for (attr, value) in edge_attrs.items():
-                    self[source][sink][attr] = value
-
-            # Set the direction attribute for edges
-            for (source, sink) in self.edges:
-                ((x1, y1), (x2, y2)) = (source, sink)
-                self[source][sink]["direction"] = int(math.degrees(math.atan2(y2 - y1, x2 - x1))) + 90
-
-    def grid_neighbors(self, node: Node, diagonal: bool = False, dist: int = 1) -> list[Node]:
+    def grid_neighbors(self, node: Node, diagonal: bool = False, center: bool = False, dist: int = 1) -> list[Node]:
         """
         Returns a list of all grid neighbors of a node. If diagonal is False, diagonal neighbors are not included.
 
         Args:
             node (Node): the node.
             diagonal (bool, optional): if True, diagonal neighbors are included. Defaults to False.
+            center (bool, optional): if True, the given node, which is at the center of the set, is included in the result. Defaults to False.
             dist (int, optional): if different from 1, include all nodes at this distance. Defaults to 1.
 
         Returns:
@@ -88,8 +58,10 @@ class RoadGridGraph(nx.DiGraph):
         result = []
         for x in range(max(ax - dist, 0), min(ax + dist + 1, self.width)):
             for y in range(max(ay - dist, 0), min(ay + dist + 1, self.height)):
-                if diagonal or x != y:
+                if diagonal or x == ax or y == ay:
                     result.append(Node((x, y)))
+        if not center:
+            result.remove(node)
         return result
 
     def add_road(self, source: Node, sink: Node, bidirectional: bool = False):
@@ -101,11 +73,24 @@ class RoadGridGraph(nx.DiGraph):
             sink (Node): sink node.
             bidirectional (bool, optional): if True, the road in opposite direction is also added. Defaults to False.
         """
-        self.nodes[source]["road"] = True
-        self.nodes[sink]["road"] = True
+        self.add_edge(source, sink)
+
+        # Set the default attribute values of nodes and edges
+        # TODO: Do this only if the attributes have not yet been defined
+        for node in [source, sink]:
+            self.nodes[node]["road"] = True
+            self.nodes[node]["destination"] = False
+            self.nodes[node]["charging_point"] = False
+            self.nodes[node]["agent"] = []
         self[source][sink]["road"] = True
+        ((x1, y1), (x2, y2)) = (source, sink)
+        self[source][sink]["direction"] = int(math.degrees(math.atan2(y2 - y1, x2 - x1))) + 90
+
         if bidirectional:
+            self.add_edge(sink, source)
             self[sink][source]["road"] = True
+            ((x1, y1), (x2, y2)) = (sink, source)
+            self[sink][source]["direction"] = int(math.degrees(math.atan2(y2 - y1, x2 - x1))) + 90
 
     def add_roads(self, node: Node, directions: list[Direction]):
         """
@@ -116,7 +101,9 @@ class RoadGridGraph(nx.DiGraph):
             directions (list[Direction]): a list containing directions in degrees.
         """
         for d in directions:
-            next_node = next(n for n in self.neighbors(node) if self[node][n]["direction"] == d)
+            (x, y) = node
+            dirs = { 0 : (x, y - 1), 90 : (x + 1, y), 180 : (x, y + 1), 270 : (x - 1, y) }
+            next_node = dirs[d]
             self.add_road(node, next_node)
             node = next_node
 
@@ -147,8 +134,7 @@ class RoadGridGraph(nx.DiGraph):
         Returns:
             bool: _description_
         """
-        roads_from = [sink for _, sink, has_road in self.out_edges(source, data = "road") if has_road]
-        return any(self[source][sink]["direction"] == direction for sink in roads_from)
+        return any(self[source][sink]["direction"] == direction for sink in self[source] if self.is_road(source, sink))
 
     def is_road(self, node1: Node, node2: Optional[Node] = None) -> bool:
         """
@@ -164,7 +150,7 @@ class RoadGridGraph(nx.DiGraph):
         if node2:
             return self[node1][node2].get("road", False)
         else:
-            return self.nodes[node1].get("road", False)
+            return self.has_node(node1) and self.nodes[node1].get("road", False)
 
     def road_degree(self, node: Node) -> int:
         """
@@ -226,7 +212,6 @@ class RoadNetworkGrid(core.Space):
             Self: the subgraph space.
         """
         result = copy.copy(self)
-#        result.road_network = self.road_network.subgraph(nodes)
         result.road_network = nx.subgraph_view(self.road_network, filter_node = lambda node: node in nodes)
         return result
 
@@ -245,7 +230,7 @@ class RoadNetworkGrid(core.Space):
 
         # Step 1. Create a connected graph whose nodes are a subset of the grid cells.
         start_node = (self.width // 2, self.height //2)
-        edge_candidates = { (start_node, neighbor) : self._edge_preference((start_node, neighbor)) for neighbor in cnw.neighbors(start_node) }
+        edge_candidates = { (start_node, neighbor) : self._edge_preference((start_node, neighbor)) for neighbor in cnw.grid_neighbors(start_node) }
 
         # The number of nodes is determined by the road_density parameter.
         remaining_nodes = self.width * self.height * self.road_density
@@ -255,7 +240,7 @@ class RoadNetworkGrid(core.Space):
 
             # If the sink of the new edge is new in the graph, add edges to its neighbors as new edge candidates
             if not cnw.is_road(sink):
-                new_edge_candidates = { (sink, neighbor) : self._edge_preference((sink, neighbor)) for neighbor in cnw.neighbors(sink) }
+                new_edge_candidates = { (sink, neighbor) : self._edge_preference((sink, neighbor)) for neighbor in cnw.grid_neighbors(sink) }
                 edge_candidates.update(new_edge_candidates)
 
             # Add the new edge (and implicitly its nodes), and remove the edge as a candidate.
@@ -265,7 +250,7 @@ class RoadNetworkGrid(core.Space):
 
             # Update the edge preferences for all connections to neighbours of source and sink
             for node in [source, sink]:
-                for neighbor in cnw.neighbors(node):
+                for neighbor in cnw.grid_neighbors(node):
                     edge_candidates[(node, neighbor)] = self._edge_preference((node, neighbor))
 
         # Step 2. Add lanes and roundabouts.
@@ -319,9 +304,9 @@ class RoadNetworkGrid(core.Space):
                 rnw.add_roads(subnode(node, 1, 1), [S, E, N, W])
 
         # Add one destination to all road nodes that have a free grid neighbor. 
-        for node in rnw.nodes:
+        for node in list(rnw.nodes):
             if rnw.is_road(node) and not self.is_destination(node):
-                for destination in rnw.neighbors(node): 
+                for destination in rnw.grid_neighbors(node): 
                     if not rnw.is_road(destination):
                         if self.model.random.random() < self.destination_density:
                             charging_point = self.model.random.random() < self.charging_point_density
@@ -525,12 +510,11 @@ class RoadNetworkGrid(core.Space):
         """
         return self.road_network.is_road(node1, node2)
 
-
-    def grid_neighbors(self, node: Node, diagonal: bool = False, dist: int = 1) -> list[Node]:
+    def grid_neighbors(self, node: Node, diagonal: bool = False, center: bool = False, dist: int = 1) -> list[Node]:
         """
         Calls the method with the same name on self.road_network.
         """
-        return self.road_network.grid_neighbors(node, diagonal, dist)
+        return self.road_network.grid_neighbors(node, diagonal, center, dist)
 
     # Mesa space API (adapted from mesa.space.NetworkGrid)
 

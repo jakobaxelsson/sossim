@@ -10,14 +10,25 @@ Style sheet for the SoSSim systems-of-systems simulator.
     /* Map colors and styling */
     --map-background: lightgreen;
     --map-border: 0.5px solid black;
+    --map-grid-color: lightslategray;
+    --map-grid-width: 0.05;
+
+    --coarse-road-color: wheat; 
+    --coarse-road-width: 2.2;
+
     --road-color: lightslategray;
     --road-width: 0.8;
+
     --destination-background: darkgray;
+
     --charging-point-background: orange;
     --charging-point-foreground: black;
+
     --cargo-color: red;
+
     --route-color: dimgray;
     --route-width: var(--road-width);
+
     --world-model-space-color: yellow;
     --world-model-space-opacity: 0.4;
 
@@ -39,6 +50,17 @@ Style sheet for the SoSSim systems-of-systems simulator.
 .map {
     border: var(--map-border); 
     background: var(--map-background);
+
+    & .grid_line {
+        stroke: var(--map-grid-color);
+        stroke-width: var(--map-grid-width);
+    }
+
+    & .coarse_road { 
+        stroke: var(--coarse-road-color); 
+        stroke-width: var(--coarse-road-width);
+        stroke-linecap: square;
+    }
 
     & .road { 
         stroke: var(--road-color); 

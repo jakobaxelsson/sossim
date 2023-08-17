@@ -46,6 +46,7 @@ class JSDomElement(Protocol):
     def querySelector(self, q: str) -> Self: ...
     def remove(self): ...
     def removeChild(self, child: Self): ...
+    def getAttribute(self, name: str) -> str: ...
     def setAttribute(self, name: str, value: Any): ...
 
 class JSDocument(Protocol):
@@ -124,12 +125,24 @@ class DomWrapper:
         """
         DomWrapper.stack.pop()
 
+    def __getitem__(self, attribute: str) -> str:
+        """
+        Retrieves an attribute of the DOM element.
+
+        Args:
+            attribute (str): the attribute.
+
+        Returns:
+            str: returns the attribute value as a string.
+        """
+        return self.dom_element.getAttribute(attribute)      
+
     def __setitem__(self, attribute: str, value: Any):
         """
         Changes an attribute of the DOM element.
 
         Args:
-            key (str): the attribute.
+            attribute (str): the attribute.
             value (Any): the new value.
         """
         self.dom_element.setAttribute(attribute, value)      
@@ -198,6 +211,15 @@ class DomWrapper:
             text (Any): the inner_html
         """
         self.dom_element.innerHTML = str(text)
+
+    def visible(self, is_visible: bool = True):
+        """
+        Changes the visibility of the element.
+
+        Args:
+            is_visible (bool, optional): if True, the element becomes visible, and otherwise invisible. Defaults to True.
+        """
+        self.dom_element.style.display = "block" if is_visible else "none"
 
 class dom(DomWrapper):
     """

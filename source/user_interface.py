@@ -87,8 +87,7 @@ class VehicleView(View):
                             
             # Show its world view space if it has one
             with document.query("#world_model").clear():
-                nodes = agent.model.space.grid_neighbors(agent.pos, diagonal = True, dist = self.agent.perception_range)
-                print(agent.pos, nodes)
+                nodes = agent.model.space.grid_neighbors(agent.pos, diagonal = True, center = True, dist = self.agent.perception_range)
                 for (x, y) in nodes:
                     rect(cls = "world_model_space", x = x, y = y, width = 1, height = 1)                        
 
@@ -138,6 +137,19 @@ class RoadNetworkGridView(View):
         """
         with document.query("#map") as m:
             m["viewBox"] = f"0 0 {space.width * 4} {space.height * 4}"
+
+        with document.query("#grid").clear():
+            # Visualize the coarse grid
+            for x in range(0, space.width + 1):
+                line(cls = "grid_line", x1 = 4 * x, y1 = 0, x2 = 4 * x, y2 = 4 * space.height)
+            for y in range(0, space.height + 1):
+                line(cls = "grid_line", x1 = 0, y1 = 4 * y, x2 = 4 * space.width, y2 = 4 * y)
+
+        with document.query("#coarse_road_network").clear():
+            # Visualize roads
+            for (x1, y1), (x2, y2) in space.coarse_network.edges:
+                line(cls = "coarse_road", x1 = 4 * x1 + 2, y1 = 4 * y1 + 2, x2 = 4 * x2 + 2, y2 = 4 * y2 + 2)
+
         with document.query("#road_network").clear():
             # Visualize roads
             for (x1, y1), (x2, y2) in space.road_edges():
@@ -235,7 +247,7 @@ class SimulationController:
         with document.query("#controls").clear():
             with div(id = "simulation_controls"):
                 with button("Step"):
-                    event_listener("click", lambda _: self.ui.model.step())
+                    event_listener("click", lambda _: self.step())
                 with button("Run"):
                     event_listener("click", lambda _: self.run())
                 with button("Stop"):
@@ -256,11 +268,22 @@ class SimulationController:
                     event_listener("click", lambda _: self.transform_map(x = 0, y = -1))
         self.transform_map()
         
+    def step(self):
+        """
+        Executes one step of the simulation.
+        """
+        try:
+            self.ui.model.step()
+        except Exception as e:
+            # If an exception occurs, stop any running simulation and reraise the exception
+            self.stop()
+            raise e
+
     def run(self):
         """
         Runs the simulation by repeatedly invoking step (with a small delay between steps).
         """
-        self.timer = js.setInterval(create_proxy(self.ui.model.step), 250)
+        self.timer = js.setInterval(create_proxy(self.step), 250)
 
     def stop(self):
         """
@@ -335,6 +358,51 @@ class ConfigurationController:
                             self.ui.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
         self.ui.reinitialize()
 
+class ViewController:
+    """
+    Provides a view configuration controller that lets the user configure what simulation elements are to be visible.
+    """
+    def __init__(self, ui: "UserInterface"):
+        """
+        Sets up the view controller, adding the necessary DOM elements.
+
+        Args:
+            ui (UserInterface): the user interface of which this controller is a part.
+        """
+        self.ui = ui
+        self.update()
+
+    def update(self):
+        """
+        Updates the view controller to match the current settings.
+        """
+        with document.query("#view_settings").clear():
+            h3("View settings")
+            self.add_control("Grid", "#grid")
+            self.add_control("Coarse road network", "#coarse_road_network")
+            self.add_control("Road network", "#road_network")
+            self.add_control("World model", "#world_model")
+            self.add_control("Route", "#route")
+            self.add_control("Vehicles", "#vehicles")
+            self.add_control("Cargo", "#cargos")
+
+    def add_control(self, label_str: str, q: str, checked: bool = True):
+        """
+        Creates a checkbox that can be used to toggle visibility of an element.
+
+        Args:
+            label_str (str): a label to be attached to the checkbox.
+            q (str): a query string that gives the element whose visibility is controlled by the checkbox.
+            checked (bool): if true, the checkbox is initially checked.
+        """
+        # TODO: It would be nicer if the initial checkbox status was derived from element being controlled
+        with input_(type = "checkbox") as checkbox:
+            if checked:
+                checkbox["checked"] = "" # Empty string means that it will appear as checked
+            event_listener("change", lambda event: document.query(q).visible(event.target.checked))
+        label(label_str)
+        br()
+
 class MenuBar:
     """
     Main menu bar of the SoSSim user interface.
@@ -363,6 +431,8 @@ class MenuBar:
                             event_listener("click", lambda _: self.ui.select_content("#configuration"))
                         with li("Agent"):
                             event_listener("click", lambda _: self.ui.select_content("#agent_information"))
+                        with li("View settings"):
+                            event_listener("click", lambda _: self.ui.select_content("#view_settings"))
                 with li("About"):
                     # Open the project README file on Github in a separate tab.
                     about_page = "https://github.com/jakobaxelsson/sossim/blob/master/README.md"
@@ -438,6 +508,8 @@ class UserInterface:
                         div(id = "controls")
                         with svg(cls = "map", id = "map", width = "100%", height = "90vh"):
                             with g(id = "map_content"):
+                                g(id = "grid")
+                                g(id = "coarse_road_network")
                                 g(id = "road_network")
                                 g(id = "world_model")
                                 g(id = "vehicles")
@@ -449,6 +521,8 @@ class UserInterface:
                         with div(id = "agent_information", style = "display: none;"):
                             h3("Agent information")
                             p("Select an agent to display information about it")
+                        with div(id = "view_settings", style = "display: none;"):
+                            self.view_controller = ViewController(self)
         model.add_view(TransportSystemView(self))
 
     def select_content(self, id: str):
@@ -463,7 +537,7 @@ class UserInterface:
             element.style.display = "none"
 
         # Show the selected content element.
-        document.query(id).dom_element.style.display = "block"
+        document.query(id).visible(True)
 
     def reinitialize(self):
         """
