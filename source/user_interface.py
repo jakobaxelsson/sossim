@@ -44,7 +44,6 @@ class VehicleView(View):
             with g(id = f"vehicle_{agent.unique_id}", transform = f"translate({x + 0.5}, {y + 0.5}) rotate({agent.heading})"): 
                 height = (agent.capacity + 1) / (agent.max_load + 1) * 0.8
                 rect(x = -0.2, y = -height / 2, width = 0.4, height = height, fill = self.color)
-                g(id = "route")
                 # When a vehicle is clicked, print some data about it to the console.
                 event_listener("click", lambda _: self.select_vehicle())
 
@@ -485,12 +484,16 @@ class MenuBar:
                 style_node.setAttribute("type", "text/css")
                 defs_node.appendChild(style_node)
                 clone.prepend(defs_node)
+
                 # Add a placeholder textnode as a child of the style element
                 style_node.appendChild(js.document.createTextNode("*** PLACEHOLDER ***"))
+
                 # Serialize the clone tree as a string in XML format
                 content = js.XMLSerializer.new().serializeToString(clone)
+
                 # Replace the placeholder with the style information, properly wrapped as CDATA.
                 content = content.replace("*** PLACEHOLDER ***", f"<![CDATA[{style_information}]]>")
+
                 # Let the user select a file, and save the content prepende with the doctype
                 doctype = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
                 await save_file_as(doctype + content)
