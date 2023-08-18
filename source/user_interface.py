@@ -10,7 +10,7 @@ import js # type: ignore
 from pyodide.ffi import create_proxy # type: ignore
 
 from configuration import Configuration
-from domed import create_tag, event_listener, document
+from domed.core import create_tag, event_listener, document
 from domed.html import br, button, details, div, h3, input_, label, li, main, nav, p, span, summary, svg, ul
 from domed.svg import circle, g, line, path, polygon, rect, svg
 from entities import Cargo, Vehicle

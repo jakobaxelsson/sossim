@@ -4,7 +4,7 @@ Hyphens in the tag names are replaced by underscore in the Python variable name.
 For example, the SVG tag `font-face` becomes `font_face` in Python.
 """
 
-from domed import create_tag
+from domed.core import create_tag
 
 svg_namespace = "http://www.w3.org/2000/svg"
 

@@ -4,7 +4,7 @@ Tag names that are reserved words in Python have an underscore appended.
 Thus, del becomes del_, input becomes input_, and set becomes set_.
 """
 
-from domed import create_tag
+from domed.core import create_tag
 
 a = create_tag("a")
 abbr = create_tag("abbr")

@@ -8,11 +8,12 @@ import pdoc
 
 if __name__ == "__main__":
     # Parse the command line arguments and store them in args.
-    parser = argparse.ArgumentParser(description='Build the SoSSim simulator.')
-    parser.add_argument('--typecheck', default = False, action = argparse.BooleanOptionalAction, help = "Run code typecheck")
-    parser.add_argument('--docs',      default = False, action = argparse.BooleanOptionalAction, help = "Generate documentation")
-    parser.add_argument('--pyconfig',  default = False, action = argparse.BooleanOptionalAction, help = "Generate pyscript configuration file")
-    parser.add_argument('--all',       default = False, action = 'store_true',                   help = "Run all build steps")
+    parser = argparse.ArgumentParser(description = "Build the SoSSim simulator.")
+    parser.add_argument("--typecheck",  default = False, action = argparse.BooleanOptionalAction, help = "Run code typecheck")
+    parser.add_argument("--docs",       default = False, action = argparse.BooleanOptionalAction, help = "Generate documentation")
+    parser.add_argument("--pyconfig",   default = False, action = argparse.BooleanOptionalAction, help = "Generate pyscript configuration file")
+    parser.add_argument("--pypi_domed", default = False, action = argparse.BooleanOptionalAction, help = "Use domed library from PyPI instead of local")
+    parser.add_argument("--all",        default = False, action = "store_true",                   help = "Run all build steps")
 
     args = parser.parse_args()
 
@@ -69,10 +70,14 @@ if __name__ == "__main__":
         # Generate list of packages from requirements.txt
         with open("requirements.txt") as file:
             packages = file.readlines()
-        # Clean the package representation and convert to a string
-        packages = ", ".join(['"' + pkg.strip() + '"' for pkg in packages])
         # Generate list of python files by walking the directory tree under source.
         files = list(source_dir.glob("**/*.py"))
+        # Configure domed library to be fetched from PyPI or from local copy
+        if args.pypi_domed:
+            packages.append("domed")
+            files = [file for file in files if "domed" not in file.parts]
+        # Clean the package representation and convert to a string
+        packages = ", ".join(['"' + pkg.strip() + '"' for pkg in packages])
         # Clean the file representation and convert to a string
         files = ", ".join(['"' + file.relative_to("source").as_posix() + '"' for file in files if file.name != "sossim.py"])
         # Generate the output

@@ -4,4 +4,6 @@ It is intended for use with Pyodide or Pyscript, for running Python in the brows
 The top module of the package contains generic functions and classes.
 The submodules `html` and `svg` define all the tags available for writing HTML and SVG. 
 """
-from .domed import *
+import sys
+if sys.platform != "emscripten":
+    raise ImportError("The domed package can only be used for code running in a browser")
