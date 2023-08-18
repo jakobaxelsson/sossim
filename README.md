@@ -53,8 +53,8 @@ The road network is implemented as a directed graph using the [NetworkX](https:/
 
 The interactive simulation is designed using the [model-view-controller](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) pattern.
 The interface components are created by manipulating the DOM elements of a web page, and the graphics are created in SVG.
-The DOM manipulation is done using the `domscript.py` module, which provides a Pythonic approach inspired by the [Dominate](https://github.com/Knio/dominate) library.
-However, `domscript.py` works directly on the DOM elements since it executes in the browser, whereas Dominate generates HTML as text and is intended for server side usage.
+The DOM manipulation is done using the `domed` package, which provides a Pythonic approach inspired by the [Dominate](https://github.com/Knio/dominate) library.
+However, `domed` works directly on the DOM elements since it executes in the browser, whereas Dominate generates HTML as text and is intended for server side usage.
 
 For development purposes, there is also a Python REPL accessible in the user interface, through the View menu.
 Through this, it is possible to access the user interface object using the variable `ui`.

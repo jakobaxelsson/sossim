@@ -2,7 +2,7 @@
 User interface for the SoSSim system-of-systems simulator.
 The user interface is based on the Model-View-Controller pattern.
 The module provides simulation controller and user interface elements, as well as views for different model elements.
-The user interface is provided as HTML DOM elements which is manipulated using the domscript module.
+The user interface is provided as HTML DOM elements which is manipulated using the domed package.
 """
 from typing import Any
 
@@ -10,7 +10,9 @@ import js # type: ignore
 from pyodide.ffi import create_proxy # type: ignore
 
 from configuration import Configuration
-from domscript import create_tag, event_listener, br, button, circle, details, document, div, g, h3, input_, label, li, line, main, nav, p, path, polygon, rect, span, summary, svg, ul
+from domed import create_tag, event_listener, document
+from domed.html import br, button, details, div, h3, input_, label, li, main, nav, p, span, summary, svg, ul
+from domed.svg import circle, g, line, path, polygon, rect, svg
 from entities import Cargo, Vehicle
 from model import TransportSystem
 from space import RoadNetworkGrid
