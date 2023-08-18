@@ -50,10 +50,16 @@ class VehicleView(View):
     def select_vehicle(self):
         """
         Selects a vehicle and show its information.
+        If the selected vehicle is selected again, it is deselected.
         """
-        VehicleView.selected_vehicle_id = self.agent.unique_id
+        if VehicleView.selected_vehicle_id == self.agent.unique_id:
+            VehicleView.selected_vehicle_id = None
+            document.query("#route").clear()
+            document.query("#world_model").clear()
+        else:
+            VehicleView.selected_vehicle_id = self.agent.unique_id
+            self.ui.select_content("#agent_information")
         self.update(self.agent)
-        self.ui.select_content("#agent_information")
 
     def update(self, agent: Vehicle):
         """
@@ -76,13 +82,12 @@ class VehicleView(View):
                     p(f"{a}: {getattr(agent, a)}")
 
             # Draw its planned route if it has one
-            if VehicleView.selected_vehicle_id:
-                wm = agent.world_model
-                if wm.plan and hasattr(wm.plan[0], "route"):
-                    route_nodes = wm.plan[0].route
-                    with document.query("#route").clear():
-                        for (x1, y1), (x2, y2) in zip(route_nodes[0: -1], route_nodes[1:]):
-                            line(cls = "route", x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5)
+            wm = agent.world_model
+            if wm.plan and hasattr(wm.plan[0], "route"):
+                route_nodes = wm.plan[0].route
+                with document.query("#route").clear():
+                    for (x1, y1), (x2, y2) in zip(route_nodes[0: -1], route_nodes[1:]):
+                        line(cls = "route", x1 = x1 + 0.5, y1 = y1 + 0.5, x2 = x2 + 0.5, y2 = y2 + 0.5)
                             
             # Show its world view space if it has one
             with document.query("#world_model").clear():
@@ -242,7 +247,9 @@ class SimulationController:
         """
         self.ui = ui
         self.timer = None
+        self.simulation_delay = 250 # Delay between simulation steps in milliseconds
         self.zoom_level = 1.0
+
         # The panning state is calculated for the center of the map to make zooming perform correctly
         self.pan_x = -self.ui.model.space.width / 2
         self.pan_y = -self.ui.model.space.height / 2
@@ -254,6 +261,10 @@ class SimulationController:
                     event_listener("click", lambda _: self.run())
                 with button("Stop"):
                     event_listener("click", lambda _: self.stop())
+                with button("Slower"):
+                    event_listener("click", lambda _: self.set_simulation_delay(2.0))
+                with button("Faster"):
+                    event_listener("click", lambda _: self.set_simulation_delay(0.5))
                 span("Time: ")
                 span("0", id = "time")
                 with button("Zoom in"):
@@ -285,7 +296,7 @@ class SimulationController:
         """
         Runs the simulation by repeatedly invoking step (with a small delay between steps).
         """
-        self.timer = js.setInterval(create_proxy(self.step), 250)
+        self.timer = js.setInterval(create_proxy(self.step), self.simulation_delay)
 
     def stop(self):
         """
@@ -293,6 +304,20 @@ class SimulationController:
         """
         if self.timer:
             js.clearInterval(self.timer)
+            self.timer = None
+
+    def set_simulation_delay(self, factor: float):
+        """
+        Changes the speed of the simulation run by a factor.
+
+        Args:
+            factor (int): the factor by which the simulation delay is multiplied.
+        """
+        self.simulation_delay = self.simulation_delay * factor
+        # If the simulation is running, restart it with the new delay.
+        if self.timer:
+            self.stop()
+            self.run()
 
     def transform_map(self, zoom: float = 1.0, x: int = 0, y: int = 0):
         """
