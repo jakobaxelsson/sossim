@@ -2,11 +2,11 @@
 Style sheet for the SoSSim systems-of-systems simulator.
 */
 
+/* Add base style sheet from MVP.css (some parts are overridden at the end of this file) */
+@import url("https://unpkg.com/mvp.css");
+
 /* Define variables */
 :root {
-    /* Fonts */
-    --font-family: Arial, Helvetica, sans-serif;
-
     /* Map colors and styling */
     --map-background: lightgreen;
     --map-border: 0.5px solid black;
@@ -31,19 +31,15 @@ Style sheet for the SoSSim systems-of-systems simulator.
 
     --world-model-space-color: white;
     --world-model-space-opacity: 0.5;
-
-    /* Navbar */
-    --navbar-color: #e8e8e8;
-    --navbar-hover-color: lightgray;
-    --navbar-font-color: black;
-    --navbar-padding: 0.75rem;
 }
 
 /* Define styling */
 
-/* Fonts */
-* { 
-    font-family: var(--font-family); 
+/* Overall layout of main grid */
+#main_grid {
+    display: grid; 
+    grid-template-columns: 2fr 1fr;
+    column-gap: 20px;
 }
 
 /* Maps */
@@ -91,56 +87,28 @@ Style sheet for the SoSSim systems-of-systems simulator.
     }
 }
 
-/* Navigation bar */
-nav {
-    float: left; 
-    width: 100vw;
-    background: var(--navbar-color);
-    
-    & ul {
-        list-style: none;
-        margin: 0;
-        padding-left: 0;
-    }
+/* Override some parts of the base styling, primarily for a more compact layout */
 
-    & li {
-        color: var(--navbar-font-color);
-        display: block;
-        float: left;
-        padding: var(--navbar-padding);
-        position: relative;
-    }
-
-    & li:hover {
-        background: var(--navbar-hover-color);
-        cursor: pointer;
-    }
-
-    & ul li ul {
-        background: var(--navbar-color);
-        visibility: hidden;
-        opacity: 0;
-        min-width: 5rem;
-        position: absolute;
-        margin-top: var(--navbar-padding);
-        left: 0;
-        display: none;
-    }
-
-    & ul li:hover > ul,
-    & ul li ul:hover {
-        visibility: visible;
-        opacity: 1;
-        display: block;
-    }
-
-    & ul li ul li {
-        clear: both;
-        width: 100%;
-    }
+/* Make layout more compact */
+nav, footer, header, main {
+    margin: 0;
+    padding: 0;
 }
 
-/* Main content */
-main { 
-    float: left; 
-    }
+/* Make buttons smaller and different color */
+button {
+    margin: 2px;
+    padding: 2px;
+    background-color: var(--color-background);
+    color: var(--color-text); 
+    border: 1px solid var(--color-text);
+    font-weight: normal;
+}
+
+/* Change font color when hovering over menu items */
+nav li {
+    font-weight: normal;
+}
+nav li:hover {
+    font-weight: bold;
+}

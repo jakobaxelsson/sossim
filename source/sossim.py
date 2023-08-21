@@ -12,11 +12,11 @@ async def import_mesa():
     Installs the mesa library when running the interactive simulation.
     This is a workaround needed since mesa has dependencies that makes it unusable from pyscript or pyodide.
     """
-    import micropip
+    import micropip # type: ignore
     await micropip.install("mesa", deps = False)
     # It is unclear why the following block is needed, but without it, later imports of mesa sublibraries fail...
     try:
-        import mesa
+        import mesa # type: ignore
     except:
         pass
 

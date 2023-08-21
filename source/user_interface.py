@@ -209,7 +209,7 @@ class TransportSystemView(View):
         """
         t = model.time()
         with document.query("#time") as p:
-            p.inner_html(t)
+            p.inner_html(int(t))
 
 async def open_file() -> str:
     """
@@ -249,7 +249,7 @@ class SimulationController:
         """
         self.ui = ui
         self.timer = None
-        self.simulation_delay = 250 # Delay between simulation steps in milliseconds
+        self.simulation_delay = 250.0 # Delay between simulation steps in milliseconds
         self.zoom_level = 1.0
 
         # The panning state is calculated for the center of the map to make zooming perform correctly
@@ -366,9 +366,7 @@ class ConfigurationController:
                         for p, v in params.items():
                             # Add a label with the parameter name, and the help text as a tooltip
                             label(p, title = self.ui.configuration.params[cls][p]["help"])
-                            br()
                             input_(id = p, value = v) 
-                            br()
                 with button("Generate", cls = "error"):
                     event_listener("click", lambda _: self.generate())
         with document.query("#random_seed") as field:
@@ -425,12 +423,12 @@ class ViewController:
             checked (bool): if true, the checkbox is initially checked.
         """
         # TODO: It would be nicer if the initial checkbox status was derived from element being controlled
-        with input_(type = "checkbox") as checkbox:
-            if checked:
-                checkbox["checked"] = "" # Empty string means that it will appear as checked
-            event_listener("change", lambda event: document.query(q).visible(event.target.checked))
-        label(label_str)
-        br()
+        with div():
+            with input_(type = "checkbox") as checkbox:
+                if checked:
+                    checkbox["checked"] = "" # Empty string means that it will appear as checked
+                event_listener("change", lambda event: document.query(q).visible(event.target.checked))
+            label(label_str)
 
 class MenuBar:
     """
@@ -554,7 +552,7 @@ class UserInterface:
         with document.query("body"):
             self.menu_bar = MenuBar(self)
             with main():
-                with div(id = "main_grid", style = "display: grid; grid-template-columns: 2fr 1fr;"):
+                with div(id = "main_grid"):
                     with div(id = "simulation"):
                         div(id = "controls")
                         with svg(cls = "map", id = "map", width = "100%", height = "90vh"):
