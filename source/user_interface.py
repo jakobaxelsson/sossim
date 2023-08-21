@@ -11,8 +11,8 @@ from pyodide.ffi import create_proxy # type: ignore
 
 from configuration import Configuration
 from domed.core import create_tag, event_listener, document
-from domed.html import br, button, details, div, h3, input_, label, li, main, nav, p, span, summary, svg, ul
-from domed.svg import circle, g, line, path, polygon, rect, svg
+from domed.html import br, button, details, div, h3, input_, label, li, main, nav, p, span, style, summary, svg, ul
+from domed.svg import circle, defs, g, line, path, polygon, rect, svg
 from entities import Cargo, Vehicle
 from model import TransportSystem
 from space import RoadNetworkGrid
@@ -505,26 +505,18 @@ class MenuBar:
             # Extract the CSS style information from the document
             style_information = "\n".join([rule.cssText for sheet in js.document.styleSheets for rule in sheet.cssRules])
             with document.query("#map") as m:
-                # Create a clone of the map and add a defs section with a style node inside
-                clone = m.dom_element.cloneNode(True)
-                defs_node = js.document.createElement("defs")
-                style_node = js.document.createElement("style")
-                style_node.setAttribute("type", "text/css")
-                defs_node.appendChild(style_node)
-                clone.prepend(defs_node)
-
-                # Add a placeholder textnode as a child of the style element
-                style_node.appendChild(js.document.createTextNode("*** PLACEHOLDER ***"))
-
                 # Serialize the clone tree as a string in XML format
-                content = js.XMLSerializer.new().serializeToString(clone)
+                content = js.XMLSerializer.new().serializeToString(m.dom_element)
 
-                # Replace the placeholder with the style information, properly wrapped as CDATA.
-                content = content.replace("*** PLACEHOLDER ***", f"<![CDATA[{style_information}]]>")
+                # Prepend the content with the proper doctype
+                doctype = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+                content = doctype + content
+
+                # Insert style information, properly wrapped as CDATA.
+                content = content.replace("</style>", f"<![CDATA[{style_information}]]></style>")
 
                 # Let the user select a file, and save the content prepende with the doctype
-                doctype = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
-                await save_file_as(doctype + content)
+                await save_file_as(content)
         except:
             pass
 
@@ -557,6 +549,10 @@ class UserInterface:
                         div(id = "controls")
                         with svg(cls = "map", id = "map", width = "100%", height = "90vh"):
                             with g(id = "map_content"):
+                                # Placeholders for adding style information when exporting SVG to file
+                                with defs():
+                                    style(type = "text/css")
+                                # Layers of map content, that can be shown or hidden separately
                                 g(id = "grid")
                                 g(id = "coarse_road_network")
                                 g(id = "road_network")
