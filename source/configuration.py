@@ -93,8 +93,11 @@ class Configuration:
         p["default"] = default
         p["help"] = help
 
-        # Update the command line arguments parser.
-        cls.parser.add_argument(f"--{class_name}.{name}", type = type, default = default, help = help)
+        # Update the command line arguments parser
+        if type == bool:
+            cls.parser.add_argument(f"--{class_name}.{name}", default = default, help = help, action = argparse.BooleanOptionalAction)
+        else:
+            cls.parser.add_argument(f"--{class_name}.{name}", type = type, default = default, help = help)
 
     def set_param_value(self, cls: str, name: str, value: Any) -> None:
         """

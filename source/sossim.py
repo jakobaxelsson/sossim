@@ -4,6 +4,7 @@ It imports the necessary modules and configures the simulation.
 It can be ran in batch mode or in interactive mode in the browser using pyscript.
 """
 import sys
+from traceback import print_exception
 
 from configuration import Configuration
 
@@ -24,19 +25,23 @@ async def interactive_mode():
     """
     Runs the simulator in interactive mode in the browser.
     """
-    await import_mesa()
+    try:
+        await import_mesa()
 
-    import model
-    import user_interface
+        import model
+        import user_interface
 
-    configuration = Configuration()
+        configuration = Configuration()
 
-    # Define a global variable ui, which can be used to access all information about the executing system from the Python REPL in the browser.
-    global ui
+        # Define a global variable ui, which can be used to access all information about the executing system from the Python REPL in the browser.
+        global ui
 
-    # Create the model and the user interface.
-    mod = model.TransportSystem(configuration)
-    ui = user_interface.UserInterface(mod, configuration)
+        # Create the model and the user interface.
+        mod = model.TransportSystem(configuration)
+        ui = user_interface.UserInterface(mod, configuration)
+    except Exception as e:
+        # Improve error messages when running in browser
+        print_exception(e)
 
 def batch_mode():
     """
@@ -84,6 +89,8 @@ def batch_mode():
         mod = model.TransportSystem(configuration)
         for i in range(args.iterations):
             mod.step()
+        if mod.collect_data:
+            print(mod.data_collector.get_agent_vars_dataframe())
 
 if __name__ == "__main__":
     # Check if the file is running in the browser, in which case interactive mode is chosen, and otherwise run it in batch mode.

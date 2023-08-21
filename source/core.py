@@ -1,7 +1,7 @@
 """
 Provides abstract classes representing the core concepts of systems-of-systems.
 """
-from typing import Self
+from typing import Annotated, Self
 
 # A workaround is needed to make mesa work properly in the browser, since the full package contains dependencies that do not work in that environment.
 # Therefore, importing the whole of mesa fails, and instead the few classes needed are imported individually.
@@ -99,6 +99,8 @@ class Entity(MesaAgent, Viewable):
     All entities are treated as agents, but not all of them have behavior.
     This means also that they can be placed on the map, and have a unique id, which is automatically generated.
     """
+    pos: Annotated[tuple[int, int], "State"]
+
     def __init__(self, model: Model):
         # Create agent, with a unique id.
         super().__init__(model.next_id(), model)

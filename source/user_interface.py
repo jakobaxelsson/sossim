@@ -60,7 +60,7 @@ class VehicleView(View):
             document.query("#world_model").clear()
         else:
             VehicleView.selected_vehicle_id = self.agent.unique_id
-            self.ui.select_content("#agent_information")
+            self.ui.show_but_hide_siblings("#agent_information")
         self.update(self.agent)
 
     def update(self, agent: Vehicle):
@@ -359,15 +359,23 @@ class ConfigurationController:
         """
         with document.query("#configuration").clear():
             h3("Configuration parameters")
-            with div(id = "configuration_controls", cls = "flex demo"):
+            with div(id = "configuration_controls"):
                 for cls, params in self.ui.configuration.data.items():
                     with details(id = "configuration_" + cls):
                         summary(cls)
                         for p, v in params.items():
                             # Add a label with the parameter name, and the help text as a tooltip
-                            label(p, title = self.ui.configuration.params[cls][p]["help"])
-                            input_(id = p, value = v) 
-                with button("Generate", cls = "error"):
+                            if self.ui.configuration.params[cls][p]["type"] == bool:
+                                # Boolean params are shown as a checkbox with a label
+                                with input_(id = p, type = "checkbox") as checkbox:
+                                    if self.ui.configuration.data[cls][p]:
+                                        checkbox["checked"] = "" # Empty string means that it will appear as checked
+                                label(p)
+                            else:
+                                # Non-boolean params are shown as a label and an input field
+                                label(p, title = self.ui.configuration.params[cls][p]["help"])
+                                input_(id = p, value = v) 
+                with button("Generate", title = "Generates a new model based on the provided configuration parameters"):
                     event_listener("click", lambda _: self.generate())
         with document.query("#random_seed") as field:
             field.dom_element.value = self.ui.model.random_seed
@@ -381,8 +389,11 @@ class ConfigurationController:
                 for p, _ in params.items():
                     with document.query("#" + p) as field:
                         param_type = self.ui.configuration.params[cls][p]["type"]
-                        if field.dom_element.value != "":
-                            self.ui.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
+                        if param_type == bool:
+                            self.ui.configuration.set_param_value(cls, p, field.dom_element.checked)
+                        else:
+                            if field.dom_element.value != "":
+                                self.ui.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
         self.ui.reinitialize()
 
 class ViewController:
@@ -455,17 +466,46 @@ class MenuBar:
                 with li("View"):
                     with ul():
                         with li("Configuration"):
-                            event_listener("click", lambda _: self.ui.select_content("#configuration"))
-                        with li("Agent"):
-                            event_listener("click", lambda _: self.ui.select_content("#agent_information"))
+                            event_listener("click", self.show_content("#configuration"))
+                        with li("Agent state"):
+                            event_listener("click", self.show_content("#agent_information"))
                         with li("View settings"):
-                            event_listener("click", lambda _: self.ui.select_content("#view_settings"))
+                            event_listener("click", self.show_content("#view_settings"))
                         with li("Python REPL"):
-                            event_listener("click", lambda _: self.ui.select_content("#py-repl"))
+                            event_listener("click", self.show_content("#py-repl"))
+                        with li("Collected data"):
+                            event_listener("click", self.show_collected_data)
                 with li("About"):
                     # Open the project README file on Github in a separate tab.
                     about_page = "https://github.com/jakobaxelsson/sossim/blob/master/README.md"
                     event_listener("click", lambda _: js.window.open(about_page, "_blank"))
+
+    def show_content(self, q: str):
+        """
+        Returns an event handler that makes the main layout grid with map and content visible.
+        The content is determined by the provided query string.
+
+        Args:
+            q (str): a query string determining which content to show.
+        """
+        def handler(event):
+            self.ui.show_but_hide_siblings("#main_grid")
+            self.ui.show_but_hide_siblings(q)
+        return handler
+
+    def show_collected_data(self, event: Any):
+        """
+        Event handler for the show collected data menu item.
+
+        Args:
+            event (Any): the event (not used).
+        """
+        if self.ui.model.data_collector:
+            with document.query("#collected_data").clear() as cd:
+                html_text = self.ui.model.data_collector.get_agent_vars_dataframe().to_html()
+                element = js.DOMParser.new().parseFromString(html_text, "text/html").body.firstChild
+                cd.dom_element.appendChild(element)
+            self.ui.show_but_hide_siblings("#collected_data")
 
     async def open_configuration(self, event: Any):
         """
@@ -569,21 +609,23 @@ class UserInterface:
                         with div(id = "view_settings", style = "display: none;"):
                             self.view_controller = ViewController(self)
                         create_tag("py-repl")(id = "py-repl", style = "display: none;")
+                with div(id = "collected_data", style = "display: none;"):
+                    p("Generate a model with data collection enabled to view data")
         model.add_view(TransportSystemView(self))
 
-    def select_content(self, id: str):
+    def show_but_hide_siblings(self, q: str):
         """
-        Selects what to show on the right side of the screen.
+        Shows the element that matches the query string q, while hiding all its direct siblings.
 
         Args:
-            id (str): the id of the element to be shown.
+            q (str): a query string that yields the element to be shown.
         """
-        # Hide all content elements.
-        for element in document.query("#content").dom_element.children:
+        # Hide all siblings of the selected element
+        for element in document.query(q).dom_element.parentElement.children:
             element.style.display = "none"
 
-        # Show the selected content element.
-        document.query(id).visible(True)
+        # Show the selected element
+        document.query(q).visible(True)
 
     def reinitialize(self):
         """

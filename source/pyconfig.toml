@@ -7,4 +7,4 @@ terminal = false
 enabled = false
 
 [[fetch]]
-files = ["capabilities.py", "configuration.py", "core.py", "entities.py", "model.py", "space.py", "user_interface.py", "view.py", "domed/core.py", "domed/html.py", "domed/svg.py", "domed/__init__.py"]
+files = ["capabilities.py", "configuration.py", "core.py", "entities.py", "model.py", "space.py", "state.py", "user_interface.py", "view.py", "domed/core.py", "domed/html.py", "domed/svg.py", "domed/__init__.py"]

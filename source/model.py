@@ -5,10 +5,13 @@ import random
 import sys
 from typing import Annotated
 
+from mesa.datacollection import DataCollector
+
 from entities import Cargo, Vehicle
 from configuration import Configuration, configurable
 import core
 import space
+from state import get_all_state_variables
 
 @configurable
 class TransportSystem(core.Model):
@@ -16,6 +19,7 @@ class TransportSystem(core.Model):
     num_vehicles: Annotated[int, "Param", "number of vehicles"] = 10
     num_cargos:   Annotated[int, "Param", "number of cargos"] = 10
     random_seed:  Annotated[int, "Param", "seed for random number generator (use -1 to initialize from system time)"] = -1
+    collect_data: Annotated[bool, "Param", "enable data collection of state variables"] = False
 
     def __init__(self, configuration: Configuration):
         """
@@ -43,6 +47,13 @@ class TransportSystem(core.Model):
         # Create cargos
         for i in range(self.num_cargos):
             Cargo(self, configuration)
+    
+        # Setup data collection
+        if self.collect_data:
+            self.data_collector = DataCollector(agent_reporters = { s: lambda o: getattr(o, s) if hasattr(o, s) else None for s in get_all_state_variables(core.Entity)} )
+            self.data_collector.collect(self)
+        else:
+            self.data_collector = None
 
     def step(self):
         """
@@ -50,3 +61,5 @@ class TransportSystem(core.Model):
         """
         self.schedule.step()
         self.update_views()
+        if self.data_collector:
+            self.data_collector.collect(self)

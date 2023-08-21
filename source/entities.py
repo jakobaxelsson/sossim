@@ -89,6 +89,10 @@ class Vehicle(core.Agent):
     charging_speed:   Annotated[int, "Param", "the charging speed of a vehicle"]     = 10 
     perception_range: Annotated[int, "Param", "the perception range of the vehicle"] = 2
 
+    # Define state variables
+    energy_level: Annotated[int, "State"]
+    heading:      Annotated[int, "State"]
+
     def __init__(self, model: "model.TransportSystem", configuration: Configuration):
         """
         Creates a vehicle agent in a simulation model.
