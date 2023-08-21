@@ -6,13 +6,30 @@ It can be ran in batch mode or in interactive mode in the browser using pyscript
 import sys
 
 from configuration import Configuration
-import model
 
-def interactive_mode(configuration: Configuration) -> None:
+async def import_mesa():
+    """
+    Installs the mesa library when running the interactive simulation.
+    This is a workaround needed since mesa has dependencies that makes it unusable from pyscript or pyodide.
+    """
+    import micropip
+    await micropip.install("mesa", deps = False)
+    # It is unclear why the following block is needed, but without it, later imports of mesa sublibraries fail...
+    try:
+        import mesa
+    except:
+        pass
+
+async def interactive_mode():
     """
     Runs the simulator in interactive mode in the browser.
     """
+    await import_mesa()
+
+    import model
     import user_interface
+
+    configuration = Configuration()
 
     # Define a global variable ui, which can be used to access all information about the executing system from the Python REPL in the browser.
     global ui
@@ -21,10 +38,14 @@ def interactive_mode(configuration: Configuration) -> None:
     mod = model.TransportSystem(configuration)
     ui = user_interface.UserInterface(mod, configuration)
 
-def batch_mode(configuration: Configuration) -> None:
+def batch_mode():
     """
     Runs the simulator in batch mode from command line.
     """
+    import model
+
+    configuration = Configuration()
+
     # Parse command line arguments.
     import argparse
 
@@ -67,6 +88,7 @@ def batch_mode(configuration: Configuration) -> None:
 if __name__ == "__main__":
     # Check if the file is running in the browser, in which case interactive mode is chosen, and otherwise run it in batch mode.
     if sys.platform == "emscripten":
-        interactive_mode(Configuration())
+        import asyncio
+        asyncio.create_task(interactive_mode())
     else:
-        batch_mode(Configuration())
+        batch_mode()

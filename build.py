@@ -70,6 +70,8 @@ if __name__ == "__main__":
         # Generate list of packages from requirements.txt
         with open("requirements.txt") as file:
             packages = file.readlines()
+        # Remove mesa from the list of packages, since it will be loaded separately using micropip
+        packages = [pkg for pkg in packages if not pkg.startswith("mesa")]
         # Generate list of python files by walking the directory tree under source.
         files = list(source_dir.glob("**/*.py"))
         # Configure domed library to be fetched from PyPI or from local copy

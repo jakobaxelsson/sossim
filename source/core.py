@@ -3,10 +3,15 @@ Provides abstract classes representing the core concepts of systems-of-systems.
 """
 from typing import Self
 
-import mesa
+# A workaround is needed to make mesa work properly in the browser, since the full package contains dependencies that do not work in that environment.
+# Therefore, importing the whole of mesa fails, and instead the few classes needed are imported individually.
+from mesa.model import Model as MesaModel
+from mesa.agent import Agent as MesaAgent
+from mesa.time import StagedActivation
+
 from view import Viewable
 
-class Model(mesa.Model, Viewable):
+class Model(MesaModel, Viewable):
     """
     A comman base class for SoS models.
     """
@@ -14,7 +19,7 @@ class Model(mesa.Model, Viewable):
         super().__init__()
 
         # Create time and space, using a staged activation scheduler based on the OODA loop
-        self.schedule = mesa.time.StagedActivation(self, ["observe", "orient", "decide", "act"])
+        self.schedule = StagedActivation(self, ["observe", "orient", "decide", "act"])
 
     def agents(self) -> list["Agent"]:
         """
@@ -23,7 +28,7 @@ class Model(mesa.Model, Viewable):
         Returns:
             list[Agent]: the agents
         """
-        # We only create core.Agent, and not other mesa.Agent, so safe to ignore type error
+        # We only create core.Agent, and not any other mesa.Agent, so safe to ignore type error
         return self.schedule.agents # type: ignore
     
     def agent(self, id: int) -> "Agent":
@@ -88,7 +93,7 @@ class WorldModel:
         """
         pass
 
-class Entity(mesa.Agent, Viewable): 
+class Entity(MesaAgent, Viewable): 
     """
     A common abstract baseclass for entities within a SoS.
     All entities are treated as agents, but not all of them have behavior.
