@@ -19,10 +19,6 @@ To run the interactive mode locally run `python source/sossim.py -i`.
 This starts a local web server from which the files can be fetched to a browser running on the same machine.
 Then, open the link [http://127.0.0.1:8000/source/sossim.html](http://127.0.0.1:8000/source/sossim.html) in the browser.
 
-The latest commit to the Github respository is automatically published on Github pages.
-It can be accessed at [https://jakobaxelsson.github.io/sossim/source/sossim.html](https://jakobaxelsson.github.io/sossim/source/sossim.html).
-This does not require any local installations whatsoever.
-
 ### Using Docker
 A Dockerfile is provided for running the software without installing Python or any libraries.
 To use, first build a Docker container using `docker build -t sossim .`.
@@ -39,7 +35,7 @@ This command can take various command line options, which can be enlisted using 
 ### Live demonstration
 
 The latest commit to the Github respository is automatically published on Github pages.
-It can be accessed at [https://jakobaxelsson.github.io/sossim/source/sossim.html](https://jakobaxelsson.github.io/sossim/source/sossim.html).
+It can be accessed as a [live demonstration](https://jakobaxelsson.github.io/sossim/source/sossim.html).
 This does not require any local installations whatsoever.
 
 ## Implementation
