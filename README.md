@@ -36,6 +36,12 @@ First, ensure that all required libraries are installed using `pip install -r re
 Then, run the command `python source/sossim.py`.
 This command can take various command line options, which can be enlisted using `python source/sossim.py -h`.
 
+### Live demonstration
+
+The latest commit to the Github respository is automatically published on Github pages.
+It can be accessed at [https://jakobaxelsson.github.io/sossim/source/sossim.html](https://jakobaxelsson.github.io/sossim/source/sossim.html).
+This does not require any local installations whatsoever.
+
 ## Implementation
 
 In this section, some more details are provided on how the software is implemented.
