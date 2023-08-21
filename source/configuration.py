@@ -94,7 +94,7 @@ class Configuration:
         p["help"] = help
 
         # Update the command line arguments parser.
-        cls.parser.add_argument("--" + name, type = type, default = default, help = help)
+        cls.parser.add_argument(f"--{class_name}.{name}", type = type, default = default, help = help)
 
     def set_param_value(self, cls: str, name: str, value: Any) -> None:
         """
@@ -134,7 +134,7 @@ class Configuration:
         args = self.parser.parse_args()
         for c, ps in self.params.items():
             for p, _ in ps.items():
-                self.set_param_value(c, p, getattr(args, p))
+                self.set_param_value(c, p, getattr(args, f"{c}.{p}"))
         return args
 
     def to_json(self) -> str:

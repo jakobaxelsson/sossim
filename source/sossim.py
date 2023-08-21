@@ -55,10 +55,10 @@ def batch_mode():
     configuration.parser.add_argument("-p", "--profile", default = False, action = argparse.BooleanOptionalAction, help = "run in batch mode with profiling")
 
     # Add shorthands for some configuration parameters.
-    configuration.parser.add_argument("-N", dest = "num_vehicles", type = int)
-    configuration.parser.add_argument("-r", dest = "random_seed", type = int)
-    configuration.parser.add_argument("-x", dest = "width", type = int)
-    configuration.parser.add_argument("-y", dest = "height", type = int)
+    configuration.parser.add_argument("-N", dest = "TransportSystem.num_vehicles", type = int)
+    configuration.parser.add_argument("-r", dest = "TransportSystem.random_seed", type = int)
+    configuration.parser.add_argument("-x", dest = "RoadNetworkGrid.width", type = int)
+    configuration.parser.add_argument("-y", dest = "RoadNetworkGrid.height", type = int)
     args = configuration.parse_args()
 
     if args.interactive:
