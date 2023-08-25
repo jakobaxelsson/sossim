@@ -27,7 +27,7 @@ if __name__ == "__main__":
         for file in source_dir.glob("**/*.py"):
             # Type check all Python files, except those in the mesa subdirectory.
             if file.parent.name != "mesa":
-                print(f"\nChecking {file}\n")
+                print(f"Checking {file}")
                 result = mypy.api.run([str(file), "--follow-imports", "silent"])
                 if result[0]:
                     print(result[0])

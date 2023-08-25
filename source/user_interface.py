@@ -489,7 +489,7 @@ class MenuBar:
             q (str): a query string determining which content to show.
         """
         def handler(event):
-            self.ui.show_but_hide_siblings("#main_grid")
+            self.ui.show_but_hide_siblings("#simulation_view")
             self.ui.show_but_hide_siblings(q)
         return handler
 
@@ -505,7 +505,7 @@ class MenuBar:
                 html_text = self.ui.model.data_collector.get_agent_vars_dataframe().to_html()
                 element = js.DOMParser.new().parseFromString(html_text, "text/html").body.firstChild
                 cd.dom_element.appendChild(element)
-            self.ui.show_but_hide_siblings("#collected_data")
+            self.ui.show_but_hide_siblings("#data_view")
 
     async def open_configuration(self, event: Any):
         """
@@ -584,33 +584,35 @@ class UserInterface:
         with document.query("body"):
             self.menu_bar = MenuBar(self)
             with main():
-                with div(id = "main_grid"):
-                    with div(id = "simulation"):
-                        div(id = "controls")
-                        with svg(cls = "map", id = "map", width = "100%", height = "90vh"):
-                            with g(id = "map_content"):
-                                # Placeholders for adding style information when exporting SVG to file
-                                with defs():
-                                    style(type = "text/css")
-                                # Layers of map content, that can be shown or hidden separately
-                                g(id = "grid")
-                                g(id = "coarse_road_network")
-                                g(id = "road_network")
-                                g(id = "world_model")
-                                g(id = "vehicles")
-                                g(id = "cargos")
-                        self.simulation_controller = SimulationController(self)
-                    with div(id = "content"):
-                        with div(id = "configuration"):
-                            self.configuration_controller = ConfigurationController(self)
-                        with div(id = "agent_information", style = "display: none;"):
-                            h3("Agent information")
-                            p("Select an agent to display information about it")
-                        with div(id = "view_settings", style = "display: none;"):
-                            self.view_controller = ViewController(self)
-                        create_tag("py-repl")(id = "py-repl", style = "display: none;")
-                with div(id = "collected_data", style = "display: none;"):
-                    p("Generate a model with data collection enabled to view data")
+                with div(id = "simulation_view"):
+                    with div(id = "main_grid"):
+                        with div(id = "simulation"):
+                            div(id = "controls")
+                            with svg(cls = "map", id = "map", width = "100%", height = "90vh"):
+                                with g(id = "map_content"):
+                                    # Placeholders for adding style information when exporting SVG to file
+                                    with defs():
+                                        style(type = "text/css")
+                                    # Layers of map content, that can be shown or hidden separately
+                                    g(id = "grid")
+                                    g(id = "coarse_road_network")
+                                    g(id = "road_network")
+                                    g(id = "world_model")
+                                    g(id = "vehicles")
+                                    g(id = "cargos")
+                            self.simulation_controller = SimulationController(self)
+                        with div(id = "content"):
+                            with div(id = "configuration"):
+                                self.configuration_controller = ConfigurationController(self)
+                            with div(id = "agent_information", style = "display: none;"):
+                                h3("Agent information")
+                                p("Select an agent to display information about it")
+                            with div(id = "view_settings", style = "display: none;"):
+                                self.view_controller = ViewController(self)
+                            create_tag("py-repl")(id = "py-repl", style = "display: none;")
+                with div(id = "data_view", stype = "display: none;"):
+                    with div(id = "collected_data"):
+                        p("Generate a model with data collection enabled to view data")
         model.add_view(TransportSystemView(self))
 
     def show_but_hide_siblings(self, q: str):

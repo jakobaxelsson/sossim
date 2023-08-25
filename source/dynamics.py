@@ -1,5 +1,6 @@
 """
-Provides a possibility to declare state variables of classes.
+Provides support for describing dynamics of entities.
+This includes a possibility to declare state variables of classes.
 A typical usage would be:
 
 ```
@@ -12,6 +13,7 @@ Then, `get_state_variables(C)` returns a list of all the state variable names de
 """
 from typing import get_type_hints
 
+
 def get_state_variables(cls: type) -> list[str]:
     """
     Returns a list of the names of all variables of a class that have been declared as Annotated[T, "State"].
@@ -23,10 +25,11 @@ def get_state_variables(cls: type) -> list[str]:
         list[str]: the list of state variables.
     """
     result = []
-    for a, t in get_type_hints(cls, include_extras = True).items():
+    for a, t in get_type_hints(cls, include_extras=True).items():
         if t.__metadata__[0] == "State":
             result.append(a)
     return result
+
 
 def get_all_state_variables(cls: type) -> list[str]:
     """
@@ -35,6 +38,7 @@ def get_all_state_variables(cls: type) -> list[str]:
     Returns:
         list[str]: _description_
     """
+
     def get_subclasses(cls):
         for subclass in cls.__subclasses__():
             yield from get_subclasses(subclass)

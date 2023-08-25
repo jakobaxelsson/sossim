@@ -11,7 +11,7 @@ from entities import Cargo, Vehicle
 from configuration import Configuration, configurable
 import core
 import space
-from state import get_all_state_variables
+from dynamics import get_all_state_variables
 
 @configurable
 class TransportSystem(core.Model):

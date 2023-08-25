@@ -222,7 +222,7 @@ class Agent(Entity):
         """
         if self.world_model.plan and self.ready_to_act:
             self.world_model.plan[0].act()
-        super().act()
+            super().act()
 
     def next_pos(self) -> tuple[int, int] | None:
         """
