@@ -90,7 +90,10 @@ def batch_mode():
         for i in range(args.iterations):
             mod.step()
         if mod.collect_data:
-            print(mod.data_collector.get_agent_vars_dataframe())
+            for table_name in mod.data_collector.tables.keys():
+                if mod.data_collector.has_rows(table_name):
+                    print(f"Data for class {table_name}")
+                    print(mod.data_collector.get_table_dataframe(table_name), end = "\n\n")
 
 if __name__ == "__main__":
     # Check if the file is running in the browser, in which case interactive mode is chosen, and otherwise run it in batch mode.

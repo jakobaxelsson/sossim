@@ -11,7 +11,7 @@ from pyodide.ffi import create_proxy # type: ignore
 
 from configuration import Configuration
 from domed.core import create_tag, event_listener, document
-from domed.html import br, button, details, div, h3, input_, label, li, main, nav, p, span, style, summary, svg, ul
+from domed.html import button, details, div, h3, input_, label, li, main, nav, option, p, select, span, style, summary, svg, ul
 from domed.svg import circle, defs, g, line, path, polygon, rect, svg
 from entities import Cargo, Vehicle
 from model import TransportSystem
@@ -441,6 +441,53 @@ class ViewController:
                 event_listener("change", lambda event: document.query(q).visible(event.target.checked))
             label(label_str)
 
+class DataCollectorView:
+    """
+    Provides a view that displays selected data and lets the user choose which data table to display.
+    """
+    def __init__(self, ui: "UserInterface"):
+        """
+        Create the view.
+
+        Args:
+            ui (UserInterface): the user interface of which this element is a part.
+        """
+        self.ui = ui
+        with div(id = "data_view", style = "display: none;"):
+            with div(id = "collected_data"):
+                p("Generate a model with data collection enabled to view data")
+
+    def update(self):
+        """
+        Updates this view.
+        """
+        if dc := self.ui.model.data_collector:
+            with document.query("#collected_data").clear():
+                if dc.has_rows():
+                    with select(id = "data_table_selector"):
+                        for table_name in dc.tables.keys():
+                            if dc.has_rows(table_name):
+                                option(table_name, value = table_name)
+                        event_listener("click", self.select_table)
+                    div(id = "data_table")
+                else:
+                    p("Run simulation to collect some data")
+            self.select_table()
+
+    def select_table(self, event: Any = None):
+        """
+        Displays the data table with the given name.
+        Can be used as an event handler.
+
+        Args:
+            event (Any): the event to be handled (ignored).
+        """
+        table_name = document.query("#data_table_selector").dom_element.value
+        with document.query("#data_table").clear() as dt:
+            html_text = self.ui.model.data_collector.get_table_dataframe(table_name).to_html()
+            element = js.DOMParser.new().parseFromString(html_text, "text/html").body.firstChild
+            dt.dom_element.appendChild(element)
+
 class MenuBar:
     """
     Main menu bar of the SoSSim user interface.
@@ -474,7 +521,7 @@ class MenuBar:
                         with li("Python REPL"):
                             event_listener("click", self.show_content("#py-repl"))
                         with li("Collected data"):
-                            event_listener("click", self.show_collected_data)
+                            event_listener("click", lambda _: self.ui.show_but_hide_siblings("#data_view"))
                 with li("About"):
                     # Open the project README file on Github in a separate tab.
                     about_page = "https://github.com/jakobaxelsson/sossim/blob/master/README.md"
@@ -492,20 +539,6 @@ class MenuBar:
             self.ui.show_but_hide_siblings("#simulation_view")
             self.ui.show_but_hide_siblings(q)
         return handler
-
-    def show_collected_data(self, event: Any):
-        """
-        Event handler for the show collected data menu item.
-
-        Args:
-            event (Any): the event (not used).
-        """
-        if self.ui.model.data_collector:
-            with document.query("#collected_data").clear() as cd:
-                html_text = self.ui.model.data_collector.get_agent_vars_dataframe().to_html()
-                element = js.DOMParser.new().parseFromString(html_text, "text/html").body.firstChild
-                cd.dom_element.appendChild(element)
-            self.ui.show_but_hide_siblings("#data_view")
 
     async def open_configuration(self, event: Any):
         """
@@ -610,9 +643,7 @@ class UserInterface:
                             with div(id = "view_settings", style = "display: none;"):
                                 self.view_controller = ViewController(self)
                             create_tag("py-repl")(id = "py-repl", style = "display: none;")
-                with div(id = "data_view", stype = "display: none;"):
-                    with div(id = "collected_data"):
-                        p("Generate a model with data collection enabled to view data")
+                self.data_collector_view = DataCollectorView(self)
         model.add_view(TransportSystemView(self))
 
     def show_but_hide_siblings(self, q: str):
@@ -637,3 +668,4 @@ class UserInterface:
         self.model.clear_views()
         self.model.add_view(TransportSystemView(self))
         self.configuration_controller.update()
+        self.data_collector_view.update()
