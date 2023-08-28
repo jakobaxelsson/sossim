@@ -82,3 +82,5 @@ To install the dependencies required for using development utilities, run `pip i
 ## Documentation
 
 Some [documentation](https://jakobaxelsson.github.io/sossim/documentation/index.html) is available to browse and search.
+Those modules that contain non-trivial class structures also come with partial UML class diagrams.
+These illustrate some of the key relations and attributes of the classes.
