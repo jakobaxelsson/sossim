@@ -1,5 +1,15 @@
 """
 Provides models for the SoSSim system-of-systems simulator.
+
+Partial UML class diagram:
+
+```mermaid
+classDiagram
+    `core.Model` <|-- TransportSystem
+    TransportSystem: step()
+    TransportSystem: manifest()
+    TransportSystem: to_archive_content(...)
+```
 """
 from datetime import datetime
 import io

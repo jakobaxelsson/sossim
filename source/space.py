@@ -2,6 +2,28 @@
 Provides spaces for the SoSSim system-of-systems simulator.
 The space is a grid rendered as a bidirectional graph, with nodes being grid cells and with edges between all adjacent grid cells.
 Attributes can be set on nodes and edges to represent roads, destinations, etc.
+
+Partial UML class diagram:
+
+```mermaid
+classDiagram
+    `nx.DiGraph` <|-- RoadGridGraph
+    RoadGridGraph: grid_neighbors(node, ...)
+    RoadGridGraph: add_road(source, sink, ...)
+    RoadGridGraph: add_roads(node, directions)
+    RoadGridGraph: add_destination(node1, node2, charging_point)
+    RoadGridGraph: has_road_to(source, direction)
+    RoadGridGraph: is_road(node1, [node2])
+    RoadGridGraph: road_degree(node)
+
+    `core.Space` <|-- RoadNetworkGrid
+    RoadNetworkGrid --> RoadGridGraph: coarse_network
+    RoadNetworkGrid --> RoadGridGraph: road_network
+    RoadNetworkGrid --> `core.Model`: model
+    RoadNetworkGrid: subgraph(nodes)
+    RoadNetworkGrid: generate_roads()
+    RoadNetworkGrid: priority_nodes()
+```
 """
 import copy
 import itertools

@@ -1,5 +1,15 @@
 """
 Classes that define capabilities of agents.
+
+Partial UML class diagram:
+
+```mermaid
+classDiagram
+    `core.Capability` <|-- FollowRoute
+    `core.Capability` <|-- LoadCargo
+    `core.Capability` <|-- UnloadCargo
+    `core.Capability` <|-- ChargeEnergy
+```
 """
 from typing import Callable, Optional
 

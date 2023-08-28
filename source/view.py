@@ -1,5 +1,7 @@
 """
 Module containing functionality for attaching views to model classes.    
+```
+
 """
 from typing import Any, Protocol
 

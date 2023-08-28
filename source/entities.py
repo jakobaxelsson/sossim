@@ -1,5 +1,37 @@
 """
 Provides concrete agents and other entities.
+
+Partial UML class diagram:
+
+```mermaid
+classDiagram
+    Agent --> WorldModel: world_model
+
+    Navigator --> `space.RoadNetworkGrid`: space
+    Navigator: shortest_path(source, target)
+    Navigator: path_to_nearest(source, targets)
+    Navigator: path_to_nearest_charging_point(source)
+
+    `core.WorldModel` <|-- VehicleWorldModel
+    VehicleWorldModel --> Vehicle: agent
+
+    `core.Agent` <|-- Vehicle
+    Vehicle --> Navigator: navigator
+    Vehicle --> `space.RoadNetworkGrid`: space
+    Vehicle --> VehicleWorldModel: world_model
+    Vehicle: energy_level
+    Vehicle: heading
+    Vehicle: load_cargo(cargo)
+    Vehicle: unload_cargo(cargo)
+
+    `core.Entity`<|-- Cargo
+    Vehicle --> "*" Cargo: cargos
+    Cargo --> "0..1" Vehicle : carrier
+    Cargo: weight
+    Cargo: destination
+    Cargo: load_onto(carrier)
+    Cargo: unload()
+```
 """
 from typing import Annotated, Callable, Optional, TYPE_CHECKING
 

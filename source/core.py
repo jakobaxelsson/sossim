@@ -1,5 +1,44 @@
 """
 Provides abstract classes representing the core concepts of systems-of-systems.
+
+Partial UML class diagram:
+
+```mermaid
+classDiagram
+    `mesa.Model` <|-- Model
+    `view.Viewable` <|-- Model
+    `view.Viewable` <|-- Space
+    
+    Model: agents()
+    Model: agent(id)
+    Model: time()
+
+    class WorldModel
+    WorldModel --> Space: space
+    WorldModel --> Agent: agent
+    WorldModel: perceive()
+
+    `mesa.Agent`<|-- Entity
+    `view.Viewable` <|-- Entity
+    Entity: pos
+    Entity: can_coexist(other)
+    Entity: observe()
+    Entity: orient()
+    Entity: decide()
+    Entity: act()
+
+    Entity <|-- Agent
+    Agent --> WorldModel: world_model
+    Agent: update_plan()
+    Agent: next_pos()
+
+    Capability --> Agent: agent
+    Capability: start()
+    Capability: precondition()
+    Capability: postcondition()
+    Capability: next_pos()
+```
+
 """
 from typing import Annotated, Self
 

@@ -19,9 +19,9 @@ if __name__ == "__main__":
 
     source_dir = Path("source")
 
-    # Build steps.
+    # Build steps
 
-    # Typechecking.
+    # Typechecking
     if args.typecheck or args.all:
         print("Typecheck code")
         for file in source_dir.glob("**/*.py"):
@@ -34,7 +34,7 @@ if __name__ == "__main__":
                 if result[1]:
                     print("\nErrors\n:", result[1])
 
-    # Documentation.
+    # Documentation
     if args.docs or args.all:
         print("Generate documentation")
         target_dir = Path("documentation")
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         for file in target_dir.glob("*"):
             file.unlink()
         # Configure and run pdoc on selected files
-        pdoc.render.configure(docformat = "google")
+        pdoc.render.configure(docformat = "google", mermaid = True)
         modules = list(source_dir.glob("*.py"))
         # The following code is based on pdoc.pdoc, but modified to skip files that causes an error.
         all_modules = {}
