@@ -6,6 +6,7 @@ The user interface is provided as HTML DOM elements which is manipulated using t
 """
 import io
 from typing import Any
+import zipfile
 
 import js # type: ignore
 from pyodide.ffi import create_proxy # type: ignore
@@ -215,6 +216,7 @@ class TransportSystemView(View):
 async def open_file() -> tuple[str, str]:
     """
     Opens the file picker dialog and reads the content of the file selected by the user.
+    If the file name ends with ".zip", the content is returned as an array buffer, otherwise as text.
 
     Returns:
         tuple[str, str]: the name and content of the file.
@@ -222,7 +224,10 @@ async def open_file() -> tuple[str, str]:
     file_handles = await js.window.showOpenFilePicker()
     file_handle = file_handles[0]
     file = await file_handle.getFile()
-    data = await file.text()
+    if file_handle.name.endswith(".zip"):
+        data = await file.arrayBuffer()
+    else:
+        data = await file.text()
     return file_handle.name, data
 
 async def save_file_as(data: str) -> str:
@@ -555,9 +560,7 @@ class MenuBar:
         try:
             file_name, data = await open_file()
             if file_name.endswith(".zip"):
-                # Try to parse the file as a zip archive
-                import zipfile
-                zip_buffer = io.BytesIO(data)
+                zip_buffer = io.BytesIO(bytearray(js.Uint8Array.new(data)))
                 with zipfile.ZipFile(zip_buffer, "r", zipfile.ZIP_DEFLATED, False) as zip_file:
                     with zip_file.open("configuration.json") as conf_file:
                         self.ui.configuration.from_json(conf_file.read())
@@ -565,8 +568,8 @@ class MenuBar:
                 # Try to parse configuration file as json
                 self.ui.configuration.from_json(data)
             self.ui.reinitialize()
-        except:
-            pass
+        except Exception as e:
+            print(f"Open configuration failed with exception {e}")
 
     async def save_model_as_zip(self, event: Any):
         """
@@ -576,8 +579,12 @@ class MenuBar:
             event (Any): the event (not used).
         """
         try:
-            content = self.ui.model.to_file_content()
-            await save_file_as(content)
+            archive = self.ui.model.to_archive_content()
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+                for file_name, content in archive.items():
+                    zip_file.writestr(file_name, content)
+            await save_file_as(js.Uint8Array.new(zip_buffer.getvalue()))
         except Exception as e:
             print(f"Save model as zip failed with exception {e}")
 

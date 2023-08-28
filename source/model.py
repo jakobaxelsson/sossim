@@ -78,7 +78,7 @@ class TransportSystem(core.Model):
         Returns:
             dict[str, Any]: the manifest as a dict.
         """
-        result = dict()
+        result: dict[str, Any] = dict()
         # TODO: Add more information about the model here
         result["files"] = dict()
         result["generation_start_time"] = str(self.generation_start_time)
