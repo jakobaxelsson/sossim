@@ -9,12 +9,5 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
-# *.so
-
-# Unit test / coverage reports
-# htmlcov/
-# .coverage
-
-# .env file, which may contain secret information
-# .env
+# Data files used for testing
+data/

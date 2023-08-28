@@ -1,9 +1,13 @@
 """
 Provides models for the SoSSim system-of-systems simulator.
 """
+from datetime import datetime
+import io
+import json
 import random
 import sys
-from typing import Annotated
+from typing import Annotated, Any
+import zipfile
 
 from configuration import Configuration, configurable
 import core
@@ -26,8 +30,11 @@ class TransportSystem(core.Model):
         Args:
             configuration (Configuration): the configuration of parameters from which the model is generated.
         """
+        self.generation_start_time = datetime.utcnow()
+
         # Initialize superclass and configuration
         super().__init__()
+        self.configuration = configuration
         configuration.initialize(self)
         
         # Setup random number generation.
@@ -53,6 +60,8 @@ class TransportSystem(core.Model):
         else:
             self.data_collector = None
 
+        self.generation_end_time = datetime.utcnow()
+
     def step(self):
         """
         Performs a simulation step and updates the views.
@@ -61,3 +70,62 @@ class TransportSystem(core.Model):
         self.update_views()
         if self.data_collector:
             self.data_collector.collect(self)
+
+    def manifest(self) -> dict[str, Any]:
+        """
+        Returns various information about the model as a dict structure.
+
+        Returns:
+            dict[str, Any]: the manifest as a dict.
+        """
+        result = dict()
+        # TODO: Add more information about the model here
+        result["files"] = dict()
+        result["generation_start_time"] = str(self.generation_start_time)
+        result["generation_end_time"] = str(self.generation_end_time)
+        return result
+
+    def to_archive_content(self, *extras: tuple[str, str, str]) -> dict[str, str]:
+        """
+        Returns the information in this model as an archive.
+        The structure of the archive is a dict whose items are file names and file content.
+        This can then easily be mapped to e.g. a zip archive.
+        The contents of the archive is a json-formatted file of the configuration.
+        If data collection was enabled, it also contains the collected data.
+        This is represented as one csv-formatted file for each table in the data collection, where the file name is the name of the table.
+        The archive also contains a manifest.json file, with various meta-information about the contents.
+        If extra arguments are provided, these should be tuples of three strings: file name, file content, and file description.
+
+        Arguments:
+            extras: tuple[str, str, str]: additional iterms to be added.
+
+        Returns:
+            dict[str, str]: the archive file names and content.
+        """
+        archive = dict()
+
+        # Create the manifest information and extend it with information about files.
+        manifest = self.manifest()
+        manifest["save_time"] = str(datetime.utcnow())
+        manifest["files"]["manifest.json"] = "Meta-information about the content of this file archive"
+
+        # Create configuration file
+        archive["configuration.json"] = self.configuration.to_json()
+        manifest["files"]["configuration.json"] = "The configuration used to create the model"
+
+        # Create data files
+        if dc := self.data_collector:
+            for table_name in dc.tables.keys():
+                if dc.has_rows(table_name):
+                    archive[table_name + ".csv"] =  dc.get_table_dataframe(table_name).to_csv()
+                    manifest["files"][table_name + ".csv"] = f"Data collected for the agent class {table_name}"
+
+        # Add extra files
+        for file_name, file_content, file_description in extras:
+            archive[file_name] =  file_content
+            manifest["files"][file_name] = file_description
+
+        # Add the manifest file
+        archive["manifest.json"] = json.dumps(manifest, indent = 4)
+
+        return archive

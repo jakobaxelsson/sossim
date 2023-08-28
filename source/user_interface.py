@@ -4,6 +4,7 @@ The user interface is based on the Model-View-Controller pattern.
 The module provides simulation controller and user interface elements, as well as views for different model elements.
 The user interface is provided as HTML DOM elements which is manipulated using the domed package.
 """
+import io
 from typing import Any
 
 import js # type: ignore
@@ -211,30 +212,34 @@ class TransportSystemView(View):
         with document.query("#time") as p:
             p.inner_html(int(t))
 
-async def open_file() -> str:
+async def open_file() -> tuple[str, str]:
     """
     Opens the file picker dialog and reads the content of the file selected by the user.
 
     Returns:
-        str: the content of the file.
+        tuple[str, str]: the name and content of the file.
     """
     file_handles = await js.window.showOpenFilePicker()
     file_handle = file_handles[0]
     file = await file_handle.getFile()
     data = await file.text()
-    return data
+    return file_handle.name, data
 
-async def save_file_as(data: str):
+async def save_file_as(data: str) -> str:
     """
     Opens the file picker dialog and saves the data to the file selected by the user.
 
     Args:
         data (str): the data to be saved.
+
+    Returns:
+        str: the name of the selected file.
     """
     file_handle = await js.window.showSaveFilePicker()
     writable = await file_handle.createWritable()
     await writable.write(data)
     await writable.close()
+    return file_handle.name
 
 class SimulationController:
     """
@@ -506,8 +511,8 @@ class MenuBar:
                     with ul():
                         with li("Open configuration..."):
                             event_listener("click", self.open_configuration)
-                        with li("Save configuration as..."):
-                            event_listener("click", self.save_configuration)
+                        with li("Save model as zip..."):
+                            event_listener("click", self.save_model_as_zip)
                         with li("Save map as SVG..."):
                             event_listener("click", self.save_map_as_SVG)
                 with li("View"):
@@ -548,24 +553,33 @@ class MenuBar:
             event (Any): the event (not used).
         """
         try:
-            data = await open_file()
-            self.ui.configuration.from_json(data)
+            file_name, data = await open_file()
+            if file_name.endswith(".zip"):
+                # Try to parse the file as a zip archive
+                import zipfile
+                zip_buffer = io.BytesIO(data)
+                with zipfile.ZipFile(zip_buffer, "r", zipfile.ZIP_DEFLATED, False) as zip_file:
+                    with zip_file.open("configuration.json") as conf_file:
+                        self.ui.configuration.from_json(conf_file.read())
+            else:
+                # Try to parse configuration file as json
+                self.ui.configuration.from_json(data)
             self.ui.reinitialize()
         except:
             pass
 
-    async def save_configuration(self, event: Any):
+    async def save_model_as_zip(self, event: Any):
         """
-        Event handler for the save configuration as menu item.
+        Event handler for the save model as zip menu item.
 
         Args:
             event (Any): the event (not used).
         """
         try:
-            content = self.ui.configuration.to_json()
+            content = self.ui.model.to_file_content()
             await save_file_as(content)
-        except:
-            pass
+        except Exception as e:
+            print(f"Save model as zip failed with exception {e}")
 
     async def save_map_as_SVG(self, event: Any):
         """
@@ -588,7 +602,7 @@ class MenuBar:
                 # Insert style information, properly wrapped as CDATA.
                 content = content.replace("</style>", f"<![CDATA[{style_information}]]></style>")
 
-                # Let the user select a file, and save the content prepende with the doctype
+                # Let the user select a file, and save the content prepended with the doctype
                 await save_file_as(content)
         except:
             pass
