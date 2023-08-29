@@ -388,7 +388,7 @@ class ConfigurationController:
                 with button("Generate", title = "Generates a new model based on the provided configuration parameters"):
                     event_listener("click", lambda _: self.generate())
         with document.query("#random_seed") as field:
-            field.dom_element.value = self.ui.model.random_seed
+            field.value = self.ui.model.random_seed
 
     def generate(self):
         """
@@ -400,10 +400,10 @@ class ConfigurationController:
                     with document.query("#" + p) as field:
                         param_type = self.ui.configuration.params[cls][p]["type"]
                         if param_type == bool:
-                            self.ui.configuration.set_param_value(cls, p, field.dom_element.checked)
+                            self.ui.configuration.set_param_value(cls, p, field.unwrap().checked)
                         else:
-                            if field.dom_element.value != "":
-                                self.ui.configuration.set_param_value(cls, p, param_type(field.dom_element.value))
+                            if field.value != "":
+                                self.ui.configuration.set_param_value(cls, p, param_type(field.value))
         self.ui.reinitialize()
 
 class ViewController:
@@ -492,11 +492,11 @@ class DataCollectorView:
         Args:
             event (Any): the event to be handled (ignored).
         """
-        table_name = document.query("#data_table_selector").dom_element.value
+        table_name = document.query("#data_table_selector").value
         with document.query("#data_table").clear() as dt:
             html_text = self.ui.model.data_collector.get_table_dataframe(table_name).to_html()
             element = js.DOMParser.new().parseFromString(html_text, "text/html").body.firstChild
-            dt.dom_element.appendChild(element)
+            dt.unwrap().appendChild(element)
 
 class MenuBar:
     """
@@ -600,7 +600,7 @@ class MenuBar:
             style_information = "\n".join([rule.cssText for sheet in js.document.styleSheets for rule in sheet.cssRules])
             with document.query("#map") as m:
                 # Serialize the clone tree as a string in XML format
-                content = js.XMLSerializer.new().serializeToString(m.dom_element)
+                content = js.XMLSerializer.new().serializeToString(m.unwrap())
 
                 # Prepend the content with the proper doctype
                 doctype = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
@@ -675,8 +675,8 @@ class UserInterface:
             q (str): a query string that yields the element to be shown.
         """
         # Hide all siblings of the selected element
-        for element in document.query(q).dom_element.parentElement.children:
-            element.style.display = "none"
+        for element in document.query(q).parent_element.children:
+            element.unwrap().style.display = "none"
 
         # Show the selected element
         document.query(q).visible(True)

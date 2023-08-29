@@ -23,7 +23,7 @@ with document.query(".body").clear():
 ```
 """
 import sys
-from typing import Any, Callable, ClassVar, Optional, Protocol, Self
+from typing import Any, Callable, ClassVar, Iterable, Optional, Protocol, Self
 
 Event = Any
 
@@ -31,16 +31,19 @@ class JSDomElement(Protocol):
     """
     Specifies the interface of Javascript DOM elements, for typechecking.
     """
+    parentElement: Self | None
     children: list[Self]
     firstChild: Self
     innerHTML: str
     style: Any
+    value: Any
 
     def addEventListener(self, event: str, listener: Callable[[Event], Any]): ...
     def appendChild(self, child: Self): ...
     def cloneNode(self, deep: Optional[bool]) -> Self: ...
     def prepend(self, other: Self): ...
     def querySelector(self, q: str) -> Self: ...
+    def querySelectorAll(self, q: str) -> list[Self]: ...
     def remove(self): ...
     def removeChild(self, child: Self): ...
     def getAttribute(self, name: str) -> str: ...
@@ -53,6 +56,7 @@ class JSDocument(Protocol):
     def createElement(self, tag_name: str) -> JSDomElement: ...
     def createElementNS(self, namespace: str, tag_name: str) -> JSDomElement: ...
     def querySelector(self, q: str) -> Self: ...
+    def querySelectorAll(self, q: str) -> Self: ...
 
 if sys.platform == "emscripten":
     import js
@@ -64,7 +68,7 @@ else:
 
     def create_proxy(f: Any) -> Any: ...
 
-class DomWrapper:
+class DomElement:
     """
     A class that acts as a context manager for DOM element creation functions.
     """
@@ -85,25 +89,25 @@ class DomWrapper:
             attrs (Any): a dictionary of attribute values. 
         """
         if isinstance(namespace, str):
-            self.dom_element = js.document.createElementNS(namespace, tag_name)
+            self._dom_element = js.document.createElementNS(namespace, tag_name)
         else:
-            self.dom_element = js.document.createElement(tag_name)
+            self._dom_element = js.document.createElement(tag_name)
 
         # If some content was provided, add it to the node depending on its type.
         if isinstance(content, str):
             # If it is a string, add it as inner HTML
-            self.dom_element.innerHTML = content
-        elif isinstance(content, DomWrapper):
+            self._dom_element.innerHTML = content
+        elif isinstance(content, DomElement):
             # Otherwise, assume it is a DOM node, and add it as a child
-            self.dom_element.appendChild(content.dom_element)
+            self._dom_element.appendChild(content._dom_element)
 
         # If attributes were provided, add them to the node, mapping the names to avoid clashes with Python reserved words.
         for (a, v) in attrs.items():
-            self.dom_element.setAttribute(self.map_attribute_name(a), v)
+            self._dom_element.setAttribute(self.map_attribute_name(a), v)
 
         # If this element is created inside a context, then add it as a child of its parent.
-        if DomWrapper.stack != []:
-            DomWrapper.stack[-1].dom_element.appendChild(self.dom_element)
+        if DomElement.stack != []:
+            DomElement.stack[-1]._dom_element.appendChild(self._dom_element)
 
     def __enter__(self) -> Self:
         """
@@ -112,7 +116,7 @@ class DomWrapper:
         Returns:
             Self: returns self.
         """
-        DomWrapper.stack.append(self)
+        DomElement.stack.append(self)
         # Return the created DOM element so that it can be bound to the context variable.
         return self
 
@@ -120,7 +124,7 @@ class DomWrapper:
         """
         Pops the top element of the stack to return to the outer context.
         """
-        DomWrapper.stack.pop()
+        DomElement.stack.pop()
 
     def __getitem__(self, attribute: str) -> str:
         """
@@ -132,7 +136,7 @@ class DomWrapper:
         Returns:
             str: returns the attribute value as a string.
         """
-        return self.dom_element.getAttribute(attribute)      
+        return self._dom_element.getAttribute(attribute)      
 
     def __setitem__(self, attribute: str, value: Any):
         """
@@ -142,7 +146,7 @@ class DomWrapper:
             attribute (str): the attribute.
             value (Any): the new value.
         """
-        self.dom_element.setAttribute(attribute, value)      
+        self._dom_element.setAttribute(attribute, value)      
 
     def map_attribute_name(self, name: str) -> str:
         """
@@ -164,7 +168,50 @@ class DomWrapper:
         else:
             return name.replace("_", "-")
 
-    def query(self, q) -> "DomWrapper":
+    @property
+    def value(self) -> Any:
+        """
+        Property getter for the dom element's value attribute.
+
+        Returns:
+            Any: the value of the attribute.
+        """
+        return self._dom_element.value
+
+    @value.setter
+    def value(self, val: Any):
+        """
+        Property getter for the dom element's value attribute.
+
+        Args:
+            val (Any): the new value of the attribute.
+        """
+        self._dom_element.value = val
+
+    @property
+    def parent_element(self) -> Self | None:
+        """
+        Property getter for the dom element's parent element attribute.
+
+        Returns:
+            Self | None: the parent DomElement, or None if it has no parent.
+        """
+        result = self._dom_element.parentElement
+        return wrap(result) if result else None
+
+    @property
+    def children(self) -> Iterable[Self]:
+        """
+        Property getter for the dom element's children attribute.
+
+        Returns:
+            Iterable[Self]: an iterable over the children DomElements.
+        """
+        cs = self._dom_element.children
+        for i in range(cs.length): # type: ignore
+            yield wrap(cs[i])
+
+    def query(self, q) -> Self:
         """
         Returns a tag structure representing the DOM element indicated by the query string.
         A typical usage is: with document.query(...).
@@ -178,10 +225,25 @@ class DomWrapper:
         Returns:
             Self: the first element that matched the query string.
         """
-        result = self.dom_element.querySelector(q)
+        result = self._dom_element.querySelector(q)
         if result == None:
             raise Exception(f"Query {q} did not give any result")
-        return dom(result)
+        return wrap(result)
+
+    def query_all(self, q) -> Iterable[Self]:
+        """
+        Returns the DOM elements indicated by the query string as an iterable.
+        A typical usage is: for elem in document.query_all(...): ...
+
+        Args:
+            q (str): a query string formatted as a CSS selector.
+
+        Returns:
+            Iterable[Self]: an iterable over all elements that match the query string.
+        """
+        es = self._dom_element.querySelectorAll(q)
+        for i in range(es.length): # type: ignore
+            yield wrap(es[i])
         
     def clear(self) -> Self:
         """
@@ -190,15 +252,15 @@ class DomWrapper:
         Returns:
             Self: self.
         """
-        while (self.dom_element.firstChild):
-            self.dom_element.removeChild(self.dom_element.firstChild)
+        while (self._dom_element.firstChild):
+            self._dom_element.removeChild(self._dom_element.firstChild)
         return self
     
     def remove(self):
         """
         Removes the DOM element from the DOM tree.
         """
-        self.dom_element.remove()
+        self._dom_element.remove()
 
     def inner_html(self, text: Any):
         """
@@ -207,7 +269,7 @@ class DomWrapper:
         Args:
             text (Any): the inner_html
         """
-        self.dom_element.innerHTML = str(text)
+        self._dom_element.innerHTML = str(text)
 
     def visible(self, is_visible: bool = True):
         """
@@ -216,17 +278,25 @@ class DomWrapper:
         Args:
             is_visible (bool, optional): if True, the element becomes visible, and otherwise invisible. Defaults to True.
         """
-        self.dom_element.style.display = "block" if is_visible else "none"
+        self._dom_element.style.display = "block" if is_visible else "none"
 
-class dom(DomWrapper):
+    def unwrap(self) -> JSDomElement | JSDocument:
+        """
+        Returns the javascript DOM element behind a DomElement, for low level access.
+        Returns:
+            JSDomElement | JSDocument: the javascript DOM element.
+        """
+        return self._dom_element
+
+class wrap(DomElement):
     """
-    A context manager for specifying an existing DOM node, that can be used as a parent of a new dom tree.
+    Wraps an existing javascript DOM element as a DomElement.
     """
-    def __init__(self, parent_node = js.document):
-        self.dom_element = parent_node
+    def __init__(self, js_element: JSDomElement | JSDocument):
+        self._dom_element = js_element
 
 # Provide the variable document as a wrapper around js.document
-document = dom()
+document = wrap(js.document)
 
 def event_listener(event: str, listener: Callable[[Event], Any]):
     """
@@ -236,10 +306,10 @@ def event_listener(event: str, listener: Callable[[Event], Any]):
         event (str): the event name.
         listener (Callable[[Event], Any]): the listener.
     """
-    if DomWrapper.stack != []:
-        DomWrapper.stack[-1].dom_element.addEventListener(event, create_proxy(listener))
+    if DomElement.stack != []:
+        DomElement.stack[-1]._dom_element.addEventListener(event, create_proxy(listener))
 
-def create_tag(tag_name: str, namespace: Optional[str] = None) -> Callable[..., DomWrapper]:
+def create_tag(tag_name: str, namespace: Optional[str] = None) -> Callable[..., DomElement]:
     """
     Returns a function which returns a DOM element with the given name and namespace.
     A typical usage is to create HTML tags. 
@@ -249,8 +319,8 @@ def create_tag(tag_name: str, namespace: Optional[str] = None) -> Callable[..., 
         namespace (str, optional): the namespace of the tag. Defaults to None.
 
     Returns:
-        Callable[..., DomWrapper]: a function returning a DOM element wrapper.
+        Callable[..., DomElement]: a function returning a DOM element wrapper.
     """
-    def f(content: Optional[str | DomWrapper] = None, **attrs: Any):
-        return DomWrapper(tag_name, content, namespace, **attrs)
+    def f(content: Optional[str | DomElement] = None, **attrs: Any):
+        return DomElement(tag_name, content, namespace, **attrs)
     return f
