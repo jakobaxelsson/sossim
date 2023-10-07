@@ -4,8 +4,8 @@ It defines a subclass of mesa's data collector, that collects data on all define
 """
 from mesa.datacollection import DataCollector
 
-import core
-from dynamics import all_state_variables
+import sossim.core as core
+from sossim.dynamics import all_state_variables
 
 class StateDataCollector(DataCollector):
 

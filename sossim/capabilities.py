@@ -13,8 +13,8 @@ classDiagram
 """
 from typing import Callable, Optional
 
-import core
-from space import Node
+import sossim.core as core
+from sossim.space import Node
 
 class FollowRoute(core.Capability):
     

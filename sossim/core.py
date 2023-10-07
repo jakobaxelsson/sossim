@@ -48,7 +48,7 @@ from mesa.model import Model as MesaModel
 from mesa.agent import Agent as MesaAgent
 from mesa.time import StagedActivation
 
-from view import Viewable
+from sossim.view import Viewable
 
 class Model(MesaModel, Viewable):
     """

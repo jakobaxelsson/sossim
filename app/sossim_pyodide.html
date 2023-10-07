@@ -1,0 +1,60 @@
+<!-- 
+This is a system-of-systems simulations running in the browser.
+-->
+
+<html>
+    <head>
+        <title>SoS transport simulation</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src = "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    </head>
+
+    <body style = "cursor: wait;">
+        <p id = "load_msg">Loading...</p>
+
+        <script>
+            async function main() {
+                // Load application configuration file
+                const config_file = "pyconfig.json"
+                response = await fetch(config_file);
+                config = await response.json();
+
+                // Load stylesheets
+                // TODO: This loads the style sheet, but it is not applied....
+                for (href of config.stylesheets) {
+                    link = document.createElement("link");
+                    link.rel = "stylesheet";
+                    link.type = "style/css";
+                    link.href = href;
+                    document.head.appendChild(link);
+                    console.log("Loaded stylesheet " + href);
+                }
+
+                // Initialize pyodide
+                let pyodide = await loadPyodide();
+
+                // Install packages
+                await pyodide.loadPackage("micropip");
+                const micropip = pyodide.pyimport("micropip");
+                for (pkg of config.packages) {
+                    await micropip.install(pkg);
+                }
+
+                // Load files
+                for (file of config.files) {
+                    console.log("Loading file " + file)
+                    response = await fetch(file);
+                    content = await response.text()
+                    pyodide.FS.writeFile(file, content, {encoding: "utf8"});
+                    // TODO: This works for top level files, but not for subdirectories.
+                    // Probably, the subdirectories need to be created before the files.
+                    // But how should pyodide discover these files?
+                };
+                // Run command
+                // TODO: Maybe this should be a script name instead?
+                // Maybe it should be "import sossim". But does that run as main?
+            };
+        main();
+        </script>
+    </body>
+</html>

@@ -32,8 +32,8 @@ from typing import Annotated, Any, Callable, Iterator, NewType, Optional, Self
 
 import networkx as nx
 
-from configuration import Configuration, configurable
-import core
+from sossim.configuration import Configuration, configurable
+import sossim.core as core
 
 # Type abbreviations for nodes, edges and directions.
 Node = NewType("Node", tuple[int, int])

@@ -11,14 +11,15 @@ import zipfile
 import js # type: ignore
 from pyodide.ffi import create_proxy # type: ignore
 
-from configuration import Configuration
 from domed.core import create_tag, event_listener, document
 from domed.html import button, details, div, h3, input_, label, li, main, nav, option, p, select, span, style, summary, svg, ul
 from domed.svg import circle, defs, g, line, path, polygon, rect, svg
-from entities import Cargo, Vehicle
-from model import TransportSystem
-from space import RoadNetworkGrid
-from view import View
+
+from sossim.configuration import Configuration
+from sossim.entities import Cargo, Vehicle
+from sossim.model import TransportSystem
+from sossim.space import RoadNetworkGrid
+from sossim.view import View
 
 class VehicleView(View):
     """

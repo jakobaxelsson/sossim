@@ -8,7 +8,7 @@ import sys
 from traceback import print_exception
 import zipfile
 
-from configuration import Configuration
+from sossim.configuration import Configuration
 
 async def import_mesa():
     """
@@ -30,8 +30,8 @@ async def interactive_mode():
     try:
         await import_mesa()
 
-        import model
-        import user_interface
+        import sossim.model as model
+        import sossim.user_interface as user_interface
 
         configuration = Configuration()
 
@@ -49,7 +49,7 @@ def batch_mode():
     """
     Runs the simulator in batch mode from command line.
     """
-    import model
+    import sossim.model as model
 
     configuration = Configuration()
 
@@ -72,10 +72,13 @@ def batch_mode():
 
     if args.interactive:
         # Start a web server from which the interactive mode can be accessed
-        # TODO: Currently only works if started from top directory.
+        from functools import partial
         from http.server import HTTPServer, SimpleHTTPRequestHandler
-        print("Server for interactive simulation started. Go to http://127.0.0.1:8000/source/sossim.html to open simulation.")
-        HTTPServer(("", 8000), SimpleHTTPRequestHandler).serve_forever()
+        import os
+        print("Server for interactive simulation started. Go to http://127.0.0.1:8000/sossim/sossim.html to open simulation.")
+        directory = os.path.dirname(os.path.dirname(__file__))
+        print("Serving from directory", directory)
+        HTTPServer(("", 8000), partial(SimpleHTTPRequestHandler, directory = directory)).serve_forever()
     else:
         # If a configuration file was provided, initiate the configuration from that
         if args.configuration_file:
@@ -124,10 +127,13 @@ def batch_mode():
                     print(f"Data for class {table_name}")
                     print(mod.data_collector.get_table_dataframe(table_name), end = "\n\n")
 
-if __name__ == "__main__":
+def main():
     # Check if the file is running in the browser, in which case interactive mode is chosen, and otherwise run it in batch mode.
     if sys.platform == "emscripten":
         import asyncio
         asyncio.create_task(interactive_mode())
     else:
         batch_mode()
+
+if __name__ == "__main__":
+    main()

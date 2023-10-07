@@ -15,9 +15,9 @@ The package can be used either in interactive mode or in batch mode.
 In interactive mode, the simulator runs in the web browser using [pyscript](https://pyscript.net/). 
 The browser fetches the necessary files from a web server.
 
-To run the interactive mode locally run `python source/sossim.py -i`.
+To run the interactive mode locally run `python -m sossim -i`.
 This starts a local web server from which the files can be fetched to a browser running on the same machine.
-Then, open the link [http://127.0.0.1:8000/source/sossim.html](http://127.0.0.1:8000/source/sossim.html) in the browser.
+Then, open the link [http://127.0.0.1:8000/sossim/sossim.html](http://127.0.0.1:8000/sossim/sossim.html) in the browser.
 
 ### Using Docker
 A Dockerfile is provided for running the software without installing Python or any libraries.
@@ -29,13 +29,13 @@ To stop the container, use `docker kill sossim` followed by `docker rm sossim` t
 
 In batch mode, the simulator can be run locally from the command line.
 First, ensure that all required libraries are installed using `pip install -r requirements.txt`.
-Then, run the command `python source/sossim.py`.
-This command can take various command line options, which can be enlisted using `python source/sossim.py -h`.
+Then, run the command `python -m sossim`.
+This command can take various command line options, which can be enlisted using `python -m sossim -h`.
 
 ### Live demonstration
 
 The latest commit to the Github respository is automatically published on Github pages.
-It can be accessed as a [live demonstration](https://jakobaxelsson.github.io/sossim/source/sossim.html).
+It can be accessed as a [live demonstration](https://jakobaxelsson.github.io/sossim/sossim/sossim.html).
 This does not require any local installations whatsoever.
 
 ## Implementation

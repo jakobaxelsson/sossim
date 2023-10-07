@@ -1,0 +1,23 @@
+{
+    "stylesheets": [
+        "sossim.css"
+    ],
+    "packages": [
+        "networkx",
+        "pandas",
+        "domed"
+    ],
+    "files": [
+        "capabilities.py",
+        "configuration.py",
+        "core.py",
+        "datacollection.py",
+        "dynamics.py",
+        "entities.py",
+        "model.py",
+        "space.py",
+        "user_interface.py",
+        "view.py"
+    ],
+    "command": "TBD"
+}

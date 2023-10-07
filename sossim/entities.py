@@ -35,10 +35,10 @@ classDiagram
 """
 from typing import Annotated, Callable, Optional, TYPE_CHECKING
 
-from capabilities import ChargeEnergy, FollowRoute, LoadCargo, UnloadCargo
-from configuration import Configuration, configurable
-import core 
-from space import Node, RoadNetworkGrid
+from sossim.capabilities import ChargeEnergy, FollowRoute, LoadCargo, UnloadCargo
+from sossim.configuration import Configuration, configurable
+import sossim.core as core
+from sossim.space import Node, RoadNetworkGrid
 
 if TYPE_CHECKING:
     import model
@@ -141,6 +141,7 @@ class Vehicle(core.Agent):
 
         # Add a load capacity of the vehicle and a list of cargos
         self.capacity = self.random.choice(range(self.max_load)) + 1
+        # TODO: Shouldn't cargo be a state?
         self.cargos: list["Cargo"] = []
 
         # Add an energy level and initialize it to a random value
@@ -309,6 +310,7 @@ class Cargo(core.Entity):
 
         self.weight = self.random.choice(range(self.max_cargo_weight)) + 1
         self.select_destination()
+        # TODO: Carrier should be a state.
         self.carrier: Vehicle | None = None
 
     def select_destination(self, destination: Optional[Node] = None):

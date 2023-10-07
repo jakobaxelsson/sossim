@@ -19,11 +19,11 @@ import sys
 from typing import Annotated, Any
 import zipfile
 
-from configuration import Configuration, configurable
-import core
-from datacollection import StateDataCollector
-from entities import Cargo, Vehicle
-import space
+from sossim.configuration import Configuration, configurable
+import sossim.core as core
+from sossim.datacollection import StateDataCollector
+from sossim.entities import Cargo, Vehicle
+import sossim.space as space
 
 @configurable
 class TransportSystem(core.Model):
