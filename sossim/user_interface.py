@@ -630,11 +630,12 @@ class UserInterface:
         self.model = model
         self.configuration = configuration
 
-        # Remove load message and set cursor to default
+        # Remove load message, set cursor to default
         with document.query("#load_msg") as e:
             e.remove()
         with document.query("body") as b:
             b["style"] = "cursor: default;"
+        
         # Setup main layout
         with document.query("body"):
             self.menu_bar = MenuBar(self)
