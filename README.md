@@ -35,7 +35,7 @@ This command can take various command line options, which can be enlisted using 
 ### Live demonstration
 
 The latest commit to the Github respository is automatically published on Github pages.
-It can be accessed as a [live demonstration](https://jakobaxelsson.github.io/sossim/sossim/sossim.html).
+It can be accessed as a [live demonstration](https://jakobaxelsson.github.io/sossim/app/sossim.html).
 This does not require any local installations whatsoever.
 
 ## Implementation
