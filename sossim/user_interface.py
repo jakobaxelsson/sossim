@@ -635,7 +635,8 @@ class UserInterface:
             e.remove()
         with document.query("body") as b:
             b["style"] = "cursor: default;"
-        
+        document.unwrap().title = "SoSSim system-of-systems simulator"
+
         # Setup main layout
         with document.query("body"):
             self.menu_bar = MenuBar(self)
