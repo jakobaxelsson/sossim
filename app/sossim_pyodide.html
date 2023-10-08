@@ -1,11 +1,16 @@
 <!-- 
-This is a system-of-systems simulations running in the browser.
+A generic pyodide template for single-page applications built using the domed package.
+It assumes the existance of the following files:
+  - a configuration file pyconfig.toml which mainly specifies the libraries to be loaded
+  - a style sheet app.css
+  - a Python script app.py to be executed
 -->
 
 <html>
     <head>
-        <title>SoS transport simulation</title>
+        <title>Loading app...</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel = "stylesheet" href = "app.css">
         <script src = "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
     </head>
 
@@ -14,47 +19,42 @@ This is a system-of-systems simulations running in the browser.
 
         <script>
             async function main() {
-                // Load application configuration file
-                const config_file = "pyconfig.json"
-                response = await fetch(config_file);
-                config = await response.json();
-
-                // Load stylesheets
-                // TODO: This loads the style sheet, but it is not applied....
-                for (href of config.stylesheets) {
-                    link = document.createElement("link");
-                    link.rel = "stylesheet";
-                    link.type = "style/css";
-                    link.href = href;
-                    document.head.appendChild(link);
-                    console.log("Loaded stylesheet " + href);
-                }
-
                 // Initialize pyodide
                 let pyodide = await loadPyodide();
+
+                // Load application configuration file
+                const config_file = "pyconfig.toml"
+                response = await fetch(config_file);
+                config = await response.text();
+
+                // Extract package information from configuration file
+                lines = config.split("\n");
+                packages = null;
+                for (i = 0; i < lines.length; i++) {
+                    if (lines[i].trim().startsWith("packages")) {
+                        packages = JSON.parse(lines[i].split("=")[1].trim());
+                        break;
+                    }
+                }
+                console.log("Identified packages:" + packages)
 
                 // Install packages
                 await pyodide.loadPackage("micropip");
                 const micropip = pyodide.pyimport("micropip");
-                for (pkg of config.packages) {
+                for (pkg of packages) {
                     await micropip.install(pkg);
                 }
 
-                // Load files
-                for (file of config.files) {
-                    console.log("Loading file " + file)
-                    response = await fetch(file);
-                    content = await response.text()
-                    pyodide.FS.writeFile(file, content, {encoding: "utf8"});
-                    // TODO: This works for top level files, but not for subdirectories.
-                    // Probably, the subdirectories need to be created before the files.
-                    // But how should pyodide discover these files?
-                };
-                // Run command
-                // TODO: Maybe this should be a script name instead?
-                // Maybe it should be "import sossim". But does that run as main?
+                // Run the app.py file
+                await pyodide.runPythonAsync(`
+                        from pyodide.http import pyfetch
+                        response = await pyfetch("app.py")
+                        with open("app.py", "wb") as f:
+                            f.write(await response.bytes())
+                    `)
+                    pkg = pyodide.pyimport("app");
             };
-        main();
+            main();
         </script>
     </body>
 </html>
