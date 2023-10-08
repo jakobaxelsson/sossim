@@ -1,74 +1,90 @@
-# Command line build script for SoSSim, with various flags to control what stages are executed.
+""" 
+Build utility for the SoSSim simulator.
+It can be used as a module providing functions for other scripts.
+It can also be used from the command line, with various flags to control what stages are executed.
+"""
 
 import argparse
 from pathlib import Path
 import os
+import shutil
 
 import mypy.api
 import pdoc
 
-if __name__ == "__main__":
-    # Parse the command line arguments and store them in args.
-    parser = argparse.ArgumentParser(description = "Build the SoSSim simulator.")
-    parser.add_argument("--typecheck",  default = False, action = argparse.BooleanOptionalAction, help = "Run code typecheck")
-    parser.add_argument("--docs",       default = False, action = argparse.BooleanOptionalAction, help = "Generate documentation")
-    parser.add_argument("--pyconfig",   default = False, action = argparse.BooleanOptionalAction, help = "Generate pyscript configuration file")
-    parser.add_argument("--wheel",      default = False, action = argparse.BooleanOptionalAction, help = "Build a wheel file for the sossim package")
-    parser.add_argument("--all",        default = False, action = "store_true",                   help = "Run all build steps")
+app_dir = Path("app")
+dist_dir = Path("dist")
+docs_dir = Path("documentation")
+source_dir = Path("sossim")
 
-    args = parser.parse_args()
+def update_needed(input_files: list[Path], output_file: Path) -> bool:
+    """
+    Returns True if and only if any of the input file has a newer modification time than the output file.
+    
+    Args:
+        input_files (list[Path]): list of input files
+        output_file (Path): output file
 
-    source_dir = Path("sossim")
-    app_dir = Path("app")
+    Returns:
+        bool: True if an input file has a newer modification time than the output file.
+    """
+    o_time = output_file.stat().st_mtime
+    return any([i.stat().st_mtime > o_time for i in input_files])
 
-    # Build steps
+def typechecking():
+    """
+    Typecheck all the python files in the source directory.
+    """
+    for file in source_dir.glob("**/*.py"):
+        # Type check all Python files, except those in the mesa subdirectory.
+        if file.parent.name != "mesa":
+            print(f"Checking {file}")
+            result = mypy.api.run([str(file), "--follow-imports", "silent"])
+            if result[0]:
+                print(result[0])
+            if result[1]:
+                print("\nErrors\n:", result[1])
 
-    # Typechecking
-    if args.typecheck or args.all:
-        print("Typecheck code")
-        for file in source_dir.glob("**/*.py"):
-            # Type check all Python files, except those in the mesa subdirectory.
-            if file.parent.name != "mesa":
-                print(f"Checking {file}")
-                result = mypy.api.run([str(file), "--follow-imports", "silent"])
-                if result[0]:
-                    print(result[0])
-                if result[1]:
-                    print("\nErrors\n:", result[1])
+def generate_docs():
+    """
+    Generate documentation.
+    """
+    # Remove existing files before generating new ones.
+    shutil.rmtree(docs_dir)
+    # Configure and run pdoc on selected files
+    pdoc.render.configure(docformat = "google", mermaid = True)
+    modules = list(source_dir.glob("*.py"))
+    # The following code is based on pdoc.pdoc, but modified to skip files that causes an error.
+    all_modules = {}
+    for module_name in pdoc.extract.walk_specs(modules):
+        try:
+            all_modules[module_name] = pdoc.doc.Module.from_name(module_name)
+        except:
+            print("Cannot document module", module_name)
 
-    # Documentation
-    if args.docs or args.all:
-        print("Generate documentation")
-        target_dir = Path("documentation")
-        # Remove existing files before generating new ones.
-        for file in target_dir.glob("*"):
-            file.unlink()
-        # Configure and run pdoc on selected files
-        pdoc.render.configure(docformat = "google", mermaid = True)
-        modules = list(source_dir.glob("*.py"))
-        # The following code is based on pdoc.pdoc, but modified to skip files that causes an error.
-        all_modules = {}
-        for module_name in pdoc.extract.walk_specs(modules):
-            try:
-                all_modules[module_name] = pdoc.doc.Module.from_name(module_name)
-            except:
-                print("Cannot document module", module_name)
+    for module in all_modules.values():
+        out = pdoc.render.html_module(module, all_modules)
+        outfile = docs_dir / f"{module.fullname.replace('.', '/')}.html"
+        outfile.parent.mkdir(parents=True, exist_ok=True)
+        outfile.write_bytes(out.encode())
 
-        for module in all_modules.values():
-            out = pdoc.render.html_module(module, all_modules)
-            outfile = target_dir / f"{module.fullname.replace('.', '/')}.html"
-            outfile.parent.mkdir(parents=True, exist_ok=True)
-            outfile.write_bytes(out.encode())
+    if index := pdoc.render.html_index(all_modules):
+        (docs_dir / "index.html").write_bytes(index.encode())
 
-        if index := pdoc.render.html_index(all_modules):
-            (target_dir / "index.html").write_bytes(index.encode())
+    if search := pdoc.render.search_index(all_modules):
+        (docs_dir / "search.js").write_bytes(search.encode())
 
-        if search := pdoc.render.search_index(all_modules):
-            (target_dir / "search.js").write_bytes(search.encode())
+def generate_pyconfig_file(force_update: bool = False) -> bool:
+    """
+    Generate the `pyconfig.toml` file used by the interactive browser app.
 
-    # Pyscript configuration file
-    if args.pyconfig or args.all:
-        print("Generate pyconfig.toml file")
+    Args:
+        force_update (bool, optional): update even if no input file changed. Defaults to False.
+
+    Returns:
+        bool: True if an update was performed, False otherwise.
+    """
+    if force_update or update_needed([Path("requirements.txt")], app_dir / "pyconfig.toml"):
         # Generate list of packages from requirements.txt
         with open("requirements.txt") as file:
             packages = file.readlines()
@@ -87,8 +103,63 @@ if __name__ == "__main__":
             f.write("terminal = false\n\n")
             f.write("[splashscreen]\n")
             f.write("enabled = false")
+        return True
+    else:
+        return False
+
+def generate_wheel_file(force_update: bool = False) -> bool:
+    """
+    Generate a wheel file for the sossim package.
+
+    Args:
+        force_update (bool, optional): update even if no input file changed. Defaults to False.
+
+    Returns:
+        bool: True if an update was performed, False otherwise.
+    """
+    # Assume that the wheel dependes on all python files in the source directory
+    modules = list(source_dir.glob("*.py"))
+    # Assume that the generated wheel is the newest wheel file in the dist directory
+    wheel_file = max(dist_dir.glob("*.whl"), key = lambda f: f.stat().st_ctime)
+    if force_update or update_needed(modules, wheel_file):
+        os.system("flit build --format wheel")
+        return True
+    else:
+        return False
+
+if __name__ == "__main__":
+    # Parse the command line arguments and store them in args.
+    parser = argparse.ArgumentParser(description = "Build utility for the SoSSim simulator.")
+    parser.add_argument("--typecheck",  default = False, action = argparse.BooleanOptionalAction, help = "Run code typecheck")
+    parser.add_argument("--docs",       default = False, action = argparse.BooleanOptionalAction, help = "Generate documentation")
+    parser.add_argument("--pyconfig",   default = False, action = argparse.BooleanOptionalAction, help = "Generate pyscript configuration file")
+    parser.add_argument("--wheel",      default = False, action = argparse.BooleanOptionalAction, help = "Build a wheel file for the sossim package")
+    parser.add_argument("--all",        default = False, action = "store_true",                   help = "Run all build steps")
+
+    args = parser.parse_args()
+
+    # Build steps
+
+    # Typechecking
+    if args.typecheck or args.all:
+        print("Typecheck code")
+        typechecking()
+
+    # Documentation
+    if args.docs or args.all:
+        print("Generate documentation")
+        generate_docs()
+
+    # Pyscript configuration file
+    if args.pyconfig or args.all:
+        print("Generate pyconfig.toml file")
+        result = generate_pyconfig_file()
+        if not result:
+            print("No update needed")
 
     # Wheel file for sossim package
     if args.wheel or args.all:
         print("Generating wheel file")
-        os.system("flit build --format wheel")
+        result = generate_wheel_file()
+        if not result:
+            print("No update needed")

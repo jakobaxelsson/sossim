@@ -15,8 +15,9 @@ The package can be used either in interactive mode or in batch mode.
 In interactive mode, the simulator runs in the web browser using [pyscript](https://pyscript.net/). 
 The browser fetches the necessary files from a web server.
 
-To run the interactive mode locally run `python -m sossim -i`.
+To run the interactive mode locally run `python dev_server.py`.
 This starts a local web server from which the files can be fetched to a browser running on the same machine.
+This server also makes sure that generated files are updated, invoking build steps if necessary.
 Then, open the link [http://127.0.0.1:8000/sossim/sossim.html](http://127.0.0.1:8000/sossim/sossim.html) in the browser.
 
 ### Using Docker
@@ -76,6 +77,11 @@ Special syntax is provided to make the specification of parameters relevant to a
 
 For development tasks, there is a utility called `build.py` that automates recurring development tasks, such as type checking, generating documentation, etc.
 Its features can be checked using `python build.py --help`.
+
+During the development of the interactive browser app, the development server should be used.
+It is invoked by `python dev_server.py`.
+It serves the app files to the browser for testing.
+It also ensures that generated app files are updated before being served, invoking necessary build steps.
 
 To install the dependencies required for using development utilities, run `pip install -r requirements_development.txt`.
 
