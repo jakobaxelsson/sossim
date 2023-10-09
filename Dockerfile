@@ -14,4 +14,4 @@ RUN pip install -r requirements.txt
 EXPOSE 8000
 
 # Define the command to run your application
-CMD ["python", "-m", "sossim", "-i"]
+CMD ["python", "dev_server.py"]
