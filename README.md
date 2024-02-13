@@ -18,7 +18,7 @@ The browser fetches the necessary files from a web server.
 To run the interactive mode locally run `python dev_server.py`.
 This starts a local web server from which the files can be fetched to a browser running on the same machine.
 This server is primarily intended for development, and therefore also makes sure that generated files are updated, invoking build steps if necessary.
-Then, open the link [http://127.0.0.1:8000/sossim/sossim.html](http://127.0.0.1:8000/sossim/sossim.html) in the browser.
+Then, open the link [http://127.0.0.1:8000/app/sossim.html](http://127.0.0.1:8000/app/sossim.html) in the browser.
 When files have changed, simply reload the page from the browser.
 
 ### Using Docker

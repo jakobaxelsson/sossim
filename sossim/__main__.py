@@ -16,7 +16,8 @@ async def import_mesa():
     This is a workaround needed since mesa has dependencies that makes it unusable from pyscript or pyodide.
     """
     import micropip # type: ignore
-    await micropip.install("mesa", deps = False)
+    # Version 2.2.0 of Mesa has some breaking changes, so use an older version
+    await micropip.install("mesa==2.1.5", deps = False)
     # It is unclear why the following block is needed, but without it, later imports of mesa sublibraries fail...
     try:
         import mesa # type: ignore
