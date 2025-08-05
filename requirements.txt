@@ -1,3 +1,5 @@
-mesa==2.1.5
+mesa
 networkx
 pandas
+scipy
+tqdm

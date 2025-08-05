@@ -12,7 +12,7 @@ The package can be used either in interactive mode or in batch mode.
 
 ### Interactive mode
 
-In interactive mode, the simulator runs in the web browser using [pyscript](https://pyscript.net/). 
+In interactive mode, the simulator runs in the web browser using [pyodide](https://pyodide.org/). 
 The browser fetches the necessary files from a web server.
 
 To run the interactive mode locally run `python dev_server.py`.
@@ -46,12 +46,14 @@ In this section, some more details are provided on how the software is implement
 
 ### Dependencies
 
-The core of the simulation is an agent-based model developed using the [Mesa](https://mesa.readthedocs.io/) library.
+The core of the simulation is an agent-based model developed using the [Mesa](https://mesa.readthedocs.io/) library (version 3+).
 The Mesa library has some dependencies that are not possible to use in the browser.
 Therefore, a copy of the core modules of Mesa has been included in this repository. 
 
 The simulation takes place on a grid map onto which a randomly generated road network is placed.
 The road network is implemented as a directed graph using the [NetworkX](https://networkx.org/) library.
+
+The software has been tested using Python 3.13, which is supported by Pyodide version 0.28.
 
 ### User interface
 
@@ -63,7 +65,7 @@ However, `domed` works directly on the DOM elements since it executes in the bro
 For development purposes, there is also a Python REPL accessible in the user interface, through the View menu.
 Through this, it is possible to access the user interface object using the variable `ui`.
 This in turn gives access to all parts of the system.
-As an example, to get the list of all agents, evaluate the expression `ui.model.agents()`.
+As an example, to get the list of all agents, evaluate the expression `ui.model.agents`.
 
 ### Configurations
 

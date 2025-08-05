@@ -197,7 +197,7 @@ class TransportSystemView(View):
         # Add agent views
         document.query("#vehicles").clear()
         document.query("#cargos").clear()
-        for agent in ui.model.agents():
+        for agent in ui.model.agents:
             if isinstance(agent, Vehicle):
                 agent.add_view(VehicleView(ui, agent))
             elif isinstance(agent, Cargo):
@@ -210,7 +210,7 @@ class TransportSystemView(View):
         Args:
             model (TransportSystem): the model.
         """
-        t = model.time()
+        t = model.steps
         with document.query("#time") as p:
             p.inner_html(int(t))
 
@@ -688,6 +688,10 @@ class UserInterface:
         """
         Reinitialize the model and its views.
         """
+        # Mesa Model class wrapps the user model's step function.
+        # For reinitialization, this wrapping must be removed to avoid multiple wrappings.
+        self.model.step = self.model._user_step
+
         self.model.__init__(self.configuration)
         self.model.clear_views()
         self.model.add_view(TransportSystemView(self))

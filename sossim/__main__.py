@@ -10,26 +10,13 @@ import zipfile
 
 from sossim.configuration import Configuration
 
-async def import_mesa():
-    """
-    Installs the mesa library when running the interactive simulation.
-    This is a workaround needed since mesa has dependencies that makes it unusable from pyscript or pyodide.
-    """
-    import micropip # type: ignore
-    # Version 2.2.0 of Mesa has some breaking changes, so use an older version
-    await micropip.install("mesa==2.1.5", deps = False)
-    # It is unclear why the following block is needed, but without it, later imports of mesa sublibraries fail...
-    try:
-        import mesa # type: ignore
-    except:
-        pass
-
 async def interactive_mode():
     """
     Runs the simulator in interactive mode in the browser.
     """
     try:
-        await import_mesa()
+        import micropip # type: ignore
+        await micropip.install("mesa", deps = False)
 
         import sossim.model as model
         import sossim.user_interface as user_interface

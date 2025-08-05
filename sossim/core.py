@@ -9,8 +9,7 @@ classDiagram
     `view.Viewable` <|-- Model
     `view.Viewable` <|-- Space
     
-    Model: agents()
-    Model: agent(id)
+    Model: agents
     Model: time()
 
     class WorldModel
@@ -42,56 +41,23 @@ classDiagram
 """
 from typing import Annotated, Self
 
-# A workaround is needed to make mesa work properly in the browser, since the full package contains dependencies that do not work in that environment.
-# Therefore, importing the whole of mesa fails, and instead the few classes needed are imported individually.
-from mesa.model import Model as MesaModel
-from mesa.agent import Agent as MesaAgent
-from mesa.time import StagedActivation
+import mesa
 
 from sossim.view import Viewable
 
-class Model(MesaModel, Viewable):
+class Model(mesa.Model, Viewable):
     """
     A comman base class for SoS models.
     """
     def __init__(self):
         super().__init__()
 
-        # Create time and space, using a staged activation scheduler based on the OODA loop
-        self.schedule = StagedActivation(self, ["observe", "orient", "decide", "act"])
-
-    def agents(self) -> list["Agent"]:
+    def step(self):
         """
-        Returns the agents in the model.
-
-        Returns:
-            list[Agent]: the agents
+        Performs a simulation step using a staged activation bassed on the OODA loop.
         """
-        # We only create core.Agent, and not any other mesa.Agent, so safe to ignore type error
-        return self.schedule.agents # type: ignore
-    
-    def agent(self, id: int) -> "Agent":
-        """
-        Returns the agent with the given id. 
-        If the agent with that id does not exist, a KeyError exception is raised.
-
-        Args:
-            id (int): the agent of the requested agent.
-
-        Returns:
-            Agent: the requested agent.
-        """
-        return self.schedule._agents[id] # type: ignore
-
-    def time(self) -> float:
-        """
-        Returns the current time of the simulation.
-
-        Returns:
-            Float: the time.
-        """
-        # Since we know there must be a scheduler, it is safe to ignore type warning.
-        return self.schedule.time # type: ignore
+        for stage in ["observe", "orient", "decide", "act"]:
+            self.agents.do(stage)
 
 class Space(Viewable):
     """
@@ -132,7 +98,7 @@ class WorldModel:
         """
         pass
 
-class Entity(MesaAgent, Viewable): 
+class Entity(mesa.Agent, Viewable): 
     """
     A common abstract baseclass for entities within a SoS.
     All entities are treated as agents, but not all of them have behavior.
@@ -142,11 +108,10 @@ class Entity(MesaAgent, Viewable):
 
     def __init__(self, model: Model):
         # Create agent, with a unique id.
-        super().__init__(model.next_id(), model)
+        super().__init__(model)
 
         # Add agent to the scheduler
         # Since we know there must be a scheduler, it is safe to ignore type warning
-        model.schedule.add(self) # type: ignore
 
         # Add type information, for type checking
         self.pos: tuple[int, int]

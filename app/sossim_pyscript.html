@@ -1,0 +1,30 @@
+<!doctype html>
+
+<!-- 
+A generic pyscript template for single-page applications built using the domed package.
+It assumes the existance of the following files:
+  - a configuration file pyconfig.toml which mainly specifies the libraries to be loaded
+  - a style sheet app.css
+  - a Python script app.py to be executed
+-->
+
+<html>
+    <head>
+        <title>Loading app...</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel = "stylesheet" href = "app.css">
+        
+        <!-- Pyscript setup -->
+        <script type="module" src="https://pyscript.net/releases/2025.7.3/core.js"></script>
+        <!-- Hide pyscript tags -->
+        <style>
+            py-script { display: none; }    
+        </style>
+    </head>
+
+    <body style = "cursor: wait;">
+        <p id = "load_msg">Loading app...</p>
+        <py-config src = "pyconfig.toml"></py-config>
+        <py-script src = "app.py"></py-script>
+   </body>
+</html>

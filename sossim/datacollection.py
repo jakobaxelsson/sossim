@@ -27,8 +27,8 @@ class StateDataCollector(DataCollector):
         Args:
             model (core.Model): the model for which data is to be collected.
         """
-        time = model.schedule.time
-        for agent in model.agents():
+        time = model.steps
+        for agent in model.agents:
             table_name = type(agent).__name__
             for var in self.tables[table_name]:
                 if var == "time":

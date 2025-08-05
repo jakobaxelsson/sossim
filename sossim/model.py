@@ -11,7 +11,7 @@ classDiagram
     TransportSystem: to_archive_content(...)
 ```
 """
-from datetime import datetime
+from datetime import datetime, timezone
 import io
 import json
 import random
@@ -40,7 +40,7 @@ class TransportSystem(core.Model):
         Args:
             configuration (Configuration): the configuration of parameters from which the model is generated.
         """
-        self.generation_start_time = datetime.utcnow()
+        self.generation_start_time = datetime.now(timezone.utc)
 
         # Initialize superclass and configuration
         super().__init__()
@@ -70,13 +70,13 @@ class TransportSystem(core.Model):
         else:
             self.data_collector = None
 
-        self.generation_end_time = datetime.utcnow()
+        self.generation_end_time = datetime.now(timezone.utc)
 
     def step(self):
         """
         Performs a simulation step and updates the views.
         """
-        self.schedule.step()
+        super().step()
         self.update_views()
         if self.data_collector:
             self.data_collector.collect(self)
